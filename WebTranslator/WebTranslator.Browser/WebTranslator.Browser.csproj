@@ -24,6 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AvaloniaResource Include="Assets\SourceHanSansCN.otf" />
+      <Folder Include="Assets\" />
     </ItemGroup>
 </Project>

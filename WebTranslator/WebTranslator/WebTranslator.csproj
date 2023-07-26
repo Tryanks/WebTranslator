@@ -27,4 +27,8 @@
     <ItemGroup>
       <WasmExtraFilesToDeploy Include="Assets\translator.ico" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controls\" />
+    </ItemGroup>
 </Project>

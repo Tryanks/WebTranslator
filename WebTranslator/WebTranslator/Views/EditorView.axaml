@@ -1,0 +1,61 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WebTranslator.Views.EditorView"
+             x:DataType="vm:EditorViewModel"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:vm="clr-namespace:WebTranslator.ViewModels"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives">
+    <Design.DataContext>
+        <vm:EditorViewModel />
+    </Design.DataContext>
+    
+    <UserControl.Styles>
+        <Style Selector="avaloniaEdit|TextEditor">
+            <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
+            <Setter Property="ShowLineNumbers" Value="True" />
+            <Setter Property="WordWrap" Value="True" />
+        </Style>
+        <Style Selector="ui|FABorder">
+            <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
+            <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Loaded="GridLoaded" RowDefinitions="Auto,*,Auto,*">
+        <TextBlock Grid.Row="0" HorizontalAlignment="Center">原文</TextBlock>
+        <ui:FABorder Grid.Row="1">
+            <avaloniaEdit:TextEditor
+                IsReadOnly="True"
+                Document="{Binding SourceDoc}"
+                Name="SyntaxEditor1">
+                <avaloniaEdit:TextEditor.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Copy" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}"/>
+                    </MenuFlyout>
+                </avaloniaEdit:TextEditor.ContextFlyout>
+            </avaloniaEdit:TextEditor>
+        </ui:FABorder>
+        
+        <TextBlock Grid.Row="2" HorizontalAlignment="Center">译文</TextBlock>
+        <ui:FABorder Grid.Row="3">
+            <avaloniaEdit:TextEditor
+                Document="{Binding TransDoc}"
+                Name="SyntaxEditor2">
+                <avaloniaEdit:TextEditor.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Paste" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}"/>
+                        <MenuItem Header="Cut" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}"/>
+                        <MenuItem Header="Copy" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}"/>
+                    </MenuFlyout>
+                </avaloniaEdit:TextEditor.ContextFlyout>
+            </avaloniaEdit:TextEditor>
+        </ui:FABorder>
+    </Grid>
+</UserControl>

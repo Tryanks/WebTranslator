@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Media;
 using Avalonia.ReactiveUI;
 
 namespace WebTranslator.Desktop;
@@ -17,7 +18,17 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .WithInterFont()
+            // .WithInterFont()
+            .With(new FontManagerOptions
+            {
+                FontFallbacks = new[]
+                {
+                    new FontFallback
+                    {
+                        FontFamily = new FontFamily("avares://WebTranslator/Assets/SourceHanSansCN.otf#Source Han Sans CN"),
+                    }
+                }
+            })
             .LogToTrace()
             .UseReactiveUI();
 }

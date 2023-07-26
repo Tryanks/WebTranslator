@@ -3,7 +3,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace WebTranslator.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class EditorViewModel : ViewModelBase
 {
     [Reactive] public TextDocument SourceDoc { get; set; } = new();
     [Reactive] public TextDocument TransDoc { get; set; } = new();
