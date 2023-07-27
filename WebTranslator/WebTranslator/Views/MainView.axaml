@@ -4,6 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.MainView"
-             xmlns:views="clr-namespace:WebTranslator.Views">
-    <views:EditorView Margin="{StaticResource FlyoutContentThemePadding}" />
+             xmlns:vm="clr-namespace:WebTranslator.ViewModels"
+             x:DataType="vm:MainViewModel"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:ic="using:FluentAvalonia.FluentIcons">
+    <ui:NavigationView
+        Name="NavView"
+        IsSettingsVisible="False"
+        Loaded="NavView_OnLoaded"
+        SelectionChanged="NavView_OnSelectionChanged">
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Tag="OpenFile" IconSource="{ic:FluentIconSource FolderOpen24Regular}" Content="打开文件" />
+            <ui:NavigationViewItem Tag="Editor" IconSource="{ic:FluentIconSource Translate24Regular}" Content="翻译" />
+            <ui:NavigationViewItem Tag="ExportFile" IconSource="{ic:FluentIconSource Save24Regular}" Content="导出文件" />
+        </ui:NavigationView.MenuItems>
+    </ui:NavigationView>
 </UserControl>

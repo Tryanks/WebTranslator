@@ -8,7 +8,8 @@
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives">
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:ic="using:FluentAvalonia.FluentIcons">
     <Design.DataContext>
         <vm:EditorViewModel />
     </Design.DataContext>
@@ -28,31 +29,33 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid Loaded="GridLoaded" RowDefinitions="Auto,*,Auto,*">
+    <Grid Loaded="GridLoaded" RowDefinitions="Auto,*,Auto,Auto,*" MaxWidth="1000" Margin="{DynamicResource FlyoutContentPadding}">
         <TextBlock Grid.Row="0" HorizontalAlignment="Center">原文</TextBlock>
-        <ui:FABorder Grid.Row="1">
+        <ui:FABorder Grid.Row="1" Background="{DynamicResource TextControlBackground}">
             <avaloniaEdit:TextEditor
                 IsReadOnly="True"
                 Document="{Binding SourceDoc}"
                 Name="SyntaxEditor1">
                 <avaloniaEdit:TextEditor.ContextFlyout>
                     <MenuFlyout>
-                        <MenuItem Header="Copy" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}"/>
+                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
                     </MenuFlyout>
                 </avaloniaEdit:TextEditor.ContextFlyout>
             </avaloniaEdit:TextEditor>
         </ui:FABorder>
         
-        <TextBlock Grid.Row="2" HorizontalAlignment="Center">译文</TextBlock>
-        <ui:FABorder Grid.Row="3">
+        <Grid Grid.Row="2" Height="8" />
+        
+        <TextBlock Grid.Row="3" HorizontalAlignment="Center">译文</TextBlock>
+        <ui:FABorder Grid.Row="4" Background="{DynamicResource TextControlBackground}">
             <avaloniaEdit:TextEditor
                 Document="{Binding TransDoc}"
                 Name="SyntaxEditor2">
                 <avaloniaEdit:TextEditor.ContextFlyout>
                     <MenuFlyout>
-                        <MenuItem Header="Paste" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}"/>
-                        <MenuItem Header="Cut" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}"/>
-                        <MenuItem Header="Copy" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}"/>
+                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>
+                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}" Icon="{ic:FluentIcon Cut24Regular}"/>
+                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
                     </MenuFlyout>
                 </avaloniaEdit:TextEditor.ContextFlyout>
             </avaloniaEdit:TextEditor>
