@@ -4,12 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.OpenFileView"
-             xmlns:views="clr-namespace:WebTranslator.Views"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:OpenFileViewModel"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:ic="using:FluentAvalonia.FluentIcons">
     
     <UserControl.Styles>
@@ -41,7 +39,7 @@
     
     <Grid RowDefinitions="Auto,*,Auto" MaxWidth="1000" Margin="{DynamicResource FlyoutContentPadding}">
         <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="{DynamicResource FlyoutContentThemeMargin}" FontSize="{StaticResource TabItemHeaderFontSize}">请选择打开语言文件的方式</TextBlock>
-        <TabControl Grid.Row="1" Margin="{DynamicResource FlyoutContentThemeMargin}">
+        <TabControl Grid.Row="1" Margin="{DynamicResource FlyoutContentThemeMargin}" SelectedIndex="{Binding SelectedIndex,Mode=OneWayToSource}">
             <TabItem Header="Github链接">
                 <Border Classes="Card">
                     <StackPanel>
@@ -59,7 +57,7 @@
                         </Grid>
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Click="Button_OnClickEn">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding DialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -72,7 +70,7 @@
                         </WrapPanel>
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Click="Button_OnClickZh">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding DialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -84,7 +82,18 @@
                                 Margin="{DynamicResource FlyoutContentThemeMargin}"/>
                         </WrapPanel>
                         <Separator Opacity="0" Height="24"/>
-                        <Button HorizontalAlignment="Right">下一步</Button>
+                        <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button>
+                        <ui:TaskDialog
+                            Name="DialogShow"
+                            Title="Show File Content"
+                            SubHeader=""
+                            FooterVisibility="Never"
+                            IsFooterExpanded="False"
+                            ShowProgressBar="False">
+                            <ui:TaskDialog.Buttons>
+                                <ui:TaskDialogButton Text="Close" DialogResult="Close"/>
+                            </ui:TaskDialog.Buttons>
+                        </ui:TaskDialog>
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -117,7 +126,7 @@
                                 </avaloniaEdit:TextEditor.ContextFlyout>
                             </avaloniaEdit:TextEditor>
                         </ui:FABorder>
-                        <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Margin="0,24,0,0">下一步</Button>
+                        <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Margin="0,24,0,0" Command="{Binding NextCommand}">下一步</Button>
                     </Grid>
                 </Border>
             </TabItem>
@@ -125,23 +134,10 @@
                 <Border Classes="Card">
                     <StackPanel>
                         <Button>打开文件</Button>
-                        <Button HorizontalAlignment="Right" Margin="0,24,0,0">下一步</Button>
+                        <Button HorizontalAlignment="Right" Margin="0,24,0,0" Command="{Binding NextCommand}">下一步</Button>
                     </StackPanel>
                 </Border>
             </TabItem>
         </TabControl>
-        
-        <!-- ReSharper disable once Xaml.MissingGridIndex -->
-        <ui:TaskDialog
-            Name="DialogShow"
-            Title="Show File Content"
-            SubHeader=""
-            FooterVisibility="Never"
-            IsFooterExpanded="False"
-            ShowProgressBar="False">
-            <ui:TaskDialog.Buttons>
-                <ui:TaskDialogButton Text="Close" DialogResult="Close"/>
-            </ui:TaskDialog.Buttons>
-        </ui:TaskDialog>
     </Grid>
 </UserControl>
