@@ -28,6 +28,7 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
+        
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -41,17 +42,12 @@ public partial class MainView : UserControl
     private void NavView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
     {
         if (e.SelectedItem is not NavigationViewItem item) return;
-        switch (item.Tag)
+        NavView.Content = item.Tag switch
         {
-            case "OpenFile":
-                NavView.Content = OpenFilePage;
-                break;
-            case "Editor":
-                NavView.Content = EditorPage;
-                break;
-            case "ExportFile":
-                NavView.Content = ExportFilePage;
-                break;
-        }
+            "OpenFile" => OpenFilePage,
+            "Editor" => EditorPage,
+            "ExportFile" => ExportFilePage,
+            _ => NavView.Content
+        };
     }
 }

@@ -57,7 +57,7 @@
                         </Grid>
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding ShowDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -70,7 +70,7 @@
                         </WrapPanel>
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding ShowDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -93,7 +93,8 @@
                         <TextBlock Grid.Row="0" Grid.Column="1" Margin="{DynamicResource FlyoutContentThemeMargin}">zh_cn.json</TextBlock>
                         <ui:FABorder Grid.Row="1" Grid.Column="0" Background="{DynamicResource TextControlBackground}">
                             <avaloniaEdit:TextEditor
-                                Name="InputEn">
+                                Name="InputEn"
+                                Document="{Binding EnDocument}">
                                 <avaloniaEdit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputEn, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>
@@ -105,7 +106,8 @@
                         </ui:FABorder>
                         <ui:FABorder Grid.Row="1" Grid.Column="1" Background="{DynamicResource TextControlBackground}">
                             <avaloniaEdit:TextEditor
-                                Name="InputZh">
+                                Name="InputZh"
+                                Document="{Binding ZhDocument}">
                                 <avaloniaEdit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputZh, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>

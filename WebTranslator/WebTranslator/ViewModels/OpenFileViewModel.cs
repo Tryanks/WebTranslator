@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
+using AvaloniaEdit.Document;
 using ReactiveUI.Fody.Helpers;
 using WebTranslator.Models;
 
@@ -7,13 +8,14 @@ namespace WebTranslator.ViewModels;
 
 public class OpenFileViewModel : ViewModelBase
 {
+    [Reactive] public JsonReader? OutJson { get; private set; }
     [Reactive] public Notification? NotifyMsg { get; private set; }
     [Reactive] public DialogMsg? ShowDialog { get; private set; }
     [Reactive] public string GithubLink { get; set; } = "";
     [Reactive] public string GithubLinkEnStatus { get; set; } = "未获取";
-    public string EnText { get; set; } = "";
+    public string GithubEnText { get; set; } = "";
     [Reactive] public string GithubLinkZhStatus { get; set; } = "未获取";
-    public string ZhText { get; set; } = "";
+    public string GithubZhText { get; set; } = "";
     [Reactive] public string OpenFileEnStatus { get; set; } = "未打开文件";
     public string FileZhText { get; set; } = "";
     [Reactive] public string OpenFileZhStatus { get; set; } = "未打开文件";
@@ -34,76 +36,34 @@ public class OpenFileViewModel : ViewModelBase
         Task.Run(async () =>
         {
             GithubLinkEnStatus = "获取中...";
-            EnText = await Utils.GetGithubText(GithubLink + "en_us.json");
-            GithubLinkEnStatus = !string.IsNullOrEmpty(EnText) ? "获取成功" : "获取失败";
+            GithubEnText = await Utils.GetGithubText(GithubLink + "en_us.json");
+            GithubLinkEnStatus = !string.IsNullOrEmpty(GithubEnText) ? "获取成功" : "获取失败";
         });
         Task.Run(async () =>
         {
             GithubLinkZhStatus = "获取中...";
-            ZhText = await Utils.GetGithubText(GithubLink + "zh_cn.json");
-            GithubLinkZhStatus = !string.IsNullOrEmpty(ZhText) ? "获取成功" : "获取失败";
+            GithubZhText = await Utils.GetGithubText(GithubLink + "zh_cn.json");
+            GithubLinkZhStatus = !string.IsNullOrEmpty(GithubZhText) ? "获取成功" : "获取失败";
         });
     }
-    [Reactive] public int SelectedIndex { get; set; }
-    public void NextCommand()
-    {
-        switch (SelectedIndex)
-        {
-            case 0:
-                // Github链接
-                break;
-            case 1:
-                // 输入json
-                break;
-            case 2:
-                // 选择文件
-                break;
-        }
-    }
-
-    // private bool CheckGithub(out JsonReader en, out JsonReader zh)
-    // {
-    //     
-    // }
-    //
-    // private bool CheckJson(out JsonReader en, out JsonReader zh)
-    // {
-    //     
-    // }
-    //
-    // private bool CheckOpenFile(out JsonReader en, out JsonReader zh)
-    // {
-    //     
-    // }
-    //
-    private bool CheckJsonText(string en, string zh, out JsonReader? json)
-    {
-        if (string.IsNullOrEmpty(en))
-        {
-            Notify("错误", "英文文件内容为空", NotificationType.Error);
-            json = null;
-            return false;
-        }
-        json = new JsonReader(en);
-        if (string.IsNullOrEmpty(zh))
-            Notify("提示", "中文文件内容为空，将自动创建空文件", NotificationType.Information);
-        zh = "{}";
-        json.SetZhText(zh);
-        return true;
-    }
-
-    public void ShowDialogCommand(string s)
+    
+    public void GithubDialogCommand(string s)
     {
         switch (s)
         {
             case "en_us":
-                Dialog(s, EnText);
+                Dialog(s, GithubEnText);
                 break;
             case "zh_cn":
-                Dialog(s, ZhText);
+                Dialog(s, GithubZhText);
                 break;
         }
     }
+    
+    [Reactive] public TextDocument EnDocument { get; set; } = new();
+    [Reactive] public TextDocument ZhDocument { get; set; } = new();
+    private string EnDocumentText => EnDocument.Text;
+    private string ZhDocumentText => ZhDocument.Text;
 
     public void OpenFileCommand()
     {
@@ -121,6 +81,64 @@ public class OpenFileViewModel : ViewModelBase
                 Dialog(s, FileZhText);
                 break;
         }
+    }
+    
+    [Reactive] public int SelectedIndex { get; set; }
+    public void NextCommand()
+    {
+        JsonReader? openJson = null;
+        switch (SelectedIndex)
+        {
+            case 0:
+                // Github Link
+                if (GithubLinkEnStatus is "未获取" or "获取失败")
+                {
+                    Notify("错误", "英文文件未获取", NotificationType.Error);
+                    break;
+                }
+
+                if (CheckJsonText(GithubEnText, GithubZhText, out openJson))
+                    OutJson = openJson;
+                break;
+            case 1:
+                // Input File
+                if (CheckJsonText(EnDocumentText, ZhDocumentText, out openJson))
+                    OutJson = openJson;
+                break;
+            case 2:
+                // Open File
+                if (OpenFileEnStatus is "未打开文件" or "打开失败")
+                {
+                    Notify("错误", "英文文件未打开", NotificationType.Error);
+                    break;
+                }
+                if (CheckJsonText(FileEnText, FileZhText, out openJson))
+                    OutJson = openJson;
+                break;
+        }
+
+        if (OutJson == openJson)
+        {
+            Notify("提示", "文件已打开", NotificationType.Information);
+        }
+    }
+    
+    private bool CheckJsonText(string en, string zh, out JsonReader? json)
+    {
+        if (string.IsNullOrEmpty(en))
+        {
+            Notify("错误", "英文文件内容为空", NotificationType.Error);
+            json = null;
+            return false;
+        }
+        json = new JsonReader(en);
+        if (string.IsNullOrEmpty(zh))
+        {
+            Notify("提示", "中文文件内容为空，将自动创建空文件", NotificationType.Information);
+            zh = "{}";
+        }
+        json.SetZhText(zh);
+        return true;
     }
 
     private void Notify(string title, string content, NotificationType type)
