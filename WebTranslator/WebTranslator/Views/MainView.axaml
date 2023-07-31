@@ -11,12 +11,11 @@
     <ui:NavigationView
         Name="NavView"
         IsSettingsVisible="False"
-        Loaded="NavView_OnLoaded"
         SelectionChanged="NavView_OnSelectionChanged">
         <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem Tag="OpenFile" IconSource="{ic:FluentIconSource FolderOpen24Regular}" Content="打开文件" />
+            <ui:NavigationViewItem Tag="OpenFile" IconSource="{ic:FluentIconSource FolderOpen24Regular}" Content="打开文件" IsSelected="True" />
             <ui:NavigationViewItem Tag="Editor" IconSource="{ic:FluentIconSource Translate24Regular}" Content="翻译" />
             <ui:NavigationViewItem Tag="ExportFile" IconSource="{ic:FluentIconSource Save24Regular}" Content="导出文件" />
         </ui:NavigationView.MenuItems>
-    </ui:NavigationView>
+    </ui:NavigationView>    
 </UserControl>

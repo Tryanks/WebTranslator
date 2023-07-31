@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
@@ -29,12 +30,12 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
-    private void NavView_OnLoaded(object? sender, RoutedEventArgs e)
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        base.OnAttachedToVisualTree(e);
         OpenFilePage.DataContext = OpenFileViewModel;
         EditorPage.DataContext = EditorViewModel;
         ExportFilePage.DataContext = ExportFileViewModel;
-        NavView.SelectedItem = NavView.MenuItems[0];
     }
 
     private void NavView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)

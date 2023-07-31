@@ -57,7 +57,7 @@
                         </Grid>
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding DialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -70,7 +70,7 @@
                         </WrapPanel>
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding DialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -133,8 +133,35 @@
             <TabItem Header="打开本地文件">
                 <Border Classes="Card">
                     <StackPanel>
-                        <Button>打开文件</Button>
-                        <Button HorizontalAlignment="Right" Margin="0,24,0,0" Command="{Binding NextCommand}">下一步</Button>
+                        <Button Command="{Binding OpenFileCommand}">打开文件</Button>
+                        <Separator Opacity="0" Height="24"/>
+                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
+                                <ic:FluentIcon Icon="Textbox24Regular" />
+                            </Button>
+                            <Separator Opacity="0" Width="20"/>
+                            <TextBlock VerticalAlignment="Center">en_us.json</TextBlock>
+                            <Separator Opacity="0" Width="20"/>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding OpenFileEnStatus}"
+                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
+                        </WrapPanel>
+                        <Separator Opacity="0" Height="8"/>
+                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
+                                <ic:FluentIcon Icon="Textbox24Regular" />
+                            </Button>
+                            <Separator Opacity="0" Width="20"/>
+                            <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock>
+                            <Separator Opacity="0" Width="20"/>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding OpenFileZhStatus}"
+                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
+                        </WrapPanel>
+                        <Separator Opacity="0" Height="24"/>
+                        <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button>
                     </StackPanel>
                 </Border>
             </TabItem>

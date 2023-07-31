@@ -9,13 +9,17 @@ namespace WebTranslator.ViewModels;
 
 public class OpenFileViewModel : ViewModelBase
 {
-    [Reactive] public Notification? notifyMsg { get; set; }
-    [Reactive] public DialogMsg? showDialog { get; set; }
+    [Reactive] public Notification? NotifyMsg { get; private set; }
+    [Reactive] public DialogMsg? ShowDialog { get; private set; }
     [Reactive] public string GithubLink { get; set; } = "";
     [Reactive] public string GithubLinkEnStatus { get; set; } = "未获取";
     public string EnText { get; set; } = "";
     [Reactive] public string GithubLinkZhStatus { get; set; } = "未获取";
     public string ZhText { get; set; } = "";
+    [Reactive] public string OpenFileEnStatus { get; set; } = "未打开文件";
+    public string FileZhText { get; set; } = "";
+    [Reactive] public string OpenFileZhStatus { get; set; } = "未打开文件";
+    public string FileEnText { get; set; } = "";
     public void CheckGithubLink()
     {
         if (string.IsNullOrEmpty(GithubLink))
@@ -74,23 +78,23 @@ public class OpenFileViewModel : ViewModelBase
     //     
     // }
     //
-    private bool CheckJsonText(string en, string zh, out JsonReader? enReader, out JsonReader? zhReader)
+    private bool CheckJsonText(string en, string zh, out JsonReader? json)
     {
         if (string.IsNullOrEmpty(en))
         {
             Notify("错误", "英文文件内容为空", NotificationType.Error);
-            enReader = null;
-            zhReader = null;
+            json = null;
             return false;
         }
-        enReader = new JsonReader(en);
-        zhReader = new JsonReader(zh);
+        json = new JsonReader(en);
         if (string.IsNullOrEmpty(zh))
             Notify("提示", "中文文件内容为空，将自动创建空文件", NotificationType.Information);
+        zh = "{}";
+        json.SetZhText(zh);
         return true;
     }
 
-    public void DialogCommand(string s)
+    public void GithubDialogCommand(string s)
     {
         switch (s)
         {
@@ -101,24 +105,41 @@ public class OpenFileViewModel : ViewModelBase
                 Dialog(s, ZhText);
                 break;
         }
+    }
 
+    public void OpenFileCommand()
+    {
+        Notify("提示", "暂不支持打开文件", NotificationType.Information);
+    }
+    
+    public void OpenFileDialogCommand(string s)
+    {
+        switch (s)
+        {
+            case "en_us":
+                Dialog(s, FileEnText);
+                break;
+            case "zh_cn":
+                Dialog(s, FileZhText);
+                break;
+        }
     }
     
     private void Notify(string title, string content, NotificationType type)
     {
-        notifyMsg = new Notification(title, content, type);
+        NotifyMsg = new Notification(title, content, type);
     }
     
     private void Dialog(string title, string content)
     {
-        showDialog = new DialogMsg(title, content);
+        ShowDialog = new DialogMsg(title, content);
     }
 }
 
 public class DialogMsg
 {
-    public string Title { get; set; }
-    public string Content { get; set; }
+    public string Title { get; }
+    public string Content { get; }
     
     public DialogMsg(string title, string content)
     {

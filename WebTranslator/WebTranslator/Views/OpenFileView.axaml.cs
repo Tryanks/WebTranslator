@@ -10,7 +10,7 @@ namespace WebTranslator.Views;
 
 public partial class OpenFileView : UserControl
 {
-    public WindowNotificationManager? NotifyHost { get; set; }
+    private WindowNotificationManager? NotifyHost { get; set; }
     public OpenFileView()
     {
         InitializeComponent();
@@ -19,18 +19,18 @@ public partial class OpenFileView : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        var topLevel = TopLevel.GetTopLevel(this);
-        NotifyHost = new WindowNotificationManager(topLevel)
+        if (NotifyHost is not null) return;
+        NotifyHost = new WindowNotificationManager(TopLevel.GetTopLevel(this))
             { MaxItems = 3, Position = NotificationPosition.BottomRight };
         this.WhenAnyValue(x => x.DataContext)
             .Subscribe(data =>
             {
                 var context = data as OpenFileViewModel;
                 // NotifyWindow
-                context.WhenAnyValue(x => x.notifyMsg)
+                context.WhenAnyValue(x => x.NotifyMsg)
                     .Subscribe(msg => NotifyHost?.Show(msg!));
                 // TaskDialog
-                context.WhenAnyValue(x => x.showDialog)
+                context.WhenAnyValue(x => x.ShowDialog)
                     .Subscribe(d =>
                     {
                         DialogShow.Title = d?.Title;
@@ -39,20 +39,4 @@ public partial class OpenFileView : UserControl
                     });
             });
     }
-    
-    // private void Button_OnClickZh(object? sender, RoutedEventArgs e)
-    // {
-    //     var data = DataContext as OpenFileViewModel;
-    //     DialogShow.Content = data?.ZhText;
-    //     DialogShow.Title = "zh_cn.json";
-    //     DialogShow.ShowAsync();
-    // }
-    //
-    // private void Button_OnClickEn(object? sender, RoutedEventArgs e)
-    // {
-    //     var data = DataContext as OpenFileViewModel;
-    //     DialogShow.Content = data?.EnText;
-    //     DialogShow.Title = "en_us.json";
-    //     DialogShow.ShowAsync();
-    // }
 }
