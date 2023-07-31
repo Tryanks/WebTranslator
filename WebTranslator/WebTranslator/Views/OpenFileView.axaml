@@ -57,7 +57,7 @@
                         </Grid>
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding ShowDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -70,7 +70,7 @@
                         </WrapPanel>
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
+                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding ShowDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
                                 <ic:FluentIcon Icon="Textbox24Regular" />
                             </Button>
                             <Separator Opacity="0" Width="20"/>
@@ -83,17 +83,6 @@
                         </WrapPanel>
                         <Separator Opacity="0" Height="24"/>
                         <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button>
-                        <ui:TaskDialog
-                            Name="DialogShow"
-                            Title="Show File Content"
-                            SubHeader=""
-                            FooterVisibility="Never"
-                            IsFooterExpanded="False"
-                            ShowProgressBar="False">
-                            <ui:TaskDialog.Buttons>
-                                <ui:TaskDialogButton Text="Close" DialogResult="Close"/>
-                            </ui:TaskDialog.Buttons>
-                        </ui:TaskDialog>
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -166,5 +155,18 @@
                 </Border>
             </TabItem>
         </TabControl>
+        
+        <!-- ReSharper disable once Xaml.MissingGridIndex -->
+        <ui:TaskDialog
+            Name="DialogShow"
+            Title="Show File Content"
+            SubHeader=""
+            FooterVisibility="Never"
+            IsFooterExpanded="False"
+            ShowProgressBar="False">
+            <ui:TaskDialog.Buttons>
+                <ui:TaskDialogButton Text="Close" DialogResult="Close"/>
+            </ui:TaskDialog.Buttons>
+        </ui:TaskDialog>
     </Grid>
 </UserControl>

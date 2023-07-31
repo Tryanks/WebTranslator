@@ -1,7 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
-using AvaloniaEdit.Document;
 using ReactiveUI.Fody.Helpers;
 using WebTranslator.Models;
 
@@ -94,7 +92,7 @@ public class OpenFileViewModel : ViewModelBase
         return true;
     }
 
-    public void GithubDialogCommand(string s)
+    public void ShowDialogCommand(string s)
     {
         switch (s)
         {
@@ -124,7 +122,7 @@ public class OpenFileViewModel : ViewModelBase
                 break;
         }
     }
-    
+
     private void Notify(string title, string content, NotificationType type)
     {
         NotifyMsg = new Notification(title, content, type);
@@ -139,7 +137,7 @@ public class OpenFileViewModel : ViewModelBase
 public class DialogMsg
 {
     public string Title { get; }
-    public string Content { get; }
+    public string Content { get;  }
     
     public DialogMsg(string title, string content)
     {
