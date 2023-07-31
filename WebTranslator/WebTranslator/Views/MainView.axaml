@@ -9,13 +9,14 @@
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentAvalonia.FluentIcons">
     <ui:NavigationView
+        OpenPaneLength="250"
         Name="NavView"
         IsSettingsVisible="False"
         SelectionChanged="NavView_OnSelectionChanged">
         <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem Tag="OpenFile" IconSource="{ic:FluentIconSource FolderOpen24Regular}" Content="打开文件" IsSelected="True" />
-            <ui:NavigationViewItem Tag="Editor" IconSource="{ic:FluentIconSource Translate24Regular}" Content="翻译" />
-            <ui:NavigationViewItem Tag="ExportFile" IconSource="{ic:FluentIconSource Save24Regular}" Content="导出文件" />
+            <ui:NavigationViewItem MaxWidth="300" Tag="OpenFile" IconSource="{ic:FluentIconSource FolderOpen24Regular}" Content="打开" IsSelected="True" />
+            <ui:NavigationViewItem MaxWidth="300" Tag="Editor" IconSource="{ic:FluentIconSource Translate24Regular}" Content="翻译" />
+            <ui:NavigationViewItem MaxWidth="300" Tag="ExportFile" IconSource="{ic:FluentIconSource Save24Regular}" Content="导出" />
         </ui:NavigationView.MenuItems>
     </ui:NavigationView>    
 </UserControl>

@@ -77,13 +77,7 @@ public partial class EditorContentView : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void SyntaxEditor1_OnLoaded(object? sender, RoutedEventArgs e)
-    {
-	    var editor = sender as AvaloniaEdit.TextEditor;
-	    editor!.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
-    }
-
-    private void SyntaxEditor2_OnLoaded(object? sender, RoutedEventArgs e)
+    private void SyntaxEditorLoaded(object? sender, RoutedEventArgs e)
     {
 	    var editor = sender as AvaloniaEdit.TextEditor;
 	    editor!.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);

@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using AvaloniaEdit.Document;
+using AvaloniaEdit.Utils;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WebTranslator.Models;
 
@@ -15,8 +17,7 @@ public class EditorViewModel : ViewModelBase
         var content = new EditorContent();
         reader.ElementList.ForEach(e =>
         {
-            content.SourceText += e.EnValue + "\n";
-            content.TransText += e.ZhValue + "\n";
+            content.AddItem(e.EnValue, e.ZhValue);
         });
         string header;
         if (reader.CfID == "" && reader.ModID != "")
@@ -47,6 +48,14 @@ public class EditorContent : ViewModelBase
 {
     [Reactive] public TextDocument SourceDoc { get; set; } = new();
     [Reactive] public TextDocument TransDoc { get; set; } = new();
+    [Reactive] public ObservableCollection<EditorListItem> EditorList { get; set; } = new();
+    [Reactive] public int SelectedIndex { get; set; } = -1;
+    public void AddItem(string en, string zh)
+    {
+        EditorList.Add(new EditorListItem(en, zh));
+        if (SelectedIndex == -1)
+            SelectedIndex = 0;
+    }
     public string SourceText
     {
         get => SourceDoc.Text;
@@ -57,5 +66,25 @@ public class EditorContent : ViewModelBase
     {
         get => TransDoc.Text;
         set => TransDoc.Text = value;
+    }
+}
+
+public class EditorListItem : ViewModelBase
+{
+    [Reactive] public string EnText { get; set; }
+    [Reactive] public string ZhText { get; set; }
+    [Reactive] public bool IsTranslated { get; set; } = false;
+
+    public EditorListItem(string en, string zh)
+    {
+        EnText = en;
+        this.WhenAnyValue(x => x.ZhText).Subscribe(s =>
+        {
+            if (s != "" && s != EnText)
+                IsTranslated = true;
+            else
+                IsTranslated = false;
+        });
+        ZhText = zh;
     }
 }
