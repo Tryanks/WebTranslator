@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WebTranslator.Models;
 
-public static class Utils
+public static partial class Utils
 {
     public static string GithubConvert(string link)
     {
@@ -38,4 +39,23 @@ public static class Utils
         var text = Encoding.UTF8.GetString(bytes);
         return text;
     }
+
+    private static readonly Regex CfIdRegex = CfRegex();
+
+    private static readonly Regex ModIdRegex = ModRegex();
+
+    public static string GithubGetCfId(string link)
+    {
+        return CfIdRegex.Match(link).Groups[1].Value;
+    }
+    
+    public static string GithubGetModId(string link)
+    {
+        return ModIdRegex.Match(link).Groups[1].Value;
+    }
+
+    [GeneratedRegex("assets/([^/]*)(?=/)")]
+    private static partial Regex CfRegex();
+    [GeneratedRegex("assets/[^/]*/([^/]*)(?=/)")]
+    private static partial Regex ModRegex();
 }

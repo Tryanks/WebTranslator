@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
-using Avalonia.Interactivity;
 using AvaloniaEdit.Utils;
 using ReactiveUI;
 using WebTranslator.ViewModels;

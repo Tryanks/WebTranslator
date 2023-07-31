@@ -16,7 +16,7 @@ public partial class EditorView : UserControl
         InitializeComponent();
     }
     
-    private void GridLoaded(object? sender, RoutedEventArgs e)
+    private void TabViewLoaded(object? sender, RoutedEventArgs e)
     {
         var xshdText = """
 <?xml version="1.0"?>
@@ -73,7 +73,7 @@ public partial class EditorView : UserControl
         var reader = new XmlTextReader(new StringReader(xshdText));
         var xshd = HighlightingLoader.LoadXshd(reader);
         reader.Close();
-        SyntaxEditor1.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
-        SyntaxEditor2.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
+        // SyntaxEditor1.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
+        // SyntaxEditor2.SyntaxHighlighting = HighlightingLoader.Load(xshd, HighlightingManager.Instance);
     }
 }

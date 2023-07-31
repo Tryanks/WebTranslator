@@ -32,17 +32,17 @@ public class OpenFileViewModel : ViewModelBase
             Notify("错误", "Github链接无效", NotificationType.Error);
             return;
         }
-        GithubLink = Utils.GithubConvert(GithubLink);
+        var link = Utils.GithubConvert(GithubLink);
         Task.Run(async () =>
         {
             GithubLinkEnStatus = "获取中...";
-            GithubEnText = await Utils.GetGithubText(GithubLink + "en_us.json");
+            GithubEnText = await Utils.GetGithubText(link + "en_us.json");
             GithubLinkEnStatus = !string.IsNullOrEmpty(GithubEnText) ? "获取成功" : "获取失败";
         });
         Task.Run(async () =>
         {
             GithubLinkZhStatus = "获取中...";
-            GithubZhText = await Utils.GetGithubText(GithubLink + "zh_cn.json");
+            GithubZhText = await Utils.GetGithubText(link + "zh_cn.json");
             GithubLinkZhStatus = !string.IsNullOrEmpty(GithubZhText) ? "获取成功" : "获取失败";
         });
     }
@@ -98,7 +98,11 @@ public class OpenFileViewModel : ViewModelBase
                 }
 
                 if (CheckJsonText(GithubEnText, GithubZhText, out openJson))
+                {
+                    openJson!.CfID = Utils.GithubGetCfId(GithubLink);
+                    openJson.ModID = Utils.GithubGetModId(GithubLink);
                     OutJson = openJson;
+                }
                 break;
             case 1:
                 // Input File
@@ -115,11 +119,6 @@ public class OpenFileViewModel : ViewModelBase
                 if (CheckJsonText(FileEnText, FileZhText, out openJson))
                     OutJson = openJson;
                 break;
-        }
-
-        if (OutJson == openJson)
-        {
-            Notify("提示", "文件已打开", NotificationType.Information);
         }
     }
     

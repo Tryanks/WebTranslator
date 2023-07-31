@@ -7,6 +7,8 @@ namespace WebTranslator.Models;
 
 public partial class JsonReader
 {
+    public string CfID { get; set; } = "";
+    public string ModID { get; set; } = "";
     private string OriginalText { get; set; }
     private List<string> JsonSplits { get; set; }
     public readonly List<TransElement> ElementList = new();
