@@ -25,27 +25,30 @@
             <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
         </Style>
     </UserControl.Styles>
-    <ui:TabView
-        TabItems="{Binding EditorPages}"
-        IsAddTabButtonVisible="False"
-        CanDragTabs="False"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch"
-        SelectedItem="{Binding SelectedEditorPage}">
-        <ui:TabView.TabItemTemplate>
-            <DataTemplate x:DataType="vm:EditorPageModel">
-                <ui:TabViewItem
-                    Header="{Binding Header}"
-                    Content="{Binding EditorContent}"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch">
-                    <ui:TabViewItem.ContentTemplate>
-                        <DataTemplate x:DataType="vm:EditorContent">
-                            <views:EditorContentView />
-                        </DataTemplate>
-                    </ui:TabViewItem.ContentTemplate>
-                </ui:TabViewItem>
-            </DataTemplate>
-        </ui:TabView.TabItemTemplate>
-    </ui:TabView>
+    <Grid>
+        <ui:TabView
+            TabItems="{Binding EditorPages}"
+            IsAddTabButtonVisible="False"
+            CanDragTabs="False"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            SelectedItem="{Binding SelectedEditorPage}">
+            <ui:TabView.TabItemTemplate>
+                <DataTemplate x:DataType="vm:EditorPageModel">
+                    <ui:TabViewItem
+                        Header="{Binding Header}"
+                        Content="{Binding}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch">
+                        <ui:TabViewItem.ContentTemplate>
+                            <DataTemplate x:DataType="vm:EditorPageModel">
+                                <views:EditorContentView />
+                            </DataTemplate>
+                        </ui:TabViewItem.ContentTemplate>
+                    </ui:TabViewItem>
+                </DataTemplate>
+            </ui:TabView.TabItemTemplate>
+        </ui:TabView>
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsEmpty}">看起来你还没有打开任何语言文件</TextBlock>
+    </Grid>
 </UserControl>

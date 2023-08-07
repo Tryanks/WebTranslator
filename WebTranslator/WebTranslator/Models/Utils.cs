@@ -8,6 +8,14 @@ namespace WebTranslator.Models;
 
 public static partial class Utils
 {
+    public static string FileLinkConvert(string link)
+    {
+        if (string.IsNullOrEmpty(link)) return "";
+        if (!link.EndsWith("json") || !link.EndsWith("lang")) return "";
+        return link.Replace("https://github.com", "https://raw.githubusercontent.com")
+            .Replace("/raw/", "/");
+    }
+    
     public static string GithubConvert(string link)
     {
         if (string.IsNullOrEmpty(link)) return "";
