@@ -48,6 +48,28 @@ public static partial class Utils
         return text;
     }
 
+    public static async Task<string> Request(string link)
+    {
+        if (string.IsNullOrEmpty(link)) return "";
+        var client = new HttpClient();
+        // 添加超时
+        client.Timeout = TimeSpan.FromSeconds(10);
+        // 当 404 时直接返回空字符串
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.GetAsync(link);
+            if (!response.IsSuccessStatusCode) return "";
+        }
+        catch (Exception)
+        {
+            return "";
+        }
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+        var text = Encoding.UTF8.GetString(bytes);
+        return text;
+    }
+
     private static readonly Regex CfIdRegex = CfRegex();
 
     private static readonly Regex ModIdRegex = ModRegex();

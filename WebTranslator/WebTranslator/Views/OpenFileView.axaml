@@ -156,6 +156,70 @@
                     </StackPanel>
                 </Border>
             </TabItem>
+            <TabItem Header="打开 Pull Request">
+                <StackPanel>
+                    <ui:SettingsExpander Header="PR编号">
+                        <ui:SettingsExpander.Footer>
+                            <ui:NumberBox
+                                Grid.Column="0"
+                                Maximum="9999"
+                                Minimum="0"
+                                SpinButtonPlacementMode="Inline"
+                                MinWidth="150"
+                                Value="123"/>
+                        </ui:SettingsExpander.Footer>
+                    </ui:SettingsExpander>
+                </StackPanel>
+                <!-- <Border Classes="Card"> -->
+                <!--     <StackPanel> -->
+                <!--         <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto"> -->
+                <!--             ~1~ <TextBox @1@ -->
+                <!--             ~1~     Grid.Column="0" @1@ -->
+                <!--             ~1~     Watermark="请输入Github项目语言文件夹的链接" @1@ -->
+                <!--             ~1~     MaxLines="1" @1@ -->
+                <!--             ~1~     TextWrapping="NoWrap" @1@ -->
+                <!--             ~1~     HorizontalAlignment="Stretch" @1@ -->
+                <!--             ~1~     VerticalAlignment="Top" @1@ -->
+                <!--             ~1~     Margin="{DynamicResource FlyoutContentThemeMargin}" @1@ -->
+                <!--             ~1~     Text="{Binding GithubLink}"/> @1@ -->
+                <!--             <ui:NumberBox -->
+                <!--                 Grid.Column="0" -->
+                <!--                 Maximum="9999" -->
+                <!--                 Minimum="0" -->
+                <!--                 Text="{Binding PullRequestNumber}"/> -->
+                <!--             <Button Grid.Column="1" Command="{Binding CheckGithubLink}">点击校验</Button> -->
+                <!--         </Grid> -->
+                <!--         <Separator Opacity="0" Height="24"/> -->
+                <!--         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > -->
+                <!--             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览"> -->
+                <!--                 <ic:FluentIcon Icon="Textbox24Regular" /> -->
+                <!--             </Button> -->
+                <!--             <Separator Opacity="0" Width="20"/> -->
+                <!--             <TextBlock VerticalAlignment="Center">en_us.json</TextBlock> -->
+                <!--             <Separator Opacity="0" Width="20"/> -->
+                <!--             <TextBlock -->
+                <!--                 VerticalAlignment="Center" -->
+                <!--                 Text="{Binding GithubLinkEnStatus}" -->
+                <!--                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> -->
+                <!--         </WrapPanel> -->
+                <!--         <Separator Opacity="0" Height="8"/> -->
+                <!--         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > -->
+                <!--             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览"> -->
+                <!--                 <ic:FluentIcon Icon="Textbox24Regular" /> -->
+                <!--             </Button> -->
+                <!--             <Separator Opacity="0" Width="20"/> -->
+                <!--             <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock> -->
+                <!--             <Separator Opacity="0" Width="20"/> -->
+                <!--             <TextBlock -->
+                <!--                 VerticalAlignment="Center" -->
+                <!--                 Text="{Binding GithubLinkZhStatus}" -->
+                <!--                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> -->
+                <!--         </WrapPanel> -->
+                <!--         <Separator Opacity="0" Height="24"/> -->
+                <!--         <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button> -->
+                <!--     </StackPanel> -->
+                <!-- </Border> -->
+            </TabItem>
         </TabControl>
         
         <!-- ReSharper disable once Xaml.MissingGridIndex -->

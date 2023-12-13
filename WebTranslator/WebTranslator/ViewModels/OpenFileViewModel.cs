@@ -119,6 +119,10 @@ public class OpenFileViewModel : ViewModelBase
                 if (CheckJsonText(FileEnText, FileZhText, out openJson))
                     OutJson = openJson;
                 break;
+            case 3:
+                // Review PR
+                Notify("提示", "暂不支持Review PR", NotificationType.Information);
+                break;
         }
     }
     
