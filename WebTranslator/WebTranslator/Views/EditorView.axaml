@@ -8,9 +8,9 @@
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:views="clr-namespace:WebTranslator.Views"
-             xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
-             xmlns:ic="using:FluentAvalonia.FluentIcons">
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
+             xmlns:fap="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="avaloniaEdit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -19,36 +19,36 @@
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="ui|FABorder">
+        <Style Selector="fa|FABorder">
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
             <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
         </Style>
     </UserControl.Styles>
     <Grid>
-        <ui:TabView
+        <fa:TabView
             TabItems="{Binding EditorPages}"
             IsAddTabButtonVisible="False"
             CanDragTabs="False"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             SelectedItem="{Binding SelectedEditorPage}">
-            <ui:TabView.TabItemTemplate>
+            <fa:TabView.TabItemTemplate>
                 <DataTemplate x:DataType="vm:EditorPageModel">
-                    <ui:TabViewItem
+                    <fa:TabViewItem
                         Header="{Binding Header}"
                         Content="{Binding}"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch">
-                        <ui:TabViewItem.ContentTemplate>
+                        <fa:TabViewItem.ContentTemplate>
                             <DataTemplate x:DataType="vm:EditorPageModel">
                                 <views:EditorContentView />
                             </DataTemplate>
-                        </ui:TabViewItem.ContentTemplate>
-                    </ui:TabViewItem>
+                        </fa:TabViewItem.ContentTemplate>
+                    </fa:TabViewItem>
                 </DataTemplate>
-            </ui:TabView.TabItemTemplate>
-        </ui:TabView>
+            </fa:TabView.TabItemTemplate>
+        </fa:TabView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsEmpty}">看起来你还没有打开任何语言文件</TextBlock>
     </Grid>
 </UserControl>

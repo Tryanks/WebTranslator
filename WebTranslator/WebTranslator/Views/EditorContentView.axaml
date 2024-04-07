@@ -7,9 +7,9 @@
              x:DataType="vm:EditorPageModel"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
-             xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
-             xmlns:ic="using:FluentAvalonia.FluentIcons">
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
+             xmlns:fap="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="avaloniaEdit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -18,7 +18,7 @@
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="ui|FABorder">
+        <Style Selector="fa|FABorder">
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
             <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
@@ -43,8 +43,8 @@
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:EditorListItem">
                     <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                        <ic:FluentIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Green" Icon="Checkmark16Filled" IsVisible="{Binding IsTranslated}" />
-                        <ic:FluentIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Red" Icon="Dismiss16Filled" IsVisible="{Binding !IsTranslated}" />
+                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
+                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
                         <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding EnText}" TextTrimming="CharacterEllipsis" />
                         <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12" Foreground="{DynamicResource TextFillColorDisabled}" Text="{Binding ZhText}" TextTrimming="CharacterEllipsis" />
                     </Grid>
@@ -64,7 +64,11 @@
                         Name="SyntaxEditor1">
                         <avaloniaEdit:TextEditor.ContextFlyout>
                             <MenuFlyout>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="Copy"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </MenuFlyout>
                         </avaloniaEdit:TextEditor.ContextFlyout>
                     </avaloniaEdit:TextEditor>
@@ -81,9 +85,21 @@
                         Name="SyntaxEditor2">
                         <avaloniaEdit:TextEditor.ContextFlyout>
                             <MenuFlyout>
-                                <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>
-                                <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}" Icon="{ic:FluentIcon Cut24Regular}"/>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
+                                <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="ClipboardPaste"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="Cut"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="Copy"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </MenuFlyout>
                         </avaloniaEdit:TextEditor.ContextFlyout>
                     </avaloniaEdit:TextEditor>

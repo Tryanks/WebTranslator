@@ -7,8 +7,8 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:OpenFileViewModel"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentAvalonia.FluentIcons">
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     
     <UserControl.Styles>
         <Style Selector="avaloniaEdit|TextEditor">
@@ -18,7 +18,7 @@
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="ui|FABorder">
+        <Style Selector="fa|FABorder">
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
@@ -58,7 +58,7 @@
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
                             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
-                                <ic:FluentIcon Icon="Textbox24Regular" />
+                                <ic:SymbolIcon Symbol="Textbox"/>
                             </Button>
                             <Separator Opacity="0" Width="20"/>
                             <TextBlock VerticalAlignment="Center">en_us.json</TextBlock>
@@ -71,7 +71,7 @@
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
                             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
-                                <ic:FluentIcon Icon="Textbox24Regular" />
+                                <ic:SymbolIcon Symbol="Textbox"/>
                             </Button>
                             <Separator Opacity="0" Width="20"/>
                             <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock>
@@ -91,32 +91,56 @@
                     <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,*">
                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="{DynamicResource FlyoutContentThemeMargin}">en_us.json</TextBlock>
                         <TextBlock Grid.Row="0" Grid.Column="1" Margin="{DynamicResource FlyoutContentThemeMargin}">zh_cn.json</TextBlock>
-                        <ui:FABorder Grid.Row="1" Grid.Column="0" Background="{DynamicResource TextControlBackground}">
+                        <fa:FABorder Grid.Row="1" Grid.Column="0" Background="{DynamicResource TextControlBackground}">
                             <avaloniaEdit:TextEditor
                                 Name="InputEn"
                                 Document="{Binding EnDocument}">
                                 <avaloniaEdit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
-                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputEn, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>
-                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputEn, Path=Cut}" Icon="{ic:FluentIcon Cut24Regular}"/>
-                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputEn, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
+                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputEn, Path=Paste}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="ClipboardPaste"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputEn, Path=Cut}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Cut"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputEn, Path=Copy}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Copy"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </MenuFlyout>
                                 </avaloniaEdit:TextEditor.ContextFlyout>
                             </avaloniaEdit:TextEditor>
-                        </ui:FABorder>
-                        <ui:FABorder Grid.Row="1" Grid.Column="1" Background="{DynamicResource TextControlBackground}">
+                        </fa:FABorder>
+                        <fa:FABorder Grid.Row="1" Grid.Column="1" Background="{DynamicResource TextControlBackground}">
                             <avaloniaEdit:TextEditor
                                 Name="InputZh"
                                 Document="{Binding ZhDocument}">
                                 <avaloniaEdit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
-                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputZh, Path=Paste}" Icon="{ic:FluentIcon ClipboardPaste24Regular}"/>
-                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputZh, Path=Cut}" Icon="{ic:FluentIcon Cut24Regular}"/>
-                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputZh, Path=Copy}" Icon="{ic:FluentIcon Copy24Regular}"/>
+                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputZh, Path=Paste}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="ClipboardPaste"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputZh, Path=Cut}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Cut"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputZh, Path=Copy}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Copy"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </MenuFlyout>
                                 </avaloniaEdit:TextEditor.ContextFlyout>
                             </avaloniaEdit:TextEditor>
-                        </ui:FABorder>
+                        </fa:FABorder>
                         <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Margin="0,24,0,0" Command="{Binding NextCommand}">下一步</Button>
                     </Grid>
                 </Border>
@@ -128,7 +152,7 @@
                         <Separator Opacity="0" Height="24"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
                             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
-                                <ic:FluentIcon Icon="Textbox24Regular" />
+                                <ic:SymbolIcon Symbol="Textbox"/>
                             </Button>
                             <Separator Opacity="0" Width="20"/>
                             <TextBlock VerticalAlignment="Center">en_us.json</TextBlock>
@@ -141,7 +165,7 @@
                         <Separator Opacity="0" Height="8"/>
                         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
                             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
-                                <ic:FluentIcon Icon="Textbox24Regular" />
+                                <ic:SymbolIcon Symbol="Textbox"/>
                             </Button>
                             <Separator Opacity="0" Width="20"/>
                             <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock>
@@ -158,17 +182,17 @@
             </TabItem>
             <TabItem Header="打开 Pull Request">
                 <StackPanel>
-                    <ui:SettingsExpander Header="PR编号">
-                        <ui:SettingsExpander.Footer>
-                            <ui:NumberBox
+                    <fa:SettingsExpander Header="PR编号">
+                        <fa:SettingsExpander.Footer>
+                            <fa:NumberBox
                                 Grid.Column="0"
                                 Maximum="9999"
                                 Minimum="0"
                                 SpinButtonPlacementMode="Inline"
                                 MinWidth="150"
                                 Value="123"/>
-                        </ui:SettingsExpander.Footer>
-                    </ui:SettingsExpander>
+                        </fa:SettingsExpander.Footer>
+                    </fa:SettingsExpander>
                 </StackPanel>
                 <!-- <Border Classes="Card"> -->
                 <!--     <StackPanel> -->
@@ -223,16 +247,16 @@
         </TabControl>
         
         <!-- ReSharper disable once Xaml.MissingGridIndex -->
-        <ui:TaskDialog
+        <fa:TaskDialog
             Name="DialogShow"
             Title="Show File Content"
             SubHeader=""
             FooterVisibility="Never"
             IsFooterExpanded="False"
             ShowProgressBar="False">
-            <ui:TaskDialog.Buttons>
-                <ui:TaskDialogButton Text="Close" DialogResult="Close"/>
-            </ui:TaskDialog.Buttons>
-        </ui:TaskDialog>
+            <fa:TaskDialog.Buttons>
+                <fa:TaskDialogButton Text="Close" DialogResult="Close"/>
+            </fa:TaskDialog.Buttons>
+        </fa:TaskDialog>
     </Grid>
 </UserControl>
