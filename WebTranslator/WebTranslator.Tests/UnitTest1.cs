@@ -63,4 +63,13 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         var GithubFileInfos = GithubHelper.GetLanguageFilesAsync(link).Result;
         foreach (var githubFileInfo in GithubFileInfos) testOutputHelper.WriteLine(githubFileInfo.Content().Result);
     }
+
+    [Fact]
+    public void TestGithubHelper()
+    {
+        const string link =
+            "https://raw.githubusercontent.com/CFPAOrg/Minecraft-Mod-Language-Package/main/projects/1.20-fabric/assets/better-than-bunnies-fabric/betterthanbunnies/lang/zh_cn.json";
+        var info = new GitHubFileInfo("zh_cn.json", link);
+        testOutputHelper.WriteLine(info.Content().Result);
+    }
 }

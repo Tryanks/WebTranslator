@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using WebTranslator.Services;
 
 namespace WebTranslator.Models;
 
@@ -84,15 +85,15 @@ public struct GitHubFileInfo(string name, string url)
 {
     public string Name { get; } = name;
     private string DownloadUrl { get; } = url;
-    private string? content { get; set; }
+    private string? _content { get; set; }
 
     public async Task<string> Content()
     {
-        if (content != null) return content;
+        if (_content != null) return _content;
         var url = "https://mirror.ghproxy.com/" +
                   (DownloadUrl.StartsWith("https://") ? DownloadUrl.Remove(0, "https://".Length) : DownloadUrl);
-        content = await GithubHelper.GetGithubTextAsync(url);
-
-        return content;
+        _content = await GithubHelper.GetGithubTextAsync(url);
+        ToastService.Notify("下载", url);
+        return _content;
     }
 }

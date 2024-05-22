@@ -3,8 +3,10 @@ using System.Text.RegularExpressions;
 using Avalonia.Controls.Notifications;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
+using FluentAvalonia.UI.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using WebTranslator.Controls;
 using WebTranslator.Models;
 using WebTranslator.Services;
 
@@ -60,24 +62,72 @@ public class OpenFileViewModel : ViewModelBase
         var link = GithubHelper.GithubConvert(GithubLink);
         GithubLanguageChoice.IsLoading = false;
         GithubLanguageChoice.Success = false;
-        DialogService.ShowDialogAsync("GithubCommit");
-        ToastService.Notify("提示", "正在获取文件列表，请稍后");
-        var infos = await GithubHelper.GetLanguageFilesAsync(link);
-        if (infos.Count == 0)
+
+        var dialog = new ContentDialog
         {
-            ToastService.Notify("错误", "获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
+            Title = "Load Github Files",
+            PrimaryButtonText = "Confirm",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            IsPrimaryButtonEnabled = false,
+            Content = new ConfirmDialog
+            {
+                DataContext = GithubLanguageChoice
+            }
+        };
+
+        var confirm = true;
+
+        dialog.Opened += DialogLoaded;
+        dialog.PrimaryButtonClick += DialogConfirmed;
+        dialog.Closed += DialogClosed;
+
+        await dialog.ShowAsync();
+        return;
+
+        async void DialogLoaded(object? sender, object? e)
+        {
+            dialog.Opened -= DialogLoaded;
+
+            GithubLanguageChoice.IsLoading = true;
+
+            ToastService.Notify("提示", "正在获取文件列表，请稍后");
+            var infos = await GithubHelper.GetLanguageFilesAsync(link);
+            if (infos.Count == 0)
+            {
+                ToastService.Notify("错误", "获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
+                GithubLanguageChoice.IsLoading = false;
+                return;
+            }
+
+            ToastService.Notify("提示", "获取文件列表成功");
+
+            dialog.IsPrimaryButtonEnabled = true;
+            GithubLanguageChoice.SetGithubFileInfos(infos);
             GithubLanguageChoice.IsLoading = false;
-            return;
+            GithubLanguageChoice.Success = true;
         }
 
-        ToastService.Notify("提示", "获取文件列表成功");
+        void DialogConfirmed(object? sender, object? e)
+        {
+            dialog.PrimaryButtonClick -= DialogConfirmed;
+            confirm = true;
+        }
 
-        GithubLanguageChoice.SetGithubFileInfos(infos);
-        GithubLanguageChoice.IsLoading = false;
-        GithubLanguageChoice.Success = true;
+        async void DialogClosed(object? sender, object? e)
+        {
+            dialog.Closed -= DialogClosed;
+            if (!confirm) return;
+
+            // GithubConfirmCommand();
+
+            OriginalText = await GithubLanguageChoice.SelectOriginal!.Value.Content();
+            TranslatedText = await GithubLanguageChoice.SelectTranslated!.Value.Content();
+            TabSelectedIndex = 1;
+        }
     }
 
-    public void GithubConfirmCommand()
+    public async void GithubConfirmCommand()
     {
         if (!GithubLanguageChoice.Success)
         {
@@ -91,9 +141,10 @@ public class OpenFileViewModel : ViewModelBase
             return;
         }
 
+        OriginalText = await GithubLanguageChoice.SelectOriginal!.Value.Content();
+        TranslatedText = await GithubLanguageChoice.SelectTranslated!.Value.Content();
+
         TabSelectedIndex = 1;
-        OriginalText = GithubLanguageChoice.SelectOriginal!.Value.Content().Result;
-        TranslatedText = GithubLanguageChoice.SelectTranslated!.Value.Content().Result;
     }
 
     public void OpenFileCommand(string s)
@@ -122,6 +173,11 @@ internal class LanguageChoice : ViewModelBase
     [Reactive] public List<GitHubFileInfo> FileInfos { get; set; } = [];
     [Reactive] public GitHubFileInfo? SelectOriginal { get; set; }
     [Reactive] public GitHubFileInfo? SelectTranslated { get; set; }
+
+    public void ConfirmCommand()
+    {
+        ToastService.Notify("title", "Confirm Command");
+    }
 
     public void SetGithubFileInfos(List<GitHubFileInfo> fileInfos)
     {

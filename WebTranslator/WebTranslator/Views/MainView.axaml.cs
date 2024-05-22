@@ -1,5 +1,5 @@
-using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using WebTranslator.Services;
 
 namespace WebTranslator.Views;
@@ -11,9 +11,9 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    protected override void OnLoaded(RoutedEventArgs e)
     {
-        base.OnAttachedToVisualTree(e);
+        base.OnLoaded(e);
         ToastService.Set(TopLevel.GetTopLevel(this));
     }
 }
