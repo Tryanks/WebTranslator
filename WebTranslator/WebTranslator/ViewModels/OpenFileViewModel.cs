@@ -1,168 +1,167 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Avalonia.Controls.Notifications;
 using AvaloniaEdit.Document;
+using AvaloniaEdit.Utils;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WebTranslator.Models;
+using WebTranslator.Services;
 
 namespace WebTranslator.ViewModels;
 
 public class OpenFileViewModel : ViewModelBase
 {
-    [Reactive] public JsonReader? OutJson { get; private set; }
-    [Reactive] public Notification? NotifyMsg { get; private set; }
-    [Reactive] public DialogMsg? ShowDialog { get; private set; }
-    [Reactive] public string GithubLink { get; set; } = "";
-    [Reactive] public string GithubLinkEnStatus { get; set; } = "未获取";
-    public string GithubEnText { get; set; } = "";
-    [Reactive] public string GithubLinkZhStatus { get; set; } = "未获取";
-    public string GithubZhText { get; set; } = "";
-    [Reactive] public string OpenFileEnStatus { get; set; } = "未打开文件";
-    public string FileZhText { get; set; } = "";
-    [Reactive] public string OpenFileZhStatus { get; set; } = "未打开文件";
-    public string FileEnText { get; set; } = "";
-    public void CheckGithubLink()
+    public OpenFileViewModel()
+    {
+        this.WhenAnyValue(x => x.GithubLink).Subscribe(link => { GithubLinkStatus.CheckLink(link); });
+    }
+
+    [Reactive] public uint TabSelectedIndex { get; set; }
+    [Reactive]
+    public string GithubLink { get; set; } =
+#if DEBUG
+        "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/main/projects/1.20-fabric/assets/better-than-bunnies-fabric/betterthanbunnies/lang";
+#else
+        "";
+#endif
+    [Reactive] internal GithubLinkStatus GithubLinkStatus { get; set; } = new();
+    [Reactive] internal LanguageChoice GithubLanguageChoice { get; set; } = new();
+    [Reactive] public bool EnableDocument { get; set; }
+    [Reactive] public TextDocument OriginalDocument { get; set; } = new();
+    [Reactive] public TextDocument TranslatedDocument { get; set; } = new();
+
+    private string OriginalText
+    {
+        get => OriginalDocument.Text;
+        set => OriginalDocument.Replace(0, OriginalDocument.TextLength, value);
+    }
+
+    private string TranslatedText
+    {
+        get => TranslatedDocument.Text;
+        set => TranslatedDocument.Replace(0, TranslatedDocument.TextLength, value);
+    }
+
+    public async void GithubCommand()
     {
         if (string.IsNullOrEmpty(GithubLink))
         {
-            Notify("错误", "Github链接不可为空", NotificationType.Error);
+            ToastService.Notify("打开失败", "Github 链接为空", NotificationType.Warning);
             return;
         }
-        if (!GithubLink.StartsWith("https://github.com") || !GithubLink.EndsWith("/lang"))
+
+        if (!GithubLinkStatus.Passed())
         {
-            Notify("错误", "Github链接无效", NotificationType.Error);
+            ToastService.Notify("打开失败", "输入的链接不满足条件", NotificationType.Warning);
             return;
         }
-        var link = Utils.GithubConvert(GithubLink);
-        Task.Run(async () =>
-        {
-            GithubLinkEnStatus = "获取中...";
-            GithubEnText = await Utils.GetGithubText(link + "en_us.json");
-            GithubLinkEnStatus = !string.IsNullOrEmpty(GithubEnText) ? "获取成功" : "获取失败";
-        });
-        Task.Run(async () =>
-        {
-            GithubLinkZhStatus = "获取中...";
-            GithubZhText = await Utils.GetGithubText(link + "zh_cn.json");
-            GithubLinkZhStatus = !string.IsNullOrEmpty(GithubZhText) ? "获取成功" : "获取失败";
-        });
-    }
-    
-    public void GithubDialogCommand(string s)
-    {
-        switch (s)
-        {
-            case "en_us":
-                Dialog(s, GithubEnText);
-                break;
-            case "zh_cn":
-                Dialog(s, GithubZhText);
-                break;
-        }
-    }
-    
-    [Reactive] public TextDocument EnDocument { get; set; } = new();
-    [Reactive] public TextDocument ZhDocument { get; set; } = new();
-    private string EnDocumentText => EnDocument.Text;
-    private string ZhDocumentText => ZhDocument.Text;
 
-    public void OpenFileCommand()
-    {
-        Notify("提示", "暂不支持打开文件", NotificationType.Information);
-    }
-    
-    public void OpenFileDialogCommand(string s)
-    {
-        switch (s)
+        var link = GithubHelper.GithubConvert(GithubLink);
+        GithubLanguageChoice.IsLoading = false;
+        GithubLanguageChoice.Success = false;
+        DialogService.ShowDialogAsync("GithubCommit");
+        ToastService.Notify("提示", "正在获取文件列表，请稍后");
+        var infos = await GithubHelper.GetLanguageFilesAsync(link);
+        if (infos.Count == 0)
         {
-            case "en_us":
-                Dialog(s, FileEnText);
-                break;
-            case "zh_cn":
-                Dialog(s, FileZhText);
-                break;
+            ToastService.Notify("错误", "获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
+            GithubLanguageChoice.IsLoading = false;
+            return;
         }
-    }
-    
-    [Reactive] public int SelectedIndex { get; set; }
-    public void NextCommand()
-    {
-        JsonReader? openJson = null;
-        switch (SelectedIndex)
-        {
-            case 0:
-                // Github Link
-                if (GithubLinkEnStatus is "未获取" or "获取失败")
-                {
-                    Notify("错误", "英文文件未获取", NotificationType.Error);
-                    break;
-                }
 
-                if (CheckJsonText(GithubEnText, GithubZhText, out openJson))
-                {
-                    openJson!.CfID = Utils.GithubGetCfId(GithubLink);
-                    openJson.ModID = Utils.GithubGetModId(GithubLink);
-                    OutJson = openJson;
-                }
-                break;
-            case 1:
-                // Input File
-                if (CheckJsonText(EnDocumentText, ZhDocumentText, out openJson))
-                    OutJson = openJson;
-                break;
-            case 2:
-                // Open File
-                if (OpenFileEnStatus is "未打开文件" or "打开失败")
-                {
-                    Notify("错误", "英文文件未打开", NotificationType.Error);
-                    break;
-                }
-                if (CheckJsonText(FileEnText, FileZhText, out openJson))
-                    OutJson = openJson;
-                break;
-            case 3:
-                // Review PR
-                Notify("提示", "暂不支持Review PR", NotificationType.Information);
-                break;
-        }
-    }
-    
-    private bool CheckJsonText(string en, string zh, out JsonReader? json)
-    {
-        if (string.IsNullOrEmpty(en))
-        {
-            Notify("错误", "英文文件内容为空", NotificationType.Error);
-            json = null;
-            return false;
-        }
-        json = new JsonReader(en);
-        if (string.IsNullOrEmpty(zh))
-        {
-            Notify("提示", "中文文件内容为空，将自动创建空文件", NotificationType.Information);
-            zh = "{}";
-        }
-        json.SetZhText(zh);
-        return true;
+        ToastService.Notify("提示", "获取文件列表成功");
+
+        GithubLanguageChoice.SetGithubFileInfos(infos);
+        GithubLanguageChoice.IsLoading = false;
+        GithubLanguageChoice.Success = true;
     }
 
-    private void Notify(string title, string content, NotificationType type)
+    public void GithubConfirmCommand()
     {
-        NotifyMsg = new Notification(title, content, type);
+        if (!GithubLanguageChoice.Success)
+        {
+            ToastService.Notify("错误", "请先获取文件列表", NotificationType.Error);
+            return;
+        }
+
+        if (GithubLanguageChoice.SelectOriginal is null || GithubLanguageChoice.SelectTranslated is null)
+        {
+            ToastService.Notify("错误", "请选择原文和译文文件", NotificationType.Error);
+            return;
+        }
+
+        TabSelectedIndex = 1;
+        OriginalText = GithubLanguageChoice.SelectOriginal!.Value.Content().Result;
+        TranslatedText = GithubLanguageChoice.SelectTranslated!.Value.Content().Result;
     }
-    
-    private void Dialog(string title, string content)
+
+    public void OpenFileCommand(string s)
     {
-        ShowDialog = new DialogMsg(title, content);
+        var word = s switch
+        {
+            "Folder" => "文件夹",
+            "Original" => "原文文件",
+            "Translated" => "译文文件",
+            _ => "未知文件"
+        };
+        ToastService.Notify("提示", "暂不支持打开" + word);
+    }
+
+    public void ManualInputCommand()
+    {
+        TabSelectedIndex = 1;
+        EnableDocument = true;
     }
 }
 
-public class DialogMsg
+internal class LanguageChoice : ViewModelBase
 {
-    public string Title { get; }
-    public string Content { get;  }
-    
-    public DialogMsg(string title, string content)
+    [Reactive] public bool IsLoading { get; set; }
+    [Reactive] public bool Success { get; set; }
+    [Reactive] public List<GitHubFileInfo> FileInfos { get; set; } = [];
+    [Reactive] public GitHubFileInfo? SelectOriginal { get; set; }
+    [Reactive] public GitHubFileInfo? SelectTranslated { get; set; }
+
+    public void SetGithubFileInfos(List<GitHubFileInfo> fileInfos)
     {
-        Title = title;
-        Content = content;
+        FileInfos = fileInfos;
+        SelectTranslated = fileInfos.Find(x => x.Name.StartsWith("zh_cn."));
+        SelectOriginal = fileInfos.Find(x => x.Name.StartsWith("en_us."));
+        if (SelectOriginal is not null) return;
+        SelectOriginal = fileInfos.Find(x => !x.Name.StartsWith("zh_cn."));
+        if (SelectOriginal is null)
+            ToastService.Notify("警告", "目标仓库没有任何非中文文件");
+        else
+            ToastService.Notify("提示", $"未找到原文文件，已选择其他文件: {SelectOriginal.Value.Name}");
     }
+}
+
+internal partial class GithubLinkStatus : ViewModelBase
+{
+    private readonly Regex _githubRegex = GenRegex();
+
+    [Reactive] public bool GithubStatus { get; set; }
+    [Reactive] public string? Version { get; set; }
+    [Reactive] public bool EndsWithLang { get; set; }
+
+    public void CheckLink(string link)
+    {
+        link = link.Trim();
+        var match = _githubRegex.Match(link);
+
+        GithubStatus = match.Success;
+        EndsWithLang = link.EndsWith("/lang");
+
+        Version = match is { Success: true, Groups.Count: > 1 } ? match.Groups[1].Value : null;
+    }
+
+    public bool Passed()
+    {
+        return GithubStatus && EndsWithLang && Version is not null;
+    }
+
+    [GeneratedRegex(
+        @"^https?://github\.com/.*?/projects/([^/]+)/assets/.*/lang$")]
+    private static partial Regex GenRegex();
 }

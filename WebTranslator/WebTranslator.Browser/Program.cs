@@ -8,10 +8,9 @@ using WebTranslator;
 
 [assembly: SupportedOSPlatform("browser")]
 
-internal partial class Program
+internal sealed partial class Program
 {
-    private static async Task Main(string[] args) => await BuildAvaloniaApp()
-        .UseReactiveUI()
+    private static Task Main(string[] args) => BuildAvaloniaApp()
         .With(new FontManagerOptions
         {
             FontFallbacks = new[]
@@ -22,6 +21,7 @@ internal partial class Program
                 }
             }
         })
+        .UseReactiveUI()
         .StartBrowserAppAsync("out");
 
     public static AppBuilder BuildAvaloniaApp()

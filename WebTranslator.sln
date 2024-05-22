@@ -1,10 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator", "WebTranslator\WebTranslator\WebTranslator.csproj", "{9AA65209-2860-4BD1-989A-F4912ABE405D}"
+# 
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator", "WebTranslator\WebTranslator\WebTranslator.csproj", "{85FE8430-B64C-4A9F-965C-4A79701BE43E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator.Desktop", "WebTranslator\WebTranslator.Desktop\WebTranslator.Desktop.csproj", "{BD7C2129-75F3-4858-9F0D-84916C17C603}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator.Desktop", "WebTranslator\WebTranslator.Desktop\WebTranslator.Desktop.csproj", "{865770DA-1557-48D2-872A-E6962C0260CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator.Browser", "WebTranslator\WebTranslator.Browser\WebTranslator.Browser.csproj", "{7A0F981F-181B-40F9-B388-06319FAF84D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator.Browser", "WebTranslator\WebTranslator.Browser\WebTranslator.Browser.csproj", "{D5A8ABF2-E3FB-4824-A825-578B2B2C3AA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTranslator.Tests", "WebTranslator\WebTranslator.Tests\WebTranslator.Tests.csproj", "{21A6E867-DD66-4EF6-BAD0-F9B45F733A19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,17 +15,25 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9AA65209-2860-4BD1-989A-F4912ABE405D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AA65209-2860-4BD1-989A-F4912ABE405D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AA65209-2860-4BD1-989A-F4912ABE405D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AA65209-2860-4BD1-989A-F4912ABE405D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD7C2129-75F3-4858-9F0D-84916C17C603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD7C2129-75F3-4858-9F0D-84916C17C603}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD7C2129-75F3-4858-9F0D-84916C17C603}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD7C2129-75F3-4858-9F0D-84916C17C603}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A0F981F-181B-40F9-B388-06319FAF84D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A0F981F-181B-40F9-B388-06319FAF84D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A0F981F-181B-40F9-B388-06319FAF84D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A0F981F-181B-40F9-B388-06319FAF84D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85FE8430-B64C-4A9F-965C-4A79701BE43E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85FE8430-B64C-4A9F-965C-4A79701BE43E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85FE8430-B64C-4A9F-965C-4A79701BE43E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85FE8430-B64C-4A9F-965C-4A79701BE43E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{865770DA-1557-48D2-872A-E6962C0260CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{865770DA-1557-48D2-872A-E6962C0260CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{865770DA-1557-48D2-872A-E6962C0260CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{865770DA-1557-48D2-872A-E6962C0260CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A8ABF2-E3FB-4824-A825-578B2B2C3AA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A8ABF2-E3FB-4824-A825-578B2B2C3AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A8ABF2-E3FB-4824-A825-578B2B2C3AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A8ABF2-E3FB-4824-A825-578B2B2C3AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21A6E867-DD66-4EF6-BAD0-F9B45F733A19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21A6E867-DD66-4EF6-BAD0-F9B45F733A19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21A6E867-DD66-4EF6-BAD0-F9B45F733A19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21A6E867-DD66-4EF6-BAD0-F9B45F733A19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{85FE8430-B64C-4A9F-965C-4A79701BE43E} = {5A766051-8FB3-4A62-8C9F-51665F674DB2}
+		{21A6E867-DD66-4EF6-BAD0-F9B45F733A19} = {645D33B6-187A-4668-B87D-4E254956F033}
 	EndGlobalSection
 EndGlobal

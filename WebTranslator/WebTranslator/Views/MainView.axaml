@@ -2,33 +2,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.MainView"
-             xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:MainViewModel"
              xmlns:fa="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
-    <fa:NavigationView
-        OpenPaneLength="250"
-        Name="NavView"
-        IsSettingsVisible="False"
-        SelectionChanged="NavView_OnSelectionChanged">
-        <fa:NavigationView.MenuItems>
-            <fa:NavigationViewItem MaxWidth="300" Tag="OpenFile" Content="打开" IsSelected="True">
-                <fa:NavigationViewItem.IconSource>
-                    <ic:SymbolIconSource Symbol="FolderOpen"/>
-                </fa:NavigationViewItem.IconSource>
-            </fa:NavigationViewItem>
-            <fa:NavigationViewItem MaxWidth="300" Tag="Editor" Content="翻译">
-                <fa:NavigationViewItem.IconSource>
-                    <ic:SymbolIconSource Symbol="Translate"/>
-                </fa:NavigationViewItem.IconSource>
-            </fa:NavigationViewItem>
-            <fa:NavigationViewItem MaxWidth="300" Tag="ExportFile" Content="导出">
-                <fa:NavigationViewItem.IconSource>
-                    <ic:SymbolIconSource Symbol="Save"/>
-                </fa:NavigationViewItem.IconSource>
-            </fa:NavigationViewItem>
-        </fa:NavigationView.MenuItems>
-    </fa:NavigationView>    
+    <Grid>
+        <fa:NavigationView OpenPaneLength="250"
+                           IsSettingsVisible="False"
+                           TabIndex="{Binding NavigationTabIdx}"
+                           Content="{Binding NavigationContent}">
+            <fa:NavigationView.MenuItems>
+                <fa:NavigationViewItem MaxWidth="300" Tag="OpenFile" Content="打开" IsSelected="True">
+                    <fa:NavigationViewItem.IconSource>
+                        <ic:SymbolIconSource Symbol="FolderOpen" />
+                    </fa:NavigationViewItem.IconSource>
+                </fa:NavigationViewItem>
+                <fa:NavigationViewItem MaxWidth="300" Tag="Editor" Content="翻译">
+                    <fa:NavigationViewItem.IconSource>
+                        <ic:SymbolIconSource Symbol="Translate" />
+                    </fa:NavigationViewItem.IconSource>
+                </fa:NavigationViewItem>
+                <fa:NavigationViewItem MaxWidth="300" Tag="ExportFile" Content="导出">
+                    <fa:NavigationViewItem.IconSource>
+                        <ic:SymbolIconSource Symbol="Save" />
+                    </fa:NavigationViewItem.IconSource>
+                </fa:NavigationViewItem>
+            </fa:NavigationView.MenuItems>
+        </fa:NavigationView>
+    </Grid>
 </UserControl>

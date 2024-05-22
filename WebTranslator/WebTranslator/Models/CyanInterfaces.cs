@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace WebTranslator.Models;
 
-public static partial class CyanInterface
+public static class CyanInterfaces
 {
     public static async Task<ReviewPrMsg> ReviewPr(string prNumber)
     {

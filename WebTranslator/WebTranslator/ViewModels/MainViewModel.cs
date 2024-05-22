@@ -1,12 +1,9 @@
-﻿using System.Threading.Tasks;
-using FluentAvalonia.UI.Controls;
-using ReactiveUI.Fody.Helpers;
-using WebTranslator.Models;
+﻿using ReactiveUI.Fody.Helpers;
 
 namespace WebTranslator.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class MainViewModel
 {
-    // public EditorViewModel Editor { get; set; } = new();
-
+    [Reactive] public uint NavigationTabIdx { get; set; }
+    [Reactive] public ViewModelBase NavigationContent { get; set; } = new OpenFileViewModel();
 }

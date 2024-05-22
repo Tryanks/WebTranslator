@@ -1,30 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-        <WasmMainJSPath>AppBundle\main.js</WasmMainJSPath>
         <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0-browser</TargetFramework>
+        <TrimMode>partial</TrimMode>
     </PropertyGroup>
 
     <ItemGroup>
-        <WasmExtraFilesToDeploy Include="AppBundle\**" />
+        <ProjectReference Include="..\WebTranslator\WebTranslator.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.6" />
-        <PackageReference Include="Avalonia.Browser" Version="11.1.0-beta1" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0-beta1" />
-        <PackageReference Include="FluentAvaloniaUI" Version="2.1.0-preview1" />
-        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.234-ci" />
-        <PackageReference Include="Json.NET.Aot" Version="9.0.1" />
-        <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\WebTranslator\WebTranslator.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Assets\" />
+        <PackageReference Include="Avalonia.Browser" Version="11.1.0-beta2"/>
     </ItemGroup>
 </Project>
