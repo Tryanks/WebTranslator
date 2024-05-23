@@ -7,34 +7,51 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:fa="using:FluentAvalonia.UI.Controls"
              x:DataType="vm:LanguageChoice">
+
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MinHeight="225" MinWidth="400">
         <fa:ProgressRing IsVisible="{Binding IsLoading}" Name="LoadingRing"
                          IsIndeterminate="True" BorderThickness="10" Width="75" Height="75"
                          VerticalAlignment="Center" HorizontalAlignment="Center" />
         <Grid IsVisible="{Binding ElementName=LoadingRing, Path=!IsVisible}"
-              VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
-                  IsVisible="{Binding Success}" Name="TaskContent">
-                <ComboBox Grid.Row="0" Grid.Column="0"
-                          ItemsSource="{Binding FileInfos}"
-                          SelectedItem="{Binding SelectOriginal}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ComboBox Grid.Row="0" Grid.Column="1"
-                          ItemsSource="{Binding FileInfos}"
-                          SelectedItem="{Binding SelectTranslated}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </Grid>
-            <TextBlock IsVisible="{Binding ElementName=TaskContent, Path=!IsVisible}">获取到的文件列表为空，请确定存在语言文件</TextBlock>
+              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <StackPanel Spacing="16" IsVisible="{Binding Success}" Name="DialogContent">
+                <fa:SettingsExpander Header="外语文件">
+                    <fa:SettingsExpander.Footer>
+                        <ComboBox ItemsSource="{Binding FileInfos}" IsEnabled="{Binding !Downloading}"
+                                  SelectedItem="{Binding SelectOriginal}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </fa:SettingsExpander.Footer>
+                </fa:SettingsExpander>
+                <fa:SettingsExpander Header="汉语文件">
+                    <fa:SettingsExpander.Footer>
+                        <ComboBox ItemsSource="{Binding FileInfos}" IsEnabled="{Binding !Downloading}"
+                                  SelectedItem="{Binding SelectTranslated}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </fa:SettingsExpander.Footer>
+                </fa:SettingsExpander>
+                <Button Command="{Binding DownloadCommand}" HorizontalAlignment="Right" MinWidth="100"
+                        IsEnabled="{Binding !Downloading}">
+                    <Grid>
+                        <TextBlock IsVisible="{Binding !Downloading}" Name="ButtonText">买定离手</TextBlock>
+                        <fa:ProgressRing IsVisible="{Binding ElementName=ButtonText,Path=!IsVisible}"
+                                         BorderThickness="100" IsIndeterminate="True"
+                                         Width="{Binding ElementName=ButtonText,Path=Width}"
+                                         Height="{Binding ElementName=ButtonText,Path=Height}"
+                                         VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Grid>
+                </Button>
+            </StackPanel>
+            <TextBlock IsVisible="{Binding ElementName=DialogContent, Path=!IsVisible}" Text="获取到的文件列表为空，请确定存在语言文件" />
         </Grid>
     </Grid>
 </UserControl>

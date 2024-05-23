@@ -189,55 +189,6 @@
         </TabControl>
     </Grid>
 
-    <!-- <Grid RowDefinitions="Auto,*,Auto" MaxWidth="1000" Margin="{DynamicResource FlyoutContentPadding}"> -->
-    <!--     <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="{DynamicResource FlyoutContentThemeMargin}" -->
-    <!--                FontSize="{StaticResource TabItemHeaderFontSize}"> -->
-    <!--         请选择打开语言文件的方式 -->
-    <!--     </TextBlock> -->
-
-    <!--         <TabItem Header="Github链接"> -->
-
-    <!--         </TabItem> -->
-    <!--         <TabItem Header="输入json"> -->
-
-    <!--         </TabItem> -->
-    <!--         <TabItem Header="打开本地文件"> -->
-    <!--             <Border Classes="Card"> -->
-    <!--                 <StackPanel> -->
-    <!--                     <Button Command="{Binding OpenFileCommand}">打开文件</Button> -->
-    <!--                     <Separator Opacity="0" Height="24" /> -->
-    <!--                     <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}"> -->
-    <!--                         <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" -->
-    <!--                                 CommandParameter="en_us" ToolTip.Tip="点击预览"> -->
-    <!--                             <ic:SymbolIcon Symbol="Textbox" /> -->
-    <!--                         </Button> -->
-    <!--                         <Separator Opacity="0" Width="20" /> -->
-    <!--                         <TextBlock VerticalAlignment="Center">en_us.json</TextBlock> -->
-    <!--                         <Separator Opacity="0" Width="20" /> -->
-    <!--                         <TextBlock -->
-    <!--                             VerticalAlignment="Center" -->
-    <!--                             Text="{Binding OpenFileEnStatus}" -->
-    <!--                             Margin="{DynamicResource FlyoutContentThemeMargin}" /> -->
-    <!--                     </WrapPanel> -->
-    <!--                     <Separator Opacity="0" Height="8" /> -->
-    <!--                     <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}"> -->
-    <!--                         <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" -->
-    <!--                                 CommandParameter="zh_cn" ToolTip.Tip="点击预览"> -->
-    <!--                             <ic:SymbolIcon Symbol="Textbox" /> -->
-    <!--                         </Button> -->
-    <!--                         <Separator Opacity="0" Width="20" /> -->
-    <!--                         <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock> -->
-    <!--                         <Separator Opacity="0" Width="20" /> -->
-    <!--                         <TextBlock -->
-    <!--                             VerticalAlignment="Center" -->
-    <!--                             Text="{Binding OpenFileZhStatus}" -->
-    <!--                             Margin="{DynamicResource FlyoutContentThemeMargin}" /> -->
-    <!--                     </WrapPanel> -->
-    <!--                     <Separator Opacity="0" Height="24" /> -->
-    <!--                     <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button> -->
-    <!--                 </StackPanel> -->
-    <!--             </Border> -->
-    <!--         </TabItem> -->
     <!--         <TabItem Header="打开 Pull Request"> -->
     <!--             <StackPanel> -->
     <!--                 <fa:SettingsExpander Header="PR编号"> -->

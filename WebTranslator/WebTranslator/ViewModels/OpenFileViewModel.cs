@@ -81,6 +81,7 @@ public class OpenFileViewModel : ViewModelBase
         dialog.Opened += DialogLoaded;
         dialog.PrimaryButtonClick += DialogConfirmed;
         dialog.Closed += DialogClosed;
+        GithubLanguageChoice.OnDownloaded += DialogDownloaded;
 
         await dialog.ShowAsync();
         return;
@@ -102,7 +103,7 @@ public class OpenFileViewModel : ViewModelBase
 
             ToastService.Notify("提示", "获取文件列表成功");
 
-            dialog.IsPrimaryButtonEnabled = true;
+            dialog.IsPrimaryButtonEnabled = false;
             GithubLanguageChoice.SetGithubFileInfos(infos);
             GithubLanguageChoice.IsLoading = false;
             GithubLanguageChoice.Success = true;
@@ -114,20 +115,22 @@ public class OpenFileViewModel : ViewModelBase
             confirm = true;
         }
 
-        async void DialogClosed(object? sender, object? e)
+        void DialogClosed(object? sender, object? e)
         {
             dialog.Closed -= DialogClosed;
             if (!confirm) return;
 
-            // GithubConfirmCommand();
+            GithubConfirmCommand();
+        }
 
-            OriginalText = await GithubLanguageChoice.SelectOriginal!.Value.Content();
-            TranslatedText = await GithubLanguageChoice.SelectTranslated!.Value.Content();
-            TabSelectedIndex = 1;
+        void DialogDownloaded()
+        {
+            GithubLanguageChoice.OnDownloaded -= DialogDownloaded;
+            dialog.IsPrimaryButtonEnabled = true;
         }
     }
 
-    public async void GithubConfirmCommand()
+    private async void GithubConfirmCommand()
     {
         if (!GithubLanguageChoice.Success)
         {
@@ -141,8 +144,8 @@ public class OpenFileViewModel : ViewModelBase
             return;
         }
 
-        OriginalText = await GithubLanguageChoice.SelectOriginal!.Value.Content();
-        TranslatedText = await GithubLanguageChoice.SelectTranslated!.Value.Content();
+        OriginalText = await GithubLanguageChoice.SelectOriginal!.String();
+        TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
 
         TabSelectedIndex = 1;
     }
@@ -168,15 +171,36 @@ public class OpenFileViewModel : ViewModelBase
 
 internal class LanguageChoice : ViewModelBase
 {
+    public delegate void DownloadHandler();
+
     [Reactive] public bool IsLoading { get; set; }
     [Reactive] public bool Success { get; set; }
+    [Reactive] public bool Downloading { get; set; }
     [Reactive] public List<GitHubFileInfo> FileInfos { get; set; } = [];
     [Reactive] public GitHubFileInfo? SelectOriginal { get; set; }
     [Reactive] public GitHubFileInfo? SelectTranslated { get; set; }
+    public event DownloadHandler? OnDownloaded;
 
-    public void ConfirmCommand()
+    public async void DownloadCommand()
     {
-        ToastService.Notify("title", "Confirm Command");
+        Downloading = true;
+        if (!Success)
+        {
+            ToastService.Notify("错误", "请先获取文件列表", NotificationType.Error);
+            return;
+        }
+
+        if (SelectOriginal is null || SelectTranslated is null)
+        {
+            ToastService.Notify("错误", "请选择原文和译文文件", NotificationType.Error);
+            return;
+        }
+
+        await SelectOriginal!.String();
+        await SelectTranslated!.String();
+        Downloading = false;
+        ToastService.Notify("提示", "下载完成");
+        OnDownloaded?.Invoke();
     }
 
     public void SetGithubFileInfos(List<GitHubFileInfo> fileInfos)
@@ -189,7 +213,7 @@ internal class LanguageChoice : ViewModelBase
         if (SelectOriginal is null)
             ToastService.Notify("警告", "目标仓库没有任何非中文文件");
         else
-            ToastService.Notify("提示", $"未找到原文文件，已选择其他文件: {SelectOriginal.Value.Name}");
+            ToastService.Notify("提示", $"未找到原文文件，已选择其他文件: {SelectOriginal.Name}");
     }
 }
 

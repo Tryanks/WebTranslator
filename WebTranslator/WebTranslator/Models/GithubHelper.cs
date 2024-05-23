@@ -81,19 +81,19 @@ public static partial class GithubHelper
     private static partial Regex MyRegex();
 }
 
-public struct GitHubFileInfo(string name, string url)
+public class GitHubFileInfo(string name, string url)
 {
     public string Name { get; } = name;
     private string DownloadUrl { get; } = url;
-    private string? _content { get; set; }
+    private string? Content { get; set; }
 
-    public async Task<string> Content()
+    public async Task<string> String()
     {
-        if (_content != null) return _content;
+        if (Content is not null) return Content;
         var url = "https://mirror.ghproxy.com/" +
                   (DownloadUrl.StartsWith("https://") ? DownloadUrl.Remove(0, "https://".Length) : DownloadUrl);
-        _content = await GithubHelper.GetGithubTextAsync(url);
+        Content ??= await GithubHelper.GetGithubTextAsync(url);
         ToastService.Notify("下载", url);
-        return _content;
+        return Content;
     }
 }
