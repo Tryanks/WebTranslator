@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:OpenFileViewModel"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
@@ -109,6 +110,21 @@
                     <Border Classes="Card">
                         <Button Command="{Binding ManualInputCommand}">进入编辑器</Button>
                     </Border>
+                    <Separator Opacity="0" Height="6" />
+                    <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
+                    <Border Classes="Card">
+                        <fa:SettingsExpander Header="PR编号">
+                            <fa:SettingsExpander.Footer>
+                                <fa:NumberBox
+                                    Grid.Column="0"
+                                    Maximum="9999"
+                                    Minimum="0"
+                                    SpinButtonPlacementMode="Inline"
+                                    MinWidth="150"
+                                    Value="123"/>
+                            </fa:SettingsExpander.Footer>
+                        </fa:SettingsExpander>
+                    </Border>
                 </StackPanel>
             </TabItem>
             <TabItem Header="预览文件">
@@ -188,71 +204,4 @@
             </TabItem>
         </TabControl>
     </Grid>
-
-    <!--         <TabItem Header="打开 Pull Request"> -->
-    <!--             <StackPanel> -->
-    <!--                 <fa:SettingsExpander Header="PR编号"> -->
-    <!--                     <fa:SettingsExpander.Footer> -->
-    <!--                         <fa:NumberBox -->
-    <!--                             Grid.Column="0" -->
-    <!--                             Maximum="9999" -->
-    <!--                             Minimum="0" -->
-    <!--                             SpinButtonPlacementMode="Inline" -->
-    <!--                             MinWidth="150" -->
-    <!--                             Value="123" /> -->
-    <!--                     </fa:SettingsExpander.Footer> -->
-    <!--                 </fa:SettingsExpander> -->
-    <!--             </StackPanel> -->
-    <!--             ~1~ <Border Classes="Card"> @1@ -->
-    <!--             ~1~     <StackPanel> @1@ -->
-    <!--             ~1~         <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto"> @1@ -->
-    <!--             ~1~             ~2~ <TextBox @2@ @1@ -->
-    <!--             ~1~             ~2~     Grid.Column="0" @2@ @1@ -->
-    <!--             ~1~             ~2~     Watermark="请输入Github项目语言文件夹的链接" @2@ @1@ -->
-    <!--             ~1~             ~2~     MaxLines="1" @2@ @1@ -->
-    <!--             ~1~             ~2~     TextWrapping="NoWrap" @2@ @1@ -->
-    <!--             ~1~             ~2~     HorizontalAlignment="Stretch" @2@ @1@ -->
-    <!--             ~1~             ~2~     VerticalAlignment="Top" @2@ @1@ -->
-    <!--             ~1~             ~2~     Margin="{DynamicResource FlyoutContentThemeMargin}" @2@ @1@ -->
-    <!--             ~1~             ~2~     Text="{Binding GithubLink}"/> @2@ @1@ -->
-    <!--             ~1~             <ui:NumberBox @1@ -->
-    <!--             ~1~                 Grid.Column="0" @1@ -->
-    <!--             ~1~                 Maximum="9999" @1@ -->
-    <!--             ~1~                 Minimum="0" @1@ -->
-    <!--             ~1~                 Text="{Binding PullRequestNumber}"/> @1@ -->
-    <!--             ~1~             <Button Grid.Column="1" Command="{Binding CheckGithubLink}">点击校验</Button> @1@ -->
-    <!--             ~1~         </Grid> @1@ -->
-    <!--             ~1~         <Separator Opacity="0" Height="24"/> @1@ -->
-    <!--             ~1~         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > @1@ -->
-    <!--             ~1~             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览"> @1@ -->
-    <!--             ~1~                 <ic:FluentIcon Icon="Textbox24Regular" /> @1@ -->
-    <!--             ~1~             </Button> @1@ -->
-    <!--             ~1~             <Separator Opacity="0" Width="20"/> @1@ -->
-    <!--             ~1~             <TextBlock VerticalAlignment="Center">en_us.json</TextBlock> @1@ -->
-    <!--             ~1~             <Separator Opacity="0" Width="20"/> @1@ -->
-    <!--             ~1~             <TextBlock @1@ -->
-    <!--             ~1~                 VerticalAlignment="Center" @1@ -->
-    <!--             ~1~                 Text="{Binding GithubLinkEnStatus}" @1@ -->
-    <!--             ~1~                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> @1@ -->
-    <!--             ~1~         </WrapPanel> @1@ -->
-    <!--             ~1~         <Separator Opacity="0" Height="8"/> @1@ -->
-    <!--             ~1~         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > @1@ -->
-    <!--             ~1~             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览"> @1@ -->
-    <!--             ~1~                 <ic:FluentIcon Icon="Textbox24Regular" /> @1@ -->
-    <!--             ~1~             </Button> @1@ -->
-    <!--             ~1~             <Separator Opacity="0" Width="20"/> @1@ -->
-    <!--             ~1~             <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock> @1@ -->
-    <!--             ~1~             <Separator Opacity="0" Width="20"/> @1@ -->
-    <!--             ~1~             <TextBlock @1@ -->
-    <!--             ~1~                 VerticalAlignment="Center" @1@ -->
-    <!--             ~1~                 Text="{Binding GithubLinkZhStatus}" @1@ -->
-    <!--             ~1~                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> @1@ -->
-    <!--             ~1~         </WrapPanel> @1@ -->
-    <!--             ~1~         <Separator Opacity="0" Height="24"/> @1@ -->
-    <!--             ~1~         <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button> @1@ -->
-    <!--             ~1~     </StackPanel> @1@ -->
-    <!--             ~1~ </Border> @1@ -->
-    <!--         </TabItem> -->
-    <!--     </TabControl> -->
-    <!-- </Grid> -->
 </UserControl>
