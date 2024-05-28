@@ -11,7 +11,7 @@
     <Grid>
         <fa:NavigationView OpenPaneLength="250"
                            IsSettingsVisible="False"
-                           TabIndex="{Binding NavigationTabIdx}"
+                           SelectionChanged="NavigationView_OnSelectionChanged"
                            Content="{Binding NavigationContent}">
             <fa:NavigationView.MenuItems>
                 <fa:NavigationViewItem MaxWidth="300" Tag="OpenFile" Content="打开" IsSelected="True">
