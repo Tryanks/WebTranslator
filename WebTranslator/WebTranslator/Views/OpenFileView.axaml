@@ -112,19 +112,17 @@
                     </Border>
                     <Separator Opacity="0" Height="6" />
                     <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
-                    <Border Classes="Card">
-                        <fa:SettingsExpander Header="PR编号">
-                            <fa:SettingsExpander.Footer>
-                                <fa:NumberBox
-                                    Grid.Column="0"
-                                    Maximum="9999"
-                                    Minimum="0"
-                                    SpinButtonPlacementMode="Inline"
-                                    MinWidth="150"
-                                    Value="123"/>
-                            </fa:SettingsExpander.Footer>
-                        </fa:SettingsExpander>
-                    </Border>
+                    <fa:SettingsExpander Header="PR编号">
+                        <fa:SettingsExpander.Footer>
+                            <fa:NumberBox
+                                Grid.Column="0"
+                                Maximum="9999"
+                                Minimum="0"
+                                SpinButtonPlacementMode="Inline"
+                                MinWidth="150"
+                                Value="123"/>
+                        </fa:SettingsExpander.Footer>
+                    </fa:SettingsExpander>
                 </StackPanel>
             </TabItem>
             <TabItem Header="预览文件">
@@ -139,12 +137,13 @@
                             <Separator Width="12" />
                             <ToggleSwitch VerticalAlignment="Center" IsChecked="{Binding EnableDocument}" />
                         </WrapPanel>
-                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="0"
+                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                 Background="{DynamicResource TextControlBackground}">
                             <edit:TextEditor
                                 Name="OriginalTextEditor"
                                 Document="{Binding OriginalDocument}"
-                                IsEnabled="{Binding EnableDocument}">
+                                IsEnabled="{Binding EnableDocument}"
+                                Margin="0,0,4,0">
                                 <edit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V"
@@ -169,7 +168,7 @@
                                 </edit:TextEditor.ContextFlyout>
                             </edit:TextEditor>
                         </Border>
-                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="1"
+                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="1" Margin="4,0,0,0"
                                 Background="{DynamicResource TextControlBackground}">
                             <edit:TextEditor
                                 Name="TranslatedTextEditor"
@@ -199,6 +198,8 @@
                                 </edit:TextEditor.ContextFlyout>
                             </edit:TextEditor>
                         </Border>
+                        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                        <Button Classes="accent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,8,0,0">开始翻译</Button>
                     </Grid>
                 </Border>
             </TabItem>
