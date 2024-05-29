@@ -19,7 +19,7 @@
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="fa|FABorder">
+        <Style Selector="Border.FABorder">
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
             <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />

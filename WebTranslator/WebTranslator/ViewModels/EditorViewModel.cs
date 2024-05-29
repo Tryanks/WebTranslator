@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using ReactiveUI;
@@ -15,26 +14,29 @@ public class EditorViewModel : ViewModelBase
         EditorPages.WhenAnyValue(x => x.Count)
             .Subscribe(x => IsEmpty = x == 0);
     }
+
     [Reactive] public bool IsEmpty { get; set; } = true;
     [Reactive] public ObservableCollection<EditorPageModel> EditorPages { get; set; } = new();
     [Reactive] public EditorPageModel? SelectedEditorPage { get; set; }
 
-    public void AppendReader(JsonReader reader)
+    public override void SetParameter(object? parameter)
     {
+        if (parameter is not ModDictionary modDictionary) return;
         string header;
-        if (reader.CfID == "" && reader.ModID != "")
-            header = reader.ModID;
-        else if (reader.CfID != "" && reader.ModID == "")
-            header = reader.CfID;
-        else if (reader.CfID != "" && reader.ModID != "")
-            header = $"{reader.CfID} / {reader.ModID}";
+        if (modDictionary.CurseForgeId == "" && modDictionary.ModNamespace != "")
+            header = modDictionary.ModNamespace;
+        else if (modDictionary.CurseForgeId != "" && modDictionary.ModNamespace == "")
+            header = modDictionary.CurseForgeId;
+        else if (modDictionary.CurseForgeId != "" && modDictionary.ModNamespace != "")
+            header = $"{modDictionary.CurseForgeId} / {modDictionary.ModNamespace}";
         else
             header = "New Tab";
         var page = new EditorPageModel
         {
-            Header = header,
+            Header = header
         };
-        reader.ElementList.ForEach(e => { page.AddItem(e.EnValue, e.ZhValue); });
+        foreach (var (_, value) in modDictionary.TextDictionary)
+            page.AddItem(value.OriginalText, value.TranslatedText, value.Key);
 
         EditorPages.Add(page);
         SelectedEditorPage = page;
@@ -51,21 +53,17 @@ public class EditorPageModel : ViewModelBase
             var editor = EditorList[x];
             SourceText = editor.EnText;
             TransText = editor.ZhText;
+            KeyText = editor.Key;
         });
     }
+
     [Reactive] public string Header { get; set; } = "New Tab";
-    
+
     [Reactive] public TextDocument SourceDoc { get; set; } = new();
     [Reactive] public TextDocument TransDoc { get; set; } = new();
     [Reactive] public ObservableCollection<EditorListItem> EditorList { get; set; } = new();
     [Reactive] public int SelectedIndex { get; set; } = -1;
-    public void AddItem(string en, string zh)
-    {
-        EditorList.Add(new EditorListItem(en, zh));
-        if (SelectedIndex == -1)
-            SelectedIndex = 0;
-    }
-    
+
     public string SourceText
     {
         get => SourceDoc.Text;
@@ -77,7 +75,16 @@ public class EditorPageModel : ViewModelBase
         get => TransDoc.Text;
         set => TransDoc.Text = value;
     }
-    
+
+    [Reactive] public string KeyText { get; set; } = "";
+
+    public void AddItem(string en, string zh, string key)
+    {
+        EditorList.Add(new EditorListItem(en, zh, key));
+        if (SelectedIndex == -1)
+            SelectedIndex = 0;
+    }
+
     public void UpdateItem()
     {
         if (SelectedIndex <= 0 || SelectedIndex >= EditorList.Count - 1) return;
@@ -85,7 +92,7 @@ public class EditorPageModel : ViewModelBase
         editor.ZhText = TransText;
         SelectNextItem();
     }
-    
+
     public bool SelectNextItem()
     {
         if (SelectedIndex == -1) return false;
@@ -93,7 +100,7 @@ public class EditorPageModel : ViewModelBase
         SelectedIndex++;
         return true;
     }
-    
+
     public bool SelectPrevItem()
     {
         if (SelectedIndex <= 0) return false;
@@ -104,15 +111,18 @@ public class EditorPageModel : ViewModelBase
 
 public class EditorListItem : ViewModelBase
 {
-    [Reactive] public string EnText { get; set; }
-    [Reactive] public string ZhText { get; set; }
-    [Reactive] public bool IsTranslated { get; set; }
+    public string Key = "";
 
-    public EditorListItem(string en, string zh)
+    public EditorListItem(string en, string zh, string key)
     {
         EnText = en;
         this.WhenAnyValue(x => x.ZhText)
             .Subscribe(s => IsTranslated = s != EnText && !string.IsNullOrEmpty(s));
         ZhText = zh;
+        Key = key;
     }
+
+    [Reactive] public string EnText { get; set; }
+    [Reactive] public string ZhText { get; set; }
+    [Reactive] public bool IsTranslated { get; set; }
 }

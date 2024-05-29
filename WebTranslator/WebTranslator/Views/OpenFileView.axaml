@@ -6,19 +6,18 @@
              x:Class="WebTranslator.Views.OpenFileView"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:OpenFileViewModel"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:fa="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
-    
     <UserControl.Styles>
-        <Style Selector="avaloniaEdit|TextEditor">
+        <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
             <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
             <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="fa|FABorder">
+        <Style Selector="Border.FABorder">
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
@@ -36,227 +35,177 @@
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
         </Style>
     </UserControl.Styles>
-    
-    <Grid RowDefinitions="Auto,*,Auto" MaxWidth="1000" Margin="{DynamicResource FlyoutContentPadding}">
-        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Margin="{DynamicResource FlyoutContentThemeMargin}" FontSize="{StaticResource TabItemHeaderFontSize}">请选择打开语言文件的方式</TextBlock>
-        <TabControl Grid.Row="1" Margin="{DynamicResource FlyoutContentThemeMargin}" SelectedIndex="{Binding SelectedIndex,Mode=OneWayToSource}">
-            <TabItem Header="Github链接">
-                <Border Classes="Card">
-                    <StackPanel>
-                        <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto">
-                            <TextBox
-                                Grid.Column="0"
-                                Watermark="请输入Github项目语言文件夹的链接"
-                                MaxLines="1"
-                                TextWrapping="NoWrap"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Top"
-                                Margin="{DynamicResource FlyoutContentThemeMargin}"
-                                Text="{Binding GithubLink}"/>
-                            <Button Grid.Column="1" Command="{Binding CheckGithubLink}">点击校验</Button>
-                        </Grid>
-                        <Separator Opacity="0" Height="24"/>
-                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
-                                <ic:SymbolIcon Symbol="Textbox"/>
-                            </Button>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock VerticalAlignment="Center">en_us.json</TextBlock>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding GithubLinkEnStatus}"
-                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
-                        </WrapPanel>
-                        <Separator Opacity="0" Height="8"/>
-                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
-                                <ic:SymbolIcon Symbol="Textbox"/>
-                            </Button>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding GithubLinkZhStatus}"
-                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
-                        </WrapPanel>
-                        <Separator Opacity="0" Height="24"/>
-                        <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button>
-                    </StackPanel>
-                </Border>
-            </TabItem>
-            <TabItem Header="输入json">
-                <Border Classes="Card">
-                    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,*">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="{DynamicResource FlyoutContentThemeMargin}">en_us.json</TextBlock>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="{DynamicResource FlyoutContentThemeMargin}">zh_cn.json</TextBlock>
-                        <fa:FABorder Grid.Row="1" Grid.Column="0" Background="{DynamicResource TextControlBackground}">
-                            <avaloniaEdit:TextEditor
-                                Name="InputEn"
-                                Document="{Binding EnDocument}">
-                                <avaloniaEdit:TextEditor.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputEn, Path=Paste}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="ClipboardPaste"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputEn, Path=Cut}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Cut"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputEn, Path=Copy}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Copy"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                    </MenuFlyout>
-                                </avaloniaEdit:TextEditor.ContextFlyout>
-                            </avaloniaEdit:TextEditor>
-                        </fa:FABorder>
-                        <fa:FABorder Grid.Row="1" Grid.Column="1" Background="{DynamicResource TextControlBackground}">
-                            <avaloniaEdit:TextEditor
-                                Name="InputZh"
-                                Document="{Binding ZhDocument}">
-                                <avaloniaEdit:TextEditor.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=InputZh, Path=Paste}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="ClipboardPaste"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=InputZh, Path=Cut}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Cut"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=InputZh, Path=Copy}">
-                                            <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Copy"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                    </MenuFlyout>
-                                </avaloniaEdit:TextEditor.ContextFlyout>
-                            </avaloniaEdit:TextEditor>
-                        </fa:FABorder>
-                        <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Margin="0,24,0,0" Command="{Binding NextCommand}">下一步</Button>
-                    </Grid>
-                </Border>
-            </TabItem>
-            <TabItem Header="打开本地文件">
-                <Border Classes="Card">
-                    <StackPanel>
-                        <Button Command="{Binding OpenFileCommand}">打开文件</Button>
-                        <Separator Opacity="0" Height="24"/>
-                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览">
-                                <ic:SymbolIcon Symbol="Textbox"/>
-                            </Button>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock VerticalAlignment="Center">en_us.json</TextBlock>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding OpenFileEnStatus}"
-                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
-                        </WrapPanel>
-                        <Separator Opacity="0" Height="8"/>
-                        <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" >
-                            <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding OpenFileDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览">
-                                <ic:SymbolIcon Symbol="Textbox"/>
-                            </Button>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock>
-                            <Separator Opacity="0" Width="20"/>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding OpenFileZhStatus}"
-                                Margin="{DynamicResource FlyoutContentThemeMargin}"/>
-                        </WrapPanel>
-                        <Separator Opacity="0" Height="24"/>
-                        <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button>
-                    </StackPanel>
-                </Border>
-            </TabItem>
-            <TabItem Header="打开 Pull Request">
-                <StackPanel>
+
+    <Grid MaxWidth="1200" Margin="{DynamicResource FlyoutContentPadding}">
+        <TabControl Margin="{DynamicResource FlyoutContentThemeMargin}"
+                    SelectedIndex="{Binding TabSelectedIndex}">
+            <TabItem Header="导入文件">
+                <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <TextBlock FontWeight="Bold">从 Github 开始</TextBlock>
+                    <Border Classes="Card">
+                        <StackPanel>
+                            <StackPanel Orientation="Vertical" Spacing="12">
+                                <TextBox
+                                    Watermark="请输入Github项目语言文件夹的链接"
+                                    MaxLines="1"
+                                    TextWrapping="NoWrap"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Top"
+                                    Margin="{DynamicResource FlyoutContentThemeMargin}"
+                                    Text="{Binding GithubLink}" />
+                                <Grid ColumnDefinitions="*,*">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="24">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0" Text="github.com" />
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding GithubLinkStatus.GithubStatus}"
+                                                           Symbol="Checkmark" Foreground="Green" />
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding !GithubLinkStatus.GithubStatus}"
+                                                           Symbol="Dismiss" Foreground="Red" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
+                                                       Text="{Binding GithubLinkStatus.Version,StringFormat='版本: {0}'}" />
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                           Symbol="Checkmark" Foreground="Green" />
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                                           Symbol="Dismiss" Foreground="Red" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0">
+                                                <Run Text="以 " />
+                                                <Run Text="/lang" FontWeight="Bold" />
+                                                <Run Text=" 结尾" />
+                                            </TextBlock>
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding GithubLinkStatus.EndsWithLang}"
+                                                           Symbol="Checkmark" Foreground="Green" />
+                                            <ic:SymbolIcon VerticalAlignment="Center"
+                                                           IsVisible="{Binding !GithubLinkStatus.EndsWithLang}"
+                                                           Symbol="Dismiss" Foreground="Red" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Command="{Binding GithubCommand}"
+                                            HorizontalAlignment="Right">
+                                        点击校验
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Separator Opacity="0" Height="6" />
+                    <TextBlock FontWeight="Bold">从本地文件开始</TextBlock>
+                    <Border Classes="Card">
+                        <StackPanel Spacing="12" Orientation="Horizontal">
+                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Folder">选择文件夹</Button>
+                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Original">选择原文</Button>
+                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Translated">选择译文</Button>
+                        </StackPanel>
+                    </Border>
+                    <Separator Opacity="0" Height="6" />
+                    <TextBlock FontWeight="Bold">手动填写文件</TextBlock>
+                    <Border Classes="Card">
+                        <Button Command="{Binding ManualInputCommand}">进入编辑器</Button>
+                    </Border>
+                    <Separator Opacity="0" Height="6" />
+                    <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
                     <fa:SettingsExpander Header="PR编号">
                         <fa:SettingsExpander.Footer>
                             <fa:NumberBox
                                 Grid.Column="0"
-                                Maximum="9999"
+                                Maximum="19999"
                                 Minimum="0"
                                 SpinButtonPlacementMode="Inline"
                                 MinWidth="150"
-                                Value="123"/>
+                                Value="123" />
                         </fa:SettingsExpander.Footer>
                     </fa:SettingsExpander>
                 </StackPanel>
-                <!-- <Border Classes="Card"> -->
-                <!--     <StackPanel> -->
-                <!--         <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto"> -->
-                <!--             ~1~ <TextBox @1@ -->
-                <!--             ~1~     Grid.Column="0" @1@ -->
-                <!--             ~1~     Watermark="请输入Github项目语言文件夹的链接" @1@ -->
-                <!--             ~1~     MaxLines="1" @1@ -->
-                <!--             ~1~     TextWrapping="NoWrap" @1@ -->
-                <!--             ~1~     HorizontalAlignment="Stretch" @1@ -->
-                <!--             ~1~     VerticalAlignment="Top" @1@ -->
-                <!--             ~1~     Margin="{DynamicResource FlyoutContentThemeMargin}" @1@ -->
-                <!--             ~1~     Text="{Binding GithubLink}"/> @1@ -->
-                <!--             <ui:NumberBox -->
-                <!--                 Grid.Column="0" -->
-                <!--                 Maximum="9999" -->
-                <!--                 Minimum="0" -->
-                <!--                 Text="{Binding PullRequestNumber}"/> -->
-                <!--             <Button Grid.Column="1" Command="{Binding CheckGithubLink}">点击校验</Button> -->
-                <!--         </Grid> -->
-                <!--         <Separator Opacity="0" Height="24"/> -->
-                <!--         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > -->
-                <!--             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="en_us" ToolTip.Tip="点击预览"> -->
-                <!--                 <ic:FluentIcon Icon="Textbox24Regular" /> -->
-                <!--             </Button> -->
-                <!--             <Separator Opacity="0" Width="20"/> -->
-                <!--             <TextBlock VerticalAlignment="Center">en_us.json</TextBlock> -->
-                <!--             <Separator Opacity="0" Width="20"/> -->
-                <!--             <TextBlock -->
-                <!--                 VerticalAlignment="Center" -->
-                <!--                 Text="{Binding GithubLinkEnStatus}" -->
-                <!--                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> -->
-                <!--         </WrapPanel> -->
-                <!--         <Separator Opacity="0" Height="8"/> -->
-                <!--         <WrapPanel Margin="{DynamicResource FlyoutContentThemeMargin}" > -->
-                <!--             <Button MaxHeight="32" VerticalAlignment="Center" Command="{Binding GithubDialogCommand}" CommandParameter="zh_cn" ToolTip.Tip="点击预览"> -->
-                <!--                 <ic:FluentIcon Icon="Textbox24Regular" /> -->
-                <!--             </Button> -->
-                <!--             <Separator Opacity="0" Width="20"/> -->
-                <!--             <TextBlock VerticalAlignment="Center">zh_cn.json</TextBlock> -->
-                <!--             <Separator Opacity="0" Width="20"/> -->
-                <!--             <TextBlock -->
-                <!--                 VerticalAlignment="Center" -->
-                <!--                 Text="{Binding GithubLinkZhStatus}" -->
-                <!--                 Margin="{DynamicResource FlyoutContentThemeMargin}"/> -->
-                <!--         </WrapPanel> -->
-                <!--         <Separator Opacity="0" Height="24"/> -->
-                <!--         <Button HorizontalAlignment="Right" Command="{Binding NextCommand}">下一步</Button> -->
-                <!--     </StackPanel> -->
-                <!-- </Border> -->
+            </TabItem>
+            <TabItem Header="预览文件">
+                <Border Classes="Card">
+                    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,*">
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                                   Margin="{DynamicResource FlyoutContentThemeMargin}" Text="en_us.json" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"
+                                   Margin="{DynamicResource FlyoutContentThemeMargin}" Text="zh_cn.json" />
+                        <WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center">编辑文本</TextBlock>
+                            <Separator Width="12" />
+                            <ToggleSwitch VerticalAlignment="Center" IsChecked="{Binding EnableDocument}" />
+                        </WrapPanel>
+                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
+                                Background="{DynamicResource TextControlBackground}">
+                            <edit:TextEditor
+                                Name="OriginalTextEditor"
+                                Document="{Binding OriginalDocument}"
+                                IsEnabled="{Binding EnableDocument}"
+                                Margin="0,0,4,0">
+                                <edit:TextEditor.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuItem Header="Paste" InputGesture="Ctrl+V"
+                                                  Command="{Binding ElementName=OriginalTextEditor, Path=Paste}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Cut" InputGesture="Ctrl+X"
+                                                  Command="{Binding ElementName=OriginalTextEditor, Path=Cut}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Cut" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                                  Command="{Binding ElementName=OriginalTextEditor, Path=Copy}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Copy" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuFlyout>
+                                </edit:TextEditor.ContextFlyout>
+                            </edit:TextEditor>
+                        </Border>
+                        <Border Classes="FABorder" Grid.Row="1" Grid.Column="1" Margin="4,0,0,0"
+                                Background="{DynamicResource TextControlBackground}">
+                            <edit:TextEditor
+                                Name="TranslatedTextEditor"
+                                Document="{Binding TranslatedDocument}"
+                                IsEnabled="{Binding EnableDocument}">
+                                <edit:TextEditor.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuItem Header="Paste" InputGesture="Ctrl+V"
+                                                  Command="{Binding ElementName=TranslatedTextEditor, Path=Paste}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Cut" InputGesture="Ctrl+X"
+                                                  Command="{Binding ElementName=TranslatedTextEditor, Path=Cut}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Cut" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                                  Command="{Binding ElementName=TranslatedTextEditor, Path=Copy}">
+                                            <MenuItem.Icon>
+                                                <ic:SymbolIcon Symbol="Copy" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuFlyout>
+                                </edit:TextEditor.ContextFlyout>
+                            </edit:TextEditor>
+                        </Border>
+                        <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                        <Button Classes="accent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                HorizontalAlignment="Right" Margin="0,8,0,0" Command="{Binding NextCommand}">
+                            开始翻译
+                        </Button>
+                    </Grid>
+                </Border>
             </TabItem>
         </TabControl>
-        
-        <!-- ReSharper disable once Xaml.MissingGridIndex -->
-        <fa:TaskDialog
-            Name="DialogShow"
-            Title="Show File Content"
-            SubHeader=""
-            FooterVisibility="Never"
-            IsFooterExpanded="False"
-            ShowProgressBar="False">
-            <fa:TaskDialog.Buttons>
-                <fa:TaskDialogButton Text="Close" DialogResult="Close"/>
-            </fa:TaskDialog.Buttons>
-        </fa:TaskDialog>
     </Grid>
 </UserControl>

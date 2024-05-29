@@ -18,7 +18,7 @@
             <Setter Property="ShowLineNumbers" Value="True" />
             <Setter Property="WordWrap" Value="True" />
         </Style>
-        <Style Selector="fa|FABorder">
+        <Style Selector="Border.FABorder">
             <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
             <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
             <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
@@ -39,23 +39,35 @@
         </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="{DynamicResource FlyoutContentPadding}">
-        <ListBox Grid.Column="0" Width="300" Margin="0,0,18,0" ItemsSource="{Binding EditorList}" SelectedIndex="{Binding SelectedIndex}">
+        <ListBox Grid.Column="0" Width="300" Margin="0,0,18,0" ItemsSource="{Binding EditorList}"
+                 SelectedIndex="{Binding SelectedIndex}">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:EditorListItem">
                     <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
-                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
-                        <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding EnText}" TextTrimming="CharacterEllipsis" />
-                        <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12" Foreground="{DynamicResource TextFillColorDisabled}" Text="{Binding ZhText}" TextTrimming="CharacterEllipsis" />
+                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                       Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
+                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                       Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
+                        <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding EnText}"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
+                                   Foreground="{DynamicResource TextFillColorDisabled}" Text="{Binding ZhText}"
+                                   TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto" MaxHeight="1000">
-            <Border Classes="Card" Grid.Row="0">
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}'}" FontSize="16" />
+                <TextBlock Text="{Binding KeyText,StringFormat='键名: {0}'}" />
+            </StackPanel>
+            <Border Classes="Card" Grid.Row="1" Margin="0,12,0,0">
                 <Grid RowDefinitions="Auto,Auto,*">
                     <TextBlock Grid.Row="0" Text="原文" />
-                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}" HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}" Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
+                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
+                               HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
+                               Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
                     <avaloniaEdit:TextEditor
                         Grid.Row="2"
                         IsReadOnly="True"
@@ -64,9 +76,10 @@
                         Name="SyntaxEditor1">
                         <avaloniaEdit:TextEditor.ContextFlyout>
                             <MenuFlyout>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                          Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy"/>
+                                        <ic:SymbolIcon Symbol="Copy" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>
@@ -74,10 +87,12 @@
                     </avaloniaEdit:TextEditor>
                 </Grid>
             </Border>
-            <Border Classes="Card" Grid.Row="1" Margin="0,12,0,0">
+            <Border Classes="Card" Grid.Row="2" Margin="0,12,0,0">
                 <Grid RowDefinitions="Auto,Auto,*">
                     <TextBlock Grid.Row="0" Text="译文" />
-                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}" HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}" Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
+                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
+                               HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
+                               Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
                     <avaloniaEdit:TextEditor
                         Grid.Row="2"
                         Document="{Binding TransDoc}"
@@ -85,19 +100,22 @@
                         Name="SyntaxEditor2">
                         <avaloniaEdit:TextEditor.ContextFlyout>
                             <MenuFlyout>
-                                <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
+                                <MenuItem Header="Paste" InputGesture="Ctrl+V"
+                                          Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="ClipboardPaste"/>
+                                        <ic:SymbolIcon Symbol="ClipboardPaste" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
+                                <MenuItem Header="Cut" InputGesture="Ctrl+X"
+                                          Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Cut"/>
+                                        <ic:SymbolIcon Symbol="Cut" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                          Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy"/>
+                                        <ic:SymbolIcon Symbol="Copy" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>

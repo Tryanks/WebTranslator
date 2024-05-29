@@ -1,51 +1,38 @@
-using Avalonia;
 using Avalonia.Controls;
-using AvaloniaEdit.Utils;
+using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
-using ReactiveUI;
-using WebTranslator.ViewModels;
+using WebTranslator.Services;
 
 namespace WebTranslator.Views;
 
 public partial class MainView : UserControl
 {
-    public OpenFileView OpenFilePage { get; set; } = new();
-    public EditorView EditorPage { get; set; } = new();
-    public ExportFileView ExportFilePage { get; set; } = new();
-    
-    public OpenFileViewModel OpenFileViewModel { get; set; } = new();
-    public EditorViewModel EditorViewModel { get; set; } = new();
-    public ExportFileViewModel ExportFileViewModel { get; set; } = new();
-    
     public MainView()
     {
         InitializeComponent();
     }
 
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    protected override void OnLoaded(RoutedEventArgs e)
     {
-        base.OnAttachedToVisualTree(e);
-        OpenFilePage.DataContext = OpenFileViewModel;
-        EditorPage.DataContext = EditorViewModel;
-        ExportFilePage.DataContext = ExportFileViewModel;
-        OpenFileViewModel.WhenAnyValue(x => x.OutJson)
-            .Subscribe(reader =>
-            {
-                if (reader is null) return;
-                EditorViewModel.AppendReader(reader);
-                NavView.SelectedItem = NavView.MenuItems[1];
-            });
+        base.OnLoaded(e);
+        ToastService.Set(TopLevel.GetTopLevel(this));
+        NavigationService.Register((index, _) =>
+        {
+            if (NavigationView.SelectedItem is NavigationViewItem item &&
+                item.Tag!.ToString() == index.ToString()) return;
+            NavigationView.SelectedItem = NavigationView.MenuItems[(int)index];
+        });
     }
 
-    private void NavView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
+    private void NavigationView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
     {
         if (e.SelectedItem is not NavigationViewItem item) return;
-        NavView.Content = item.Tag switch
+        NavigationService.NavigatePage(item.Tag switch
         {
-            "OpenFile" => OpenFilePage,
-            "Editor" => EditorPage,
-            "ExportFile" => ExportFilePage,
-            _ => NavView.Content
-        };
+            "OpenFile" => 0,
+            "Editor" => 1,
+            "ExportFile" => 2,
+            _ => 0
+        });
     }
 }

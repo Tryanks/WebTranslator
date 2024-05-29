@@ -1,0 +1,30 @@
+{
+    // 单双引号或无引号
+    key1: 'value1',
+    'key2': 'value2',
+    "key3": "value3",
+    "key4": 'value4',
+    'key5': "value5",
+    /* 多行字符串 */
+    'key6': 'too\nline',
+
+    key7: "really two
+    
+    lines",
+
+    "key8": "three"
+    "line"
+    "tests",
+
+    "key10": "another \
+    multi-line \
+    string",
+    /*
+     * 重复键
+     */
+    "key9": "end",
+    "key9": "conflict",
+    "key9": "...",
+    // 注: 上面的注释也属于这个 json 的一部分
+    // 这就是为什么它们没有报错
+}

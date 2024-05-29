@@ -2,11 +2,11 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WebTranslator.Views;
+namespace WebTranslator.Controls;
 
-public partial class ExportFileView : UserControl
+public partial class ConfirmDialog : UserControl
 {
-    public ExportFileView()
+    public ConfirmDialog()
     {
         InitializeComponent();
     }
