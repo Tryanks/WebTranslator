@@ -65,7 +65,7 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
 
 public class TextElement(string k, string en, string template, string zh = "")
 {
-    private string Key { get; } = k;
+    public string Key { get; } = k;
     public string OriginalText { get; } = en;
     public string ReplaceTemplate { get; } = template;
     [Reactive] public string TranslatedText { get; set; } = zh;

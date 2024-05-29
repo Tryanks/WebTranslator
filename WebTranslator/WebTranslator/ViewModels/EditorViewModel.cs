@@ -35,7 +35,8 @@ public class EditorViewModel : ViewModelBase
         {
             Header = header
         };
-        foreach (var (_, value) in modDictionary.TextDictionary) page.AddItem(value.OriginalText, value.TranslatedText);
+        foreach (var (_, value) in modDictionary.TextDictionary)
+            page.AddItem(value.OriginalText, value.TranslatedText, value.Key);
 
         EditorPages.Add(page);
         SelectedEditorPage = page;
@@ -52,15 +53,17 @@ public class EditorPageModel : ViewModelBase
             var editor = EditorList[x];
             SourceText = editor.EnText;
             TransText = editor.ZhText;
+            KeyText = editor.Key;
         });
     }
+
     [Reactive] public string Header { get; set; } = "New Tab";
-    
+
     [Reactive] public TextDocument SourceDoc { get; set; } = new();
     [Reactive] public TextDocument TransDoc { get; set; } = new();
     [Reactive] public ObservableCollection<EditorListItem> EditorList { get; set; } = new();
     [Reactive] public int SelectedIndex { get; set; } = -1;
-    
+
     public string SourceText
     {
         get => SourceDoc.Text;
@@ -72,10 +75,12 @@ public class EditorPageModel : ViewModelBase
         get => TransDoc.Text;
         set => TransDoc.Text = value;
     }
-    
-    public void AddItem(string en, string zh)
+
+    [Reactive] public string KeyText { get; set; } = "";
+
+    public void AddItem(string en, string zh, string key)
     {
-        EditorList.Add(new EditorListItem(en, zh));
+        EditorList.Add(new EditorListItem(en, zh, key));
         if (SelectedIndex == -1)
             SelectedIndex = 0;
     }
@@ -87,7 +92,7 @@ public class EditorPageModel : ViewModelBase
         editor.ZhText = TransText;
         SelectNextItem();
     }
-    
+
     public bool SelectNextItem()
     {
         if (SelectedIndex == -1) return false;
@@ -95,7 +100,7 @@ public class EditorPageModel : ViewModelBase
         SelectedIndex++;
         return true;
     }
-    
+
     public bool SelectPrevItem()
     {
         if (SelectedIndex <= 0) return false;
@@ -106,12 +111,15 @@ public class EditorPageModel : ViewModelBase
 
 public class EditorListItem : ViewModelBase
 {
-    public EditorListItem(string en, string zh)
+    public string Key = "";
+
+    public EditorListItem(string en, string zh, string key)
     {
         EnText = en;
         this.WhenAnyValue(x => x.ZhText)
             .Subscribe(s => IsTranslated = s != EnText && !string.IsNullOrEmpty(s));
         ZhText = zh;
+        Key = key;
     }
 
     [Reactive] public string EnText { get; set; }
