@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
@@ -17,7 +18,7 @@ public class OpenFileViewModel : ViewModelBase
 {
     public OpenFileViewModel()
     {
-        this.WhenAnyValue(x => x.GithubLink).Subscribe(link => { GithubLinkStatus.CheckLink(link); });
+        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.GithubLink), link => { GithubLinkStatus.CheckLink(link); });
     }
 
     [Reactive] public uint TabSelectedIndex { get; set; }
@@ -93,16 +94,16 @@ public class OpenFileViewModel : ViewModelBase
 
             GithubLanguageChoice.IsLoading = true;
 
-            ToastService.Notify("提示", "正在获取文件列表，请稍后");
+            ToastService.Notify("正在获取文件列表，请稍后");
             var infos = await GithubHelper.GetLanguageFilesAsync(link);
             if (infos.Count == 0)
             {
-                ToastService.Notify("错误", "获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
+                ToastService.Notify("获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
                 GithubLanguageChoice.IsLoading = false;
                 return;
             }
 
-            ToastService.Notify("提示", "获取文件列表成功");
+            ToastService.Notify("获取文件列表成功");
 
             dialog.IsPrimaryButtonEnabled = false;
             GithubLanguageChoice.SetGithubFileInfos(infos);
@@ -135,13 +136,13 @@ public class OpenFileViewModel : ViewModelBase
     {
         if (!GithubLanguageChoice.Success)
         {
-            ToastService.Notify("错误", "请先获取文件列表", NotificationType.Error);
+            ToastService.Notify("请先获取文件列表", NotificationType.Error);
             return;
         }
 
         if (GithubLanguageChoice.SelectOriginal is null || GithubLanguageChoice.SelectTranslated is null)
         {
-            ToastService.Notify("错误", "请选择原文和译文文件", NotificationType.Error);
+            ToastService.Notify("请选择原文和译文文件", NotificationType.Error);
             return;
         }
 
@@ -149,6 +150,7 @@ public class OpenFileViewModel : ViewModelBase
         TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
 
         TabSelectedIndex = 1;
+        PreviewFileStatus = ImportFileMode.Github;
     }
 
     public void OpenFileCommand(string s)
@@ -160,13 +162,48 @@ public class OpenFileViewModel : ViewModelBase
             "Translated" => "译文文件",
             _ => "未知文件"
         };
-        ToastService.Notify("提示", "暂不支持打开" + word);
+        ToastService.Notify("暂不支持打开" + word);
+#if true
+        return;
+#endif
+        PreviewFileStatus = ImportFileMode.Folder;
     }
 
     public void ManualInputCommand()
     {
         TabSelectedIndex = 1;
         EnableDocument = true;
+        PreviewFileStatus = ImportFileMode.Manual;
+    }
+
+    internal ImportFileMode PreviewFileStatus = ImportFileMode.None;
+
+    public void NextCommand()
+    {
+        if (string.IsNullOrEmpty(OriginalText) && string.IsNullOrEmpty(TranslatedText))
+        {
+            ToastService.Notify("没有任何文本待翻译");
+            return;
+        }
+
+        ModDictionary dict;
+
+        switch (PreviewFileStatus)
+        {
+            case ImportFileMode.Github:
+                var id = GithubLinkStatus.Identifier.Split("/");
+                var cfid = id[^2];
+                var modid = id[^1];
+                var version = Helper.GetVersion(GithubLinkStatus.Version!);
+                dict = new ModDictionary(cfid, modid, version);
+                dict.LoadOriginalFile(OriginalText);
+                dict.LoadTranslatedFile(TranslatedText);
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+
+        NavigationService.NavigatePage(1, dict);
     }
 }
 
@@ -187,23 +224,23 @@ internal class LanguageChoice : ViewModelBase
         Downloading = true;
         if (!Success)
         {
-            ToastService.Notify("错误", "请先获取文件列表", NotificationType.Error);
+            ToastService.Notify("请先获取文件列表", NotificationType.Error);
             return;
         }
 
         if (SelectOriginal is null || SelectTranslated is null)
         {
-            ToastService.Notify("错误", "请选择原文和译文文件", NotificationType.Error);
+            ToastService.Notify("请选择原文和译文文件", NotificationType.Error);
             return;
         }
-        
+
         var task1 = SelectOriginal!.String();
         var task2 = SelectTranslated!.String();
-        
+
         await Task.WhenAll(task1, task2);
-        
+
         Downloading = false;
-        ToastService.Notify("提示", "下载完成");
+        ToastService.Notify("下载完成");
         OnDownloaded?.Invoke();
     }
 
@@ -214,16 +251,14 @@ internal class LanguageChoice : ViewModelBase
         SelectOriginal = fileInfos.Find(x => x.Name.StartsWith("en_us."));
         if (SelectOriginal is not null) return;
         SelectOriginal = fileInfos.Find(x => !x.Name.StartsWith("zh_cn."));
-        if (SelectOriginal is null)
-            ToastService.Notify("警告", "目标仓库没有任何非中文文件");
-        else
-            ToastService.Notify("提示", $"未找到原文文件，已选择其他文件: {SelectOriginal.Name}");
+        ToastService.Notify(SelectOriginal is null ? "目标仓库没有任何非中文文件" : $"未找到原文文件，已选择其他文件: {SelectOriginal.Name}");
     }
 }
 
 internal partial class GithubLinkStatus : ViewModelBase
 {
     private readonly Regex _githubRegex = GenRegex();
+    public string Identifier = "";
 
     [Reactive] public bool GithubStatus { get; set; }
     [Reactive] public string? Version { get; set; }
@@ -238,6 +273,7 @@ internal partial class GithubLinkStatus : ViewModelBase
         EndsWithLang = link.EndsWith("/lang");
 
         Version = match is { Success: true, Groups.Count: > 1 } ? match.Groups[1].Value : null;
+        Identifier = match is { Success: true, Groups.Count: > 2 } ? match.Groups[2].Value : "";
     }
 
     public bool Passed()
@@ -246,6 +282,15 @@ internal partial class GithubLinkStatus : ViewModelBase
     }
 
     [GeneratedRegex(
-        @"^https?://github\.com/.*?/projects/([^/]+)/assets/.*/lang$")]
+        @"^https?://github\.com/.*?/projects/([^/]+)/assets/(.*)/lang$")]
     private static partial Regex GenRegex();
+}
+
+internal enum ImportFileMode
+{
+    None,
+    Github,
+    Folder,
+    Manual,
+    Review
 }

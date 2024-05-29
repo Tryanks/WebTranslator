@@ -16,6 +16,12 @@ public partial class MainView : UserControl
     {
         base.OnLoaded(e);
         ToastService.Set(TopLevel.GetTopLevel(this));
+        NavigationService.Register((index, _) =>
+        {
+            if (NavigationView.SelectedItem is NavigationViewItem item &&
+                item.Tag!.ToString() == index.ToString()) return;
+            NavigationView.SelectedItem = NavigationView.MenuItems[(int)index];
+        });
     }
 
     private void NavigationView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)

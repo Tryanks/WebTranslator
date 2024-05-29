@@ -116,11 +116,11 @@
                         <fa:SettingsExpander.Footer>
                             <fa:NumberBox
                                 Grid.Column="0"
-                                Maximum="9999"
+                                Maximum="19999"
                                 Minimum="0"
                                 SpinButtonPlacementMode="Inline"
                                 MinWidth="150"
-                                Value="123"/>
+                                Value="123" />
                         </fa:SettingsExpander.Footer>
                     </fa:SettingsExpander>
                 </StackPanel>
@@ -199,7 +199,10 @@
                             </edit:TextEditor>
                         </Border>
                         <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-                        <Button Classes="accent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,8,0,0">开始翻译</Button>
+                        <Button Classes="accent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                HorizontalAlignment="Right" Margin="0,8,0,0" Command="{Binding NextCommand}">
+                            开始翻译
+                        </Button>
                     </Grid>
                 </Border>
             </TabItem>

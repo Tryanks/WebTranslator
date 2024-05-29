@@ -12,7 +12,8 @@
         <fa:NavigationView OpenPaneLength="250"
                            IsSettingsVisible="False"
                            SelectionChanged="NavigationView_OnSelectionChanged"
-                           Content="{Binding NavigationContent}">
+                           Content="{Binding NavigationContent}"
+                           Name="NavigationView">
             <fa:NavigationView.MenuItems>
                 <fa:NavigationViewItem MaxWidth="300" Tag="OpenFile" Content="打开" IsSelected="True">
                     <fa:NavigationViewItem.IconSource>

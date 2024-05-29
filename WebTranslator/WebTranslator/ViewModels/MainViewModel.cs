@@ -3,11 +3,14 @@ using WebTranslator.Services;
 
 namespace WebTranslator.ViewModels;
 
-public class MainViewModel: ViewModelBase
+public class MainViewModel : ViewModelBase
 {
+    private static readonly OpenFileViewModel Page1 = new();
+    private static readonly EditorViewModel Page2 = new();
+
     public MainViewModel()
     {
-        NavigationService.Register(page =>
+        NavigationService.Register((page, parameter) =>
         {
             NavigationContent = page switch
             {
@@ -15,11 +18,9 @@ public class MainViewModel: ViewModelBase
                 1 => Page2,
                 _ => NavigationContent
             };
+            NavigationContent.SetParameter(parameter);
         });
     }
-
-    private static OpenFileViewModel Page1 = new();
-    private static EditorViewModel Page2 = new();
 
     [Reactive] public ViewModelBase NavigationContent { get; set; } = Page1;
 }

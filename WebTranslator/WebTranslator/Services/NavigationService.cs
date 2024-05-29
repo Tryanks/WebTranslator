@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WebTranslator.Services;
 
 public static class NavigationService
 {
-    private static Action<uint>? _callback;
+    private static readonly List<Action<uint, object?>> Callback = [];
 
-    public static void Register(Action<uint> callback)
+    public static void Register(Action<uint, object?> callback)
     {
-        _callback = callback;
+        Callback.Add(callback);
     }
 
-    public static void NavigatePage(uint page)
+    public static void NavigatePage(uint page, object? parameter = null)
     {
-        _callback?.Invoke(page);
+        foreach (var action in Callback) action(page, parameter);
     }
 }

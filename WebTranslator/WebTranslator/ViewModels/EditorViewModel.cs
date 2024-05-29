@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using ReactiveUI;
@@ -15,30 +14,32 @@ public class EditorViewModel : ViewModelBase
         EditorPages.WhenAnyValue(x => x.Count)
             .Subscribe(x => IsEmpty = x == 0);
     }
+
     [Reactive] public bool IsEmpty { get; set; } = true;
     [Reactive] public ObservableCollection<EditorPageModel> EditorPages { get; set; } = new();
     [Reactive] public EditorPageModel? SelectedEditorPage { get; set; }
 
-    // public void AppendReader(JsonReader reader)
-    // {
-    //     string header;
-    //     if (reader.CfID == "" && reader.ModID != "")
-    //         header = reader.ModID;
-    //     else if (reader.CfID != "" && reader.ModID == "")
-    //         header = reader.CfID;
-    //     else if (reader.CfID != "" && reader.ModID != "")
-    //         header = $"{reader.CfID} / {reader.ModID}";
-    //     else
-    //         header = "New Tab";
-    //     var page = new EditorPageModel
-    //     {
-    //         Header = header,
-    //     };
-    //     reader.ElementList.ForEach(e => { page.AddItem(e.EnValue, e.ZhValue); });
-    //
-    //     EditorPages.Add(page);
-    //     SelectedEditorPage = page;
-    // }
+    public override void SetParameter(object? parameter)
+    {
+        if (parameter is not ModDictionary modDictionary) return;
+        string header;
+        if (modDictionary.CurseForgeId == "" && modDictionary.ModNamespace != "")
+            header = modDictionary.ModNamespace;
+        else if (modDictionary.CurseForgeId != "" && modDictionary.ModNamespace == "")
+            header = modDictionary.CurseForgeId;
+        else if (modDictionary.CurseForgeId != "" && modDictionary.ModNamespace != "")
+            header = $"{modDictionary.CurseForgeId} / {modDictionary.ModNamespace}";
+        else
+            header = "New Tab";
+        var page = new EditorPageModel
+        {
+            Header = header
+        };
+        foreach (var (_, value) in modDictionary.TextDictionary) page.AddItem(value.OriginalText, value.TranslatedText);
+
+        EditorPages.Add(page);
+        SelectedEditorPage = page;
+    }
 }
 
 public class EditorPageModel : ViewModelBase
@@ -59,12 +60,6 @@ public class EditorPageModel : ViewModelBase
     [Reactive] public TextDocument TransDoc { get; set; } = new();
     [Reactive] public ObservableCollection<EditorListItem> EditorList { get; set; } = new();
     [Reactive] public int SelectedIndex { get; set; } = -1;
-    public void AddItem(string en, string zh)
-    {
-        EditorList.Add(new EditorListItem(en, zh));
-        if (SelectedIndex == -1)
-            SelectedIndex = 0;
-    }
     
     public string SourceText
     {
@@ -78,6 +73,13 @@ public class EditorPageModel : ViewModelBase
         set => TransDoc.Text = value;
     }
     
+    public void AddItem(string en, string zh)
+    {
+        EditorList.Add(new EditorListItem(en, zh));
+        if (SelectedIndex == -1)
+            SelectedIndex = 0;
+    }
+
     public void UpdateItem()
     {
         if (SelectedIndex <= 0 || SelectedIndex >= EditorList.Count - 1) return;
@@ -104,10 +106,6 @@ public class EditorPageModel : ViewModelBase
 
 public class EditorListItem : ViewModelBase
 {
-    [Reactive] public string EnText { get; set; }
-    [Reactive] public string ZhText { get; set; }
-    [Reactive] public bool IsTranslated { get; set; }
-
     public EditorListItem(string en, string zh)
     {
         EnText = en;
@@ -115,4 +113,8 @@ public class EditorListItem : ViewModelBase
             .Subscribe(s => IsTranslated = s != EnText && !string.IsNullOrEmpty(s));
         ZhText = zh;
     }
+
+    [Reactive] public string EnText { get; set; }
+    [Reactive] public string ZhText { get; set; }
+    [Reactive] public bool IsTranslated { get; set; }
 }
