@@ -5,11 +5,11 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.EditorContentView"
              x:DataType="vm:EditorPageModel"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
-        <Style Selector="avaloniaEdit|TextEditor">
+        <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
             <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
             <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
@@ -35,6 +35,9 @@
             <Setter Property="Padding" Value="{StaticResource ContentDialogPadding}" />
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
         </Style>
+        <Style Selector="StackPanel.ShortCut TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="{DynamicResource FlyoutContentPadding}">
         <ListBox Grid.Column="0" Width="300" Margin="0,0,18,0" ItemsSource="{Binding EditorList}"
@@ -55,7 +58,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto" MaxHeight="1000">
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,*,Auto" MaxHeight="1000">
             <StackPanel Grid.Row="0">
                 <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}'}" FontSize="16" />
                 <TextBlock Text="{Binding KeyText,StringFormat='键名: {0}'}" />
@@ -66,13 +69,14 @@
                     <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
                                HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
                                Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
-                    <avaloniaEdit:TextEditor
+                    <edit:TextEditor
                         Grid.Row="2"
                         IsReadOnly="True"
                         Document="{Binding SourceDoc}"
                         Loaded="SyntaxEditorLoaded"
+                        ShowLineNumbers="True"
                         Name="SyntaxEditor1">
-                        <avaloniaEdit:TextEditor.ContextFlyout>
+                        <edit:TextEditor.ContextFlyout>
                             <MenuFlyout>
                                 <MenuItem Header="Copy" InputGesture="Ctrl+C"
                                           Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
@@ -81,8 +85,8 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>
-                        </avaloniaEdit:TextEditor.ContextFlyout>
-                    </avaloniaEdit:TextEditor>
+                        </edit:TextEditor.ContextFlyout>
+                    </edit:TextEditor>
                 </Grid>
             </Border>
             <Border Classes="Card" Grid.Row="2" Margin="0,12,0,0">
@@ -91,12 +95,13 @@
                     <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
                                HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
                                Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
-                    <avaloniaEdit:TextEditor
+                    <edit:TextEditor
                         Grid.Row="2"
                         Document="{Binding TransDoc}"
                         Loaded="SyntaxEditorLoaded"
+                        ShowLineNumbers="True"
                         Name="SyntaxEditor2">
-                        <avaloniaEdit:TextEditor.ContextFlyout>
+                        <edit:TextEditor.ContextFlyout>
                             <MenuFlyout>
                                 <MenuItem Header="Paste" InputGesture="Ctrl+V"
                                           Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
@@ -117,17 +122,57 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>
-                        </avaloniaEdit:TextEditor.ContextFlyout>
-                    </avaloniaEdit:TextEditor>
+                        </edit:TextEditor.ContextFlyout>
+                    </edit:TextEditor>
                 </Grid>
             </Border>
-        </Grid>
-        <Border Classes="Card" Grid.Column="2" VerticalAlignment="Stretch">
-            <StackPanel>
-                <TextBlock>只是个占位符</TextBlock>
-                <TextBlock>这里将放置词典</TextBlock>
-                <TextBlock>等外围功能</TextBlock>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Button>上一个</Button>
             </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <!-- ReSharper disable once Xaml.StyleClassNotFound -->
+                <Button Classes="accent">保存</Button>
+            </StackPanel>
+        </Grid>
+        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="18,0,0,0">
+            <Grid>
+                <StackPanel Spacing="4">
+                    <TextBlock>只是个占位符</TextBlock>
+                    <TextBlock>这里将放置词典</TextBlock>
+                    <TextBlock>等外围功能</TextBlock>
+                </StackPanel>
+                <StackPanel Spacing="4" VerticalAlignment="Bottom" Classes="ShortCut">
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+1</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">应用第一个翻译</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+2</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">应用第二个翻译</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+3</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">应用第三个翻译</TextBlock>
+                    </Grid>
+                    <Separator Height="4" Opacity="0" />
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+B</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">回到上一个</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+C</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">清空翻译框</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+N</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">跳过到下一个</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+N</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">保存并下一个</TextBlock>
+                    </Grid>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>
