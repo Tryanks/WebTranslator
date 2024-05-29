@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
@@ -195,9 +196,12 @@ internal class LanguageChoice : ViewModelBase
             ToastService.Notify("错误", "请选择原文和译文文件", NotificationType.Error);
             return;
         }
-
-        await SelectOriginal!.String();
-        await SelectTranslated!.String();
+        
+        var task1 = SelectOriginal!.String();
+        var task2 = SelectTranslated!.String();
+        
+        await Task.WhenAll(task1, task2);
+        
         Downloading = false;
         ToastService.Notify("提示", "下载完成");
         OnDownloaded?.Invoke();
