@@ -7,8 +7,6 @@
              x:DataType="vm:EditorPageModel"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:fap="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="avaloniaEdit|TextEditor">
@@ -57,7 +55,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto" MaxHeight="1000">
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto" MaxHeight="1000">
             <StackPanel Grid.Row="0">
                 <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}'}" FontSize="16" />
                 <TextBlock Text="{Binding KeyText,StringFormat='键名: {0}'}" />

@@ -31,10 +31,7 @@ public class EditorViewModel : ViewModelBase
             header = $"{modDictionary.CurseForgeId} / {modDictionary.ModNamespace}";
         else
             header = "New Tab";
-        var page = new EditorPageModel
-        {
-            Header = header
-        };
+        var page = new EditorPageModel { Header = header };
         foreach (var (_, value) in modDictionary.TextDictionary)
             page.AddItem(value.OriginalText, value.TranslatedText, value.Key);
 
