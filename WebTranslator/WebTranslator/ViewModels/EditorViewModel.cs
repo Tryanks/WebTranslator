@@ -111,7 +111,7 @@ public class EditorPageModel : ViewModelBase
 
 public class EditorListItem : ViewModelBase
 {
-    public string Key = "";
+    public readonly string Key;
 
     public EditorListItem(string en, string zh, string key)
     {
