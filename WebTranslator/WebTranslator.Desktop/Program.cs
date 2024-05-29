@@ -24,7 +24,7 @@ sealed class Program
                 {
                     new FontFallback
                     {
-                        FontFamily = new FontFamily("avares://WebTranslator/Assets/SourceHanSansCN-Regular.otf#Source Han Sans CN"),
+                        FontFamily = new FontFamily("avares://WebTranslator/Assets/SourceHanSansCN.otf#Source Han Sans CN"),
                     }
                 }
             })
