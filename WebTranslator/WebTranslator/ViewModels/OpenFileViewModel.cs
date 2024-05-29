@@ -78,7 +78,7 @@ public class OpenFileViewModel : ViewModelBase
             }
         };
 
-        var confirm = true;
+        var confirm = false;
 
         dialog.Opened += DialogLoaded;
         dialog.PrimaryButtonClick += DialogConfirmed;

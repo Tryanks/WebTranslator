@@ -142,7 +142,7 @@
                             <edit:TextEditor
                                 Name="OriginalTextEditor"
                                 Document="{Binding OriginalDocument}"
-                                IsReadOnly="{Binding EnableDocument}"
+                                IsReadOnly="{Binding !EnableDocument}"
                                 Margin="0,0,4,0">
                                 <edit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
@@ -173,7 +173,7 @@
                             <edit:TextEditor
                                 Name="TranslatedTextEditor"
                                 Document="{Binding TranslatedDocument}"
-                                IsReadOnly="{Binding EnableDocument}">
+                                IsReadOnly="{Binding !EnableDocument}">
                                 <edit:TextEditor.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V"
