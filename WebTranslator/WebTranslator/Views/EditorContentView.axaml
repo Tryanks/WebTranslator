@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.EditorContentView"
-             x:DataType="vm:EditorPageModel"
+             x:DataType="vm:EditorContentViewModel"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
@@ -41,107 +41,141 @@
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="{DynamicResource FlyoutContentPadding}">
         <ListBox Grid.Column="0" Width="300" Margin="0,0,16,0" ItemsSource="{Binding EditorList}"
-                 SelectedIndex="{Binding SelectedIndex}">
+                 SelectedIndex="{Binding SelectedIndex}"
+                 SelectedItem="{Binding TranslationItem}">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:EditorListItem">
                     <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                        <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
                                        Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
                         <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
                                        Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
-                        <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding EnText}"
+                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-8,0"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                                       Foreground="Coral" Symbol="Circle" IsFilled="True" FontSize="8"
+                                       IsVisible="{Binding IsChanged}" />
+                        <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
                                    TextTrimming="CharacterEllipsis" />
                         <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
-                                   Foreground="{DynamicResource TextFillColorDisabled}" Text="{Binding ZhText}"
+                                   Foreground="{DynamicResource TextFillColorDisabled}"
+                                   Text="{Binding SavedTranslatedText}"
                                    TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Grid Grid.Column="1" RowDefinitions="Auto,*,*,Auto" MaxHeight="1000">
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto">
             <StackPanel Grid.Row="0">
-                <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}'}" FontSize="16" />
-                <TextBlock Text="{Binding KeyText,StringFormat='键名: {0}'}" />
+                <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}',Mode=OneTime}" FontSize="16" />
+                <TextBlock Text="{Binding TranslationItem.Key,StringFormat='键名: {0}',Mode=OneWay}" />
             </StackPanel>
-            <Border Classes="Card" Grid.Row="1" Margin="0,12,0,0">
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <TextBlock Grid.Row="0" Text="原文" />
-                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
-                               HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
-                               Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
-                    <edit:TextEditor
-                        Grid.Row="2"
-                        IsReadOnly="True"
-                        Document="{Binding SourceDoc}"
-                        Loaded="SyntaxEditorLoaded"
-                        ShowLineNumbers="True"
-                        Name="SyntaxEditor1">
-                        <edit:TextEditor.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C"
-                                          Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
-                                    <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                            </MenuFlyout>
-                        </edit:TextEditor.ContextFlyout>
-                    </edit:TextEditor>
-                </Grid>
-            </Border>
-            <Border Classes="Card" Grid.Row="2" Margin="0,12,0,0">
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <TextBlock Grid.Row="0" Text="译文" />
-                    <Separator Grid.Row="1" Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
-                               HorizontalAlignment="Stretch" Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
-                               Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
-                    <edit:TextEditor
-                        Grid.Row="2"
-                        Document="{Binding TransDoc}"
-                        Loaded="SyntaxEditorLoaded"
-                        ShowLineNumbers="True"
-                        Name="SyntaxEditor2">
-                        <edit:TextEditor.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuItem Header="Paste" InputGesture="Ctrl+V"
-                                          Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
-                                    <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="ClipboardPaste" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="Cut" InputGesture="Ctrl+X"
-                                          Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
-                                    <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Cut" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="Copy" InputGesture="Ctrl+C"
-                                          Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
-                                    <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                            </MenuFlyout>
-                        </edit:TextEditor.ContextFlyout>
-                    </edit:TextEditor>
-                </Grid>
-            </Border>
-            <StackPanel Grid.Row="3" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
-                <Button>上一个</Button>
-                <Button>下一个</Button>
+            <Grid Grid.Row="1" RowDefinitions="*,*" Margin="0,12,0,0" DataContext="{Binding TranslationItem}">
+                <Border Classes="Card" Grid.Row="0">
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <TextBlock Grid.Row="0" Text="原文" />
+                        <Separator Grid.Row="1"
+                                   Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
+                                   HorizontalAlignment="Stretch"
+                                   Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
+                                   Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
+                        <edit:TextEditor
+                            Grid.Row="2"
+                            IsReadOnly="True"
+                            Document="{Binding OriginalDoc}"
+                            Loaded="SyntaxEditorLoaded"
+                            ShowLineNumbers="True"
+                            Name="SyntaxEditor1">
+                            <edit:TextEditor.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                              Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="Copy" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </MenuFlyout>
+                            </edit:TextEditor.ContextFlyout>
+                        </edit:TextEditor>
+                    </Grid>
+                </Border>
+                <Border Classes="Card" Grid.Row="1" Margin="0,12,0,0">
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <TextBlock Grid.Row="0" Text="译文" />
+                        <Separator Grid.Row="1"
+                                   Foreground="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
+                                   HorizontalAlignment="Stretch"
+                                   Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
+                                   Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
+                        <edit:TextEditor
+                            Grid.Row="2"
+                            Document="{Binding TranslatedDoc}"
+                            Loaded="SyntaxEditorLoaded"
+                            ShowLineNumbers="True"
+                            Name="SyntaxEditor2">
+                            <edit:TextEditor.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="Paste" InputGesture="Ctrl+V"
+                                              Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Cut" InputGesture="Ctrl+X"
+                                              Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="Cut" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Copy" InputGesture="Ctrl+C"
+                                              Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="Copy" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </MenuFlyout>
+                            </edit:TextEditor.ContextFlyout>
+                        </edit:TextEditor>
+                    </Grid>
+                </Border>
+            </Grid>
+            <StackPanel Grid.Row="2" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Button Command="{Binding PrevItem}">上一个</Button>
+                <Button Command="{Binding NextItem}">下一个</Button>
+                <Button
+                    IsEnabled="{Binding TranslationItem.IsChanged}"
+                    Command="{Binding TranslationItem.Reset}">
+                    重置
+                </Button>
             </StackPanel>
-            <StackPanel Grid.Row="3" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-                <Button>保存</Button>
+            <StackPanel Grid.Row="2" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button IsEnabled="{Binding TranslationItem.IsChanged}" Command="{Binding SaveItem}">保存</Button>
                 <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-                <Button Classes="accent">保存并下一个</Button>
+                <Button IsEnabled="{Binding TranslationItem.IsChanged}" Classes="accent"
+                        Command="{Binding SaveAndNextItem}">
+                    保存并下一个
+                </Button>
             </StackPanel>
-        </Grid>
-        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="16,0,0,0">
-            <Grid>
-                <StackPanel Spacing="4">
+            <Grid Grid.Row="3" MinHeight="250" Margin="0,12,0,0">
+                <StackPanel Spacing="6">
                     <TextBlock>只是个占位符</TextBlock>
                     <TextBlock>这里将放置词典</TextBlock>
                     <TextBlock>等外围功能</TextBlock>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="16,0,0,0">
+            <Grid>
+                <StackPanel Spacing="6">
+                    <TextBlock>这里放置程序指示</TextBlock>
+                    <TextBlock>例如：</TextBlock>
+                    <TextBlock>
+                        换行数量：
+                        原文: 4
+                        译文: 2
+                    </TextBlock>
+                    <TextBlock>译文中的格式化字符串与原文不匹配</TextBlock>
+                    <TextBlock>缺少: %d %s</TextBlock>
+                    <TextBlock>多余: %1$d</TextBlock>
                 </StackPanel>
                 <StackPanel Spacing="4" VerticalAlignment="Bottom" Classes="ShortCut">
                     <Grid>

@@ -8,9 +8,7 @@
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:views="clr-namespace:WebTranslator.Views"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:fap="using:FluentAvalonia.UI.Controls.Primitives"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:fa="using:FluentAvalonia.UI.Controls">
     <UserControl.Styles>
         <Style Selector="avaloniaEdit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -34,14 +32,14 @@
             VerticalAlignment="Stretch"
             SelectedItem="{Binding SelectedEditorPage}">
             <fa:TabView.TabItemTemplate>
-                <DataTemplate x:DataType="vm:EditorPageModel">
+                <DataTemplate x:DataType="vm:EditorContentViewModel">
                     <fa:TabViewItem
                         Header="{Binding Header}"
                         Content="{Binding}"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch">
                         <fa:TabViewItem.ContentTemplate>
-                            <DataTemplate x:DataType="vm:EditorPageModel">
+                            <DataTemplate x:DataType="vm:EditorContentViewModel">
                                 <views:EditorContentView />
                             </DataTemplate>
                         </fa:TabViewItem.ContentTemplate>

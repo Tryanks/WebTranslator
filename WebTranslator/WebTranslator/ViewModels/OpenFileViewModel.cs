@@ -150,7 +150,7 @@ public class OpenFileViewModel : ViewModelBase
         TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
 
         TabSelectedIndex = 1;
-        PreviewFileStatus = ImportFileMode.Github;
+        _previewFileStatus = ImportFileMode.Github;
     }
 
     public void OpenFileCommand(string s)
@@ -166,17 +166,17 @@ public class OpenFileViewModel : ViewModelBase
 #if true
         return;
 #endif
-        PreviewFileStatus = ImportFileMode.Folder;
+        _previewFileStatus = ImportFileMode.Folder;
     }
 
     public void ManualInputCommand()
     {
         TabSelectedIndex = 1;
         EnableDocument = true;
-        PreviewFileStatus = ImportFileMode.Manual;
+        _previewFileStatus = ImportFileMode.Manual;
     }
 
-    internal ImportFileMode PreviewFileStatus = ImportFileMode.None;
+    private ImportFileMode _previewFileStatus = ImportFileMode.None;
 
     public void NextCommand()
     {
@@ -188,7 +188,7 @@ public class OpenFileViewModel : ViewModelBase
 
         ModDictionary dict;
 
-        switch (PreviewFileStatus)
+        switch (_previewFileStatus)
         {
             case ImportFileMode.Github:
                 var id = GithubLinkStatus.Identifier.Split("/");
