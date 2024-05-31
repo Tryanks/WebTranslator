@@ -40,7 +40,7 @@
         </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="{DynamicResource FlyoutContentPadding}">
-        <ListBox Grid.Column="0" Width="300" Margin="0,0,18,0" ItemsSource="{Binding EditorList}"
+        <ListBox Grid.Column="0" Width="300" Margin="0,0,16,0" ItemsSource="{Binding EditorList}"
                  SelectedIndex="{Binding SelectedIndex}">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:EditorListItem">
@@ -126,15 +126,17 @@
                     </edit:TextEditor>
                 </Grid>
             </Border>
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
+            <StackPanel Grid.Row="3" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
                 <Button>上一个</Button>
+                <Button>下一个</Button>
             </StackPanel>
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <StackPanel Grid.Row="3" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button>保存</Button>
                 <!-- ReSharper disable once Xaml.StyleClassNotFound -->
-                <Button Classes="accent">保存</Button>
+                <Button Classes="accent">保存并下一个</Button>
             </StackPanel>
         </Grid>
-        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="18,0,0,0">
+        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="16,0,0,0">
             <Grid>
                 <StackPanel Spacing="4">
                     <TextBlock>只是个占位符</TextBlock>
