@@ -5,48 +5,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.EditorView"
              x:DataType="vm:EditorViewModel"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
-             xmlns:views="clr-namespace:WebTranslator.Views"
-             xmlns:fa="using:FluentAvalonia.UI.Controls">
-    <UserControl.Styles>
-        <Style Selector="avaloniaEdit|TextEditor">
-            <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
-            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
-            <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
-            <Setter Property="ShowLineNumbers" Value="True" />
-            <Setter Property="WordWrap" Value="True" />
-        </Style>
-        <Style Selector="Border.FABorder">
-            <Setter Property="BorderThickness" Value="{StaticResource TextControlBorderThemeThickness}" />
-            <Setter Property="BorderBrush" Value="{StaticResource TextControlBorderBrush}" />
-            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
-        </Style>
-    </UserControl.Styles>
+             xmlns:views="clr-namespace:WebTranslator.Views">
     <Grid>
-        <fa:TabView
-            TabItems="{Binding EditorPages}"
-            IsAddTabButtonVisible="False"
-            CanDragTabs="False"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            SelectedItem="{Binding SelectedEditorPage}">
-            <fa:TabView.TabItemTemplate>
-                <DataTemplate x:DataType="vm:EditorContentViewModel">
-                    <fa:TabViewItem
-                        Header="{Binding Header}"
-                        Content="{Binding}"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch">
-                        <fa:TabViewItem.ContentTemplate>
-                            <DataTemplate x:DataType="vm:EditorContentViewModel">
-                                <views:EditorContentView />
-                            </DataTemplate>
-                        </fa:TabViewItem.ContentTemplate>
-                    </fa:TabViewItem>
-                </DataTemplate>
-            </fa:TabView.TabItemTemplate>
-        </fa:TabView>
+        <Grid IsVisible="{Binding !IsEmpty}">
+            <views:EditorContentView DataContext="{Binding EditorContent}" />
+        </Grid>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsEmpty}">看起来你还没有打开任何语言文件</TextBlock>
     </Grid>
 </UserControl>
