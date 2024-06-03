@@ -25,7 +25,7 @@ public class OpenFileViewModel : ViewModelBase
     [Reactive]
     public string GithubLink { get; set; } =
 #if DEBUG
-        "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/main/projects/1.20-fabric/assets/better-than-bunnies-fabric/betterthanbunnies/lang";
+        "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/cf1a801466a901ec14a28c3b08dfe62f69c8db53/projects/1.20/assets/adorn-for-forge/adorn/lang";
 #else
         "";
 #endif
@@ -140,14 +140,17 @@ public class OpenFileViewModel : ViewModelBase
             return;
         }
 
-        if (GithubLanguageChoice.SelectOriginal is null || GithubLanguageChoice.SelectTranslated is null)
+        if (GithubLanguageChoice.SelectOriginal is null)
         {
-            ToastService.Notify("请选择原文和译文文件", NotificationType.Error);
+            ToastService.Notify("请选择原文文件", NotificationType.Error);
             return;
         }
 
         OriginalText = await GithubLanguageChoice.SelectOriginal!.String();
-        TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
+        if (GithubLanguageChoice.SelectTranslated is null)
+            TranslatedText = "{}";
+        else
+            TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
 
         TabSelectedIndex = 1;
         _previewFileStatus = ImportFileMode.Github;
@@ -228,16 +231,16 @@ internal class LanguageChoice : ViewModelBase
             return;
         }
 
-        if (SelectOriginal is null || SelectTranslated is null)
+        if (SelectOriginal is null)
         {
-            ToastService.Notify("请选择原文和译文文件", NotificationType.Error);
+            ToastService.Notify("请选择原文文件", NotificationType.Error);
             return;
         }
 
-        var task1 = SelectOriginal!.String();
-        var task2 = SelectTranslated!.String();
+        var tasks = new List<Task<string>> { SelectOriginal!.String() };
+        if (SelectTranslated is not null) tasks.Add(SelectTranslated!.String());
 
-        await Task.WhenAll(task1, task2);
+        await Task.WhenAll(tasks);
 
         Downloading = false;
         ToastService.Notify("下载完成");
