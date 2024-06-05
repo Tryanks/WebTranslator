@@ -33,7 +33,7 @@ jobs:
           cd ../gh-pages
 
           # Remove all files except .nojekyll and README.md
-          find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
+          find . -type f ! -path './.git*' ! -name '.nojekyll' ! -name 'README.md' -delete
           find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
 
           # Copy new files from the publish directory
