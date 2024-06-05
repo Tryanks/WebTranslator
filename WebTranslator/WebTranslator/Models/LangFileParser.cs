@@ -50,7 +50,6 @@ public static partial class LangFileParser
         var lines = text.Split(LangSeparator, StringSplitOptions.RemoveEmptyEntries);
         var textBuilder = new StringBuilder(text);
         var generator = new Helper.WebTranslatorTemplate(lines.Length);
-        var index = 0;
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
@@ -65,7 +64,7 @@ public static partial class LangFileParser
             keys.Add(key);
             var template = generator.Get();
             sd[key] = new LangFileDictionaryResult(value, template);
-            index = textBuilder.ReplaceOnce(value, template, index);
+            textBuilder.ReplaceOnce(value, template);
         }
 
         return textBuilder.ToString();

@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using ReactiveUI.Fody.Helpers;
 
 namespace WebTranslator.Models;
 
 public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVersion version)
 {
-    public readonly List<string> Keys = [];
-    public readonly Dictionary<string, TextElement> TextDictionary = new();
+    public List<string> Keys = [];
+    public Dictionary<string, TextElement> TextDictionary = new();
 
     public string CurseForgeId { get; } = curseForgeId;
     public string ModNamespace { get; } = modNamespace;
@@ -17,7 +19,15 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
     public MinecraftVersion Version { get; } = version;
     public LangFormat Format => Version.GetFormat();
 
-    public string Template { get; private set; } = "";
+    public string Template { get; set; } = "";
+
+    public static ModDictionary FromJson(string jsonString)
+    {
+        var dict = JsonConvert.DeserializeObject<ModDictionary>(jsonString);
+        if (dict == null)
+            throw new ArgumentException("Input text may not Minecraft Mod language file.");
+        return dict;
+    }
 
     public void LoadOriginalFile(string text)
     {
@@ -56,26 +66,38 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
 
     public override string ToString()
     {
-        var text = Template;
-        var textBuilder = new StringBuilder(text);
-        var index = 0;
+        var textBuilder = new StringBuilder(Template);
         foreach (var key in Keys)
         {
             var value = TextDictionary[key];
             var v = value.ToString();
             if (Format == LangFormat.Json) v = v.ReplaceToJson5();
-            index = textBuilder.ReplaceOnce(value.ReplaceTemplate, v, index);
+            textBuilder.ReplaceOnce(value.ReplaceTemplate, v);
         }
 
         return textBuilder.ToString();
+    }
+
+    public bool Equals(ModDictionary? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return CurseForgeId == other.CurseForgeId && ModNamespace == other.ModNamespace && Version == other.Version
+               && Template == other.Template && Keys.SequenceEqual(other.Keys);
+    }
+
+    public string Export()
+    {
+        var json = JsonConvert.SerializeObject(this);
+        return json;
     }
 }
 
 public class TextElement(string k, string en, string template, string zh = "")
 {
-    public string Key { get; } = k;
-    public string OriginalText { get; } = en;
-    public string ReplaceTemplate { get; } = template;
+    public string Key { get; set; } = k;
+    public string OriginalText { get; set; } = en;
+    public string ReplaceTemplate { get; set; } = template;
     [Reactive] public string TranslatedText { get; set; } = zh;
 
     public override string ToString()

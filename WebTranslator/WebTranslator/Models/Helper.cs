@@ -11,11 +11,11 @@ public static class Helper
         return version == MinecraftVersion.Version1Dot12Dot2 ? LangFormat.Lang : LangFormat.Json;
     }
 
-    public static int ReplaceOnce(this StringBuilder original, string oldValue, string newValue, int startIndex)
+    public static void ReplaceOnce(this StringBuilder original, string oldValue, string newValue)
     {
-        var index = original.ToString().IndexOf(oldValue, startIndex, StringComparison.Ordinal);
-        original.Replace(oldValue, newValue, index, oldValue.Length);
-        return index;
+        var index = original.ToString().IndexOf(oldValue, StringComparison.Ordinal);
+        original.Remove(index, oldValue.Length);
+        original.Insert(index, newValue);
     }
 
     public static void ReplaceMatchGroup(this StringBuilder original, Group oldValue, string newValue)

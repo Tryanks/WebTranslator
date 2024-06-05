@@ -76,4 +76,19 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         var info = new GitHubFileInfo("zh_cn.json", link);
         testOutputHelper.WriteLine(info.String().Result);
     }
+
+    [Fact]
+    public void TestDictionaryExport()
+    {
+        var dict = new ModDictionary("1", "test", MinecraftVersion.Version1Dot16);
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var originFilePath = Path.Combine(currentDirectory, "TestFiles", "LargeFile.json");
+        var originText = File.ReadAllText(originFilePath);
+        dict.LoadOriginalFile(originText);
+        dict.LoadTranslatedFile("{}");
+        var dict2 = ModDictionary.FromJson(dict.Export());
+        var key = dict2.Keys.First();
+        var value = dict2.TextDictionary[key];
+        testOutputHelper.WriteLine("Same status: " + dict2.Equals(dict));
+    }
 }
