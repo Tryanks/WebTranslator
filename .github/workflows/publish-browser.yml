@@ -24,22 +24,26 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CFPATools_Token }}
         run: |
-          git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io.git gh-pages
+          git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io.git ../gh-pages
 
       - name: Copy Files to GitHub Pages Repository
         run: |
-          cd gh-pages
-          
-          find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
-          find . -type d ! -path . ! -path './.git*' -exec rm -rf {} +
-          
-          cp -r ../publish/wwwroot/* ./
-          
-          cd ..
-          mv gh-pages ../
+          # Switch to the gh-pages directory in the parent directory
           cd ../gh-pages
+          
+          # Remove all files except .nojekyll and README.md
+          find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
+          find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
+          
+          # Copy new files from the publish directory
+          cp -r ../${GITHUB_WORKSPACE}/publish/wwwroot/* .
+
+          # Configure git to recognize the action as the author
           git config user.name github-actions
           git config user.email github-actions@github.com
+
+          # Add changes to git
           git add .
-          git commit -m "$(date +'%Y-%m-%d %H:%M:%S.%3N') Action"
-          git push origin master
+          git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin main  # Ensure you're using the correct branch name
+
