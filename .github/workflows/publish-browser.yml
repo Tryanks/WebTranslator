@@ -26,16 +26,14 @@ jobs:
         run: |
           git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io.git --depth=1 gh-pages
 
-      - name: Remove Old Files
-        run: |
-          cd gh-pages
-          find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
-          find . -type d ! -path . ! -path './.git*' -exec rm -rf {} +
-
       - name: Copy Files to GitHub Pages Repository
         run: |
-          cp -r ./publish/wwwroot/* ./gh-pages/
           cd gh-pages
+          
+          find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
+          find . -type d ! -path . ! -path './.git*' -exec rm -rf {} +
+          
+          cp -r ../publish/wwwroot/* ./
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
