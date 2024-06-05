@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using ReactiveUI.Fody.Helpers;
 
 namespace WebTranslator.Models;
 
 public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVersion version)
 {
-    public readonly SortedDictionary<string, TextElement> TextDictionary = new();
+    public readonly List<string> Keys = [];
+    public readonly Dictionary<string, TextElement> TextDictionary = new();
 
-    private string _originalTemplate = "";
     public string CurseForgeId { get; } = curseForgeId;
     public string ModNamespace { get; } = modNamespace;
 
     public MinecraftVersion Version { get; } = version;
     public LangFormat Format => Version.GetFormat();
+
+    public string Template { get; private set; } = "";
 
     public void LoadOriginalFile(string text)
     {
@@ -22,13 +25,15 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
         if (result.Dictionary.Count == 0)
             throw new ArgumentException("Empty list: Input text may not Minecraft Mod language file.");
         TextDictionary.Clear();
-        foreach (var (key, value) in result.Dictionary)
+        foreach (var key in result.Keys)
         {
+            Keys.Add(key);
+            var value = result.Dictionary[key];
             var element = new TextElement(key, value.Text.Trim('"'), value.Template.Trim('"'));
-            TextDictionary.Add(key, element);
+            TextDictionary[key] = element;
         }
 
-        _originalTemplate = result.Template;
+        Template = result.Template;
     }
 
     public void LoadTranslatedFile(string text)
@@ -51,15 +56,18 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
 
     public override string ToString()
     {
-        var text = _originalTemplate;
-        foreach (var (_, value) in TextDictionary)
+        var text = Template;
+        var textBuilder = new StringBuilder(text);
+        var index = 0;
+        foreach (var key in Keys)
         {
+            var value = TextDictionary[key];
             var v = value.ToString();
             if (Format == LangFormat.Json) v = v.ReplaceToJson5();
-            text = text.ReplaceOnce(value.ReplaceTemplate, v);
+            index = textBuilder.ReplaceOnce(value.ReplaceTemplate, v, index);
         }
 
-        return text;
+        return textBuilder.ToString();
     }
 }
 

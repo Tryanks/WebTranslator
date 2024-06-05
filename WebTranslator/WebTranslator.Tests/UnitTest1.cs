@@ -18,6 +18,8 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         // _testOutputHelper.WriteLine(dict.OriginalTemplate);
         dict.LoadTranslatedFile(translatedText);
 
+        testOutputHelper.WriteLine(dict.Template);
+
         foreach (var (key, value) in dict.TextDictionary)
             testOutputHelper.WriteLine(key + "\n" + value.ReplaceTemplate + "\n" + value.OriginalText + "\n" +
                                        value.TranslatedText + "\n\n");
@@ -36,6 +38,8 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         dict.LoadOriginalFile(originText);
         // _testOutputHelper.WriteLine(dict.OriginalTemplate);
         dict.LoadTranslatedFile(translatedText);
+
+        testOutputHelper.WriteLine(dict.Template);
 
         foreach (var (key, value) in dict.TextDictionary)
             testOutputHelper.WriteLine(key + "\n" + value.ReplaceTemplate + "\n" + value.OriginalText + "\n" +
