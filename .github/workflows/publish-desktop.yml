@@ -1,8 +1,8 @@
 ﻿name: Desktop Publish
 
 on:
-  workflow_dispatch: 
-    
+  workflow_dispatch:
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -11,25 +11,36 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: 8.0.x
-            
-      # Add  MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
+          dotnet-version: 8.0.x
+      
+      # Add MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
-      
+
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
-        
-      - name: Upload Windows Publish Directory
+
+      - name: Rename and Clean Windows Files
+        run: |
+          mv publish/WebTranslator.Desktop.exe publish/WebTranslator.exe
+          rm -f publish/WebTranslator.Desktop.pdb publish/WebTranslator.pdb
+
+      - name: Package Windows Build
+        run: |
+          cd publish
+          Compress-Archive -Path * -DestinationPath ../WebTranslator-windows_amd64.zip
+          cd ..
+
+      - name: Upload Windows Build
         uses: actions/upload-artifact@v2
         with:
-          name: windows-publish
-          path: publish
-        
+          name: WebTranslator-windows_amd64.zip
+          path: WebTranslator-windows_amd64.zip
+  
   build-ubuntu:
     runs-on: ubuntu-20.04
     steps:
@@ -44,62 +55,42 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install clang zlib1g-dev
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev p7zip-full
 
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
 
-      - name: Upload Ubuntu Publish Directory
+      - name: Rename and Clean Ubuntu Files
+        run: |
+          mv publish/WebTranslator.Desktop publish/WebTranslator
+          rm -f publish/WebTranslator.Desktop.dbg publish/WebTranslator.pdb
+
+      - name: Package Ubuntu Build
+        run: |
+          cd publish
+          7z a -ttar WebTranslator-linux_amd64.tar .
+          7z a -tgzip ../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
+          rm WebTranslator-linux_amd64.tar
+          cd ..
+
+      - name: Upload Ubuntu Build
         uses: actions/upload-artifact@v2
         with:
-          name: ubuntu-publish
-          path: publish
-        
+          name: WebTranslator-linux_amd64.tar.gz
+          path: WebTranslator-linux_amd64.tar.gz
+  
   release:
     needs: [build-windows, build-ubuntu]
     runs-on: ubuntu-latest
     steps:
-      - name: Install p7zip
-        run: sudo apt-get install p7zip-full
-      
-      - name: Download Windows Publish Directory
+      - name: Download Windows Build
         uses: actions/download-artifact@v2
         with:
-          name: windows-publish
-          path: publish/windows
+          name: WebTranslator-windows_amd64.zip
+          path: release/windows
 
-      - name: Download Ubuntu Publish Directory
+      - name: Download Ubuntu Build
         uses: actions/download-artifact@v2
         with:
-          name: ubuntu-publish
-          path: publish/ubuntu
-
-      - name: Rename and Clean Windows Files
-        run: |
-          mv publish/windows/WebTranslator.Desktop.exe publish/windows/WebTranslator.exe
-          rm -f publish/windows/WebTranslator.Desktop.pdb publish/windows/WebTranslator.pdb
-
-      - name: Package Windows Build
-        run: |
-          cd publish/windows
-          zip -r WebTranslator-windows_amd64.zip .
-          mv WebTranslator-windows_amd64.zip ../../
-          cd ../..
-
-      - name: Rename and Clean Ubuntu Files
-        run: |
-          mv publish/ubuntu/WebTranslator.Desktop publish/ubuntu/WebTranslator
-          rm -f publish/ubuntu/WebTranslator.Desktop.dbg publish/ubuntu/WebTranslator.pdb
-
-      - name: Package Ubuntu Build
-        run: |
-          cd publish/ubuntu
-          7z a -ttar WebTranslator-linux_amd64.tar .
-          7z a -tgzip ../../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
-          rm WebTranslator-linux_amd64.tar
-          cd ../..
-    
-      - name: List Final Artifacts
-        run: |
-          ls -l WebTranslator-windows_amd64.zip
-          ls -l WebTranslator-linux_amd64.tar.gz
+          name: WebTranslator-linux_amd64.tar.gz
+          path: release/ubuntu
