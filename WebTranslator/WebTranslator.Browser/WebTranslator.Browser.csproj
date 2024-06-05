@@ -12,15 +12,4 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="11.1.0-beta2"/>
     </ItemGroup>
-
-    <Target Name="AddNoJekyllFile" AfterTargets="Publish">
-        <ItemGroup>
-            <NoJekyllFile Include="$(PublishDir)/wwwroot/.nojekyll"/>
-        </ItemGroup>
-        <WriteLinesToFile
-                File="@(NoJekyllFile)"
-                Lines=""
-                Overwrite="true"
-                Encoding="UTF-8"/>
-    </Target>
 </Project>
