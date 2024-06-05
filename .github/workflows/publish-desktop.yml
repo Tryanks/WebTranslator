@@ -26,14 +26,12 @@ jobs:
 
       - name: Rename and Clean Windows Files
         run: |
-          mv publish/WebTranslator.Desktop.exe publish/WebTranslator.exe
-          rm -f publish/WebTranslator.Desktop.pdb publish/WebTranslator.pdb
+          Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe
+          Remove-Item -Path publish/WebTranslator.Desktop.pdb, publish/WebTranslator.pdb -Force
 
       - name: Package Windows Build
         run: |
-          cd publish
-          Compress-Archive -Path * -DestinationPath ../WebTranslator-windows_amd64.zip
-          cd ..
+          Compress-Archive -Path publish/* -DestinationPath WebTranslator-windows_amd64.zip -Force
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v2
