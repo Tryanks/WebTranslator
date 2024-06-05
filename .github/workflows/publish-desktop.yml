@@ -73,7 +73,7 @@ jobs:
 
       - name: Rename and Clean Windows Files
         run: |
-          mv publish/windows/WebTranslator/Desktop.exe publish/windows/WebTranslator.exe
+          mv publish/windows/WebTranslator.Desktop.exe publish/windows/WebTranslator.exe
           rm -f publish/windows/WebTranslator.Desktop.pdb publish/windows/WebTranslator.pdb
 
       - name: Package Windows Build
@@ -85,7 +85,7 @@ jobs:
 
       - name: Rename and Clean Ubuntu Files
         run: |
-          mv publish/ubuntu/WebTranslator/Desktop publish/ubuntu/WebTranslator
+          mv publish/ubuntu/WebTranslator.Desktop publish/ubuntu/WebTranslator
           rm -f publish/ubuntu/WebTranslator.Desktop.dbg publish/ubuntu/WebTranslator.pdb
 
       - name: Package Ubuntu Build
