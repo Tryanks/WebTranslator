@@ -36,7 +36,7 @@ jobs:
           find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
           
           # Copy new files from the publish directory
-          cp -r ../${GITHUB_WORKSPACE}/publish/wwwroot/* .
+          cp -r ${GITHUB_WORKSPACE}/publish/wwwroot/* .
 
           # Configure git to recognize the action as the author
           git config user.name github-actions
