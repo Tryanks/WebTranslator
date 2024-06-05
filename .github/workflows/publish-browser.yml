@@ -34,4 +34,4 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "$(date +'%Y-%m-%d') Action"
-          git push origin main
+          git push origin master
