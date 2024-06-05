@@ -59,6 +59,9 @@ jobs:
     needs: [build-windows, build-ubuntu]
     runs-on: ubuntu-latest
     steps:
+      - name: Install p7zip
+        run: sudo apt-get install p7zip-full
+      
       - name: Download Windows Publish Directory
         uses: actions/download-artifact@v2
         with:
@@ -91,12 +94,10 @@ jobs:
       - name: Package Ubuntu Build
         run: |
           cd publish/ubuntu
-          sleep 2  # 等待2秒以稳定文件系统
-          tar --ignore-failed-read -czvf WebTranslator-linux_amd64.tar.gz .
+          7z a -ttar WebTranslator-linux_amd64.tar .
+          7z a -tgzip ../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
           mv WebTranslator-linux_amd64.tar.gz ../../
           cd ../..
-        shell: /usr/bin/bash -e {0}
-    
     
       - name: List Final Artifacts
         run: |
