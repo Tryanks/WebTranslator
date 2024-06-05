@@ -24,6 +24,12 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
         
+      - name: Upload Windows Publish Directory
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-publish
+          path: publish
+        
   build-ubuntu:
     runs-on: ubuntu-20.04
     steps:
@@ -42,3 +48,30 @@ jobs:
 
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
+
+      - name: Upload Ubuntu Publish Directory
+        uses: actions/upload-artifact@v2
+        with:
+          name: ubuntu-publish
+          path: publish
+        
+  release:
+    needs: [build-windows, build-ubuntu]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows Publish Directory
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-publish
+          path: publish/windows
+
+      - name: Download Ubuntu Publish Directory
+        uses: actions/download-artifact@v2
+        with:
+          name: ubuntu-publish
+          path: publish/ubuntu
+
+      - name: List Publish Directories
+        run: |
+          ls publish/windows
+          ls publish/ubuntu
