@@ -40,9 +40,15 @@ jobs:
           # Remove all files except .nojekyll and README.md
           find . -type f ! -name '.nojekyll' ! -name 'README.md' -delete
           find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
+
+          # Debugging: List the contents of gh-pages to confirm .git directory exists
+          ls -la
           
           # Copy new files from the publish directory
           cp -r ${GITHUB_WORKSPACE}/publish/wwwroot/* .
+
+          # Debugging: List the contents of gh-pages to confirm .git directory exists
+          ls -la
 
           # Configure git to recognize the action as the author
           git config user.name github-actions
