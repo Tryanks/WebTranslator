@@ -4,7 +4,7 @@ on:
   workflow_dispatch: 
     
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -21,5 +21,24 @@ jobs:
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
       
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
+        
+  build-ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install clang zlib1g-dev
+
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
