@@ -19,7 +19,7 @@ jobs:
             
       # Add  MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v1.0.0
+        uses: microsoft/setup-msbuild@v2
       
       - name: Publish
         run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
