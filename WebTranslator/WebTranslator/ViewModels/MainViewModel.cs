@@ -7,6 +7,7 @@ public class MainViewModel : ViewModelBase
 {
     private static readonly OpenFileViewModel Page1 = new();
     private static readonly EditorViewModel Page2 = new();
+    private static readonly ExportViewModel Page3 = new();
 
     public MainViewModel()
     {
@@ -16,6 +17,7 @@ public class MainViewModel : ViewModelBase
             {
                 0 => Page1,
                 1 => Page2,
+                2 => Page3,
                 _ => NavigationContent
             };
             NavigationContent.SetParameter(parameter);

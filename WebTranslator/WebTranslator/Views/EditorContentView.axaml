@@ -7,6 +7,7 @@
              x:DataType="vm:EditorContentViewModel"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
@@ -36,11 +37,30 @@
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
         </Style>
         <Style Selector="StackPanel.ShortCut TextBlock">
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="12" />
         </Style>
     </UserControl.Styles>
-    <Grid ColumnDefinitions="Auto,*,Auto" Margin="{DynamicResource FlyoutContentPadding}">
-        <ListBox Grid.Column="0" Width="300" Margin="0,0,16,0" ItemsSource="{Binding EditorList}"
+    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,*" Margin="{DynamicResource FlyoutContentPadding}">
+        <fa:CommandBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DefaultLabelPosition="Right" Margin="0,-8,0,8">
+            <fa:CommandBar.PrimaryCommands>
+                <fa:CommandBarButton IconSource="SaveAs" Label="暂存更改" ToolTip.Tip="保存所有未保存的更改项"
+                                     Command="{Binding SaveAll}" />
+                <fa:CommandBarButton IconSource="Save" Label="开始导出" ToolTip.Tip="完成翻译，进入导出页"
+                                     Command="{Binding ExportCommand}"/>
+                <fa:CommandBarSeparator />
+                <fa:CommandBarButton IconSource="Delete" Label="清除重复译文" ToolTip.Tip="当译文与原文完全相同时，将译文清空，留待翻译"
+                                     Command="{Binding ClearAllTranslationText}" />
+                <fa:CommandBarButton IconSource="ClipboardFilled" Label="填充原文到译文" ToolTip.Tip="使用原文填充所有为空的译文"
+                                     Command="{Binding FillAllTranslationText}" />
+                <fa:CommandBarSeparator />
+                <fa:CommandBarToggleButton IconSource="Import" Label="自动跳转翻译项" ToolTip.Tip="当点击提交时，自动跳转到下一条译文为空的条目"
+                                           IsChecked="{Binding AutoSkip}" />
+            </fa:CommandBar.PrimaryCommands>
+            <fa:CommandBar.SecondaryCommands>
+                <!-- <fa:CommandBarButton Label="附加功能" /> -->
+            </fa:CommandBar.SecondaryCommands>
+        </fa:CommandBar>
+        <ListBox Grid.Row="1" Grid.Column="0" Width="300" Margin="0,0,16,0" ItemsSource="{Binding EditorList}"
                  SelectedIndex="{Binding SelectedIndex}"
                  SelectedItem="{Binding TranslationItem}">
             <ListBox.ItemTemplate>
@@ -64,12 +84,20 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto">
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto">
             <StackPanel Grid.Row="0">
                 <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}',Mode=OneTime}" FontSize="16" />
-                <TextBlock Text="{Binding TranslationItem.Key,StringFormat='键名: {0}',Mode=OneWay}" />
+                <Grid>
+                    <TextBlock Text="{Binding TranslationItem.Key,StringFormat='键名: {0}',Mode=OneWay}" />
+                    <TextBlock HorizontalAlignment="Right">
+                        <Run Text="翻译进度 " />
+                        <Run Text="{Binding TranslatedCount}" />
+                        <Run Text="|" />
+                        <Run Text="{Binding AllCount}" />
+                    </TextBlock>
+                </Grid>
             </StackPanel>
-            <Grid Grid.Row="1" RowDefinitions="*,*" Margin="0,12,0,0" DataContext="{Binding TranslationItem}">
+            <Grid Grid.Row="1" RowDefinitions="*,*" Margin="0,12,0,0">
                 <Border Classes="Card" Grid.Row="0">
                     <Grid RowDefinitions="Auto,Auto,*">
                         <TextBlock Grid.Row="0" Text="原文" />
@@ -81,7 +109,7 @@
                         <edit:TextEditor
                             Grid.Row="2"
                             IsReadOnly="True"
-                            Document="{Binding OriginalDoc}"
+                            Document="{Binding TranslationItem.OriginalDoc}"
                             Loaded="SyntaxEditorLoaded"
                             ShowLineNumbers="True"
                             Name="SyntaxEditor1">
@@ -108,18 +136,12 @@
                                    Padding="{StaticResource MenuFlyoutSeparatorThemePadding}" />
                         <edit:TextEditor
                             Grid.Row="2"
-                            Document="{Binding TranslatedDoc}"
+                            Document="{Binding TranslationItem.TranslatedDoc}"
                             Loaded="SyntaxEditorLoaded"
                             ShowLineNumbers="True"
                             Name="SyntaxEditor2">
                             <edit:TextEditor.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuItem Header="Paste" InputGesture="Ctrl+V"
-                                              Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
-                                        <MenuItem.Icon>
-                                            <ic:SymbolIcon Symbol="ClipboardPaste" />
-                                        </MenuItem.Icon>
-                                    </MenuItem>
                                     <MenuItem Header="Cut" InputGesture="Ctrl+X"
                                               Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
                                         <MenuItem.Icon>
@@ -130,6 +152,12 @@
                                               Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
                                         <MenuItem.Icon>
                                             <ic:SymbolIcon Symbol="Copy" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Paste" InputGesture="Ctrl+V"
+                                              Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="ClipboardPaste" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </MenuFlyout>
@@ -148,12 +176,26 @@
                 </Button>
             </StackPanel>
             <StackPanel Grid.Row="2" Spacing="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-                <Button IsEnabled="{Binding TranslationItem.IsChanged}" Command="{Binding SaveItem}">保存</Button>
+                <Button Command="{Binding SkipItem}">
+                    跳过
+                </Button>
+                <Button IsEnabled="{Binding TranslationItem.IsChanged}" Command="{Binding SaveItem}">
+                    保存
+                </Button>
                 <!-- ReSharper disable once Xaml.StyleClassNotFound -->
                 <Button IsEnabled="{Binding TranslationItem.IsChanged}" Classes="accent"
-                        Command="{Binding SaveAndNextItem}">
-                    保存并下一个
+                        Command="{Binding SubmitItem}"
+                        ToolTip.Tip="保存并跳转到下一个带翻译条目">
+                    提交
                 </Button>
+            </StackPanel>
+            <StackPanel Grid.Row="2" IsVisible="False"
+                        Spacing="6" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
+                <Button HotKey="Ctrl+S" Command="{Binding SaveAll}">暂存快捷键</Button>
+                <Button HotKey="Ctrl+Shift+C" Command="{Binding TranslationItem.Clear}">清空快捷键</Button>
+                <Button HotKey="Ctrl+Shift+N" Command="{Binding NextItem}">下一个快捷键</Button>
+                <Button HotKey="Ctrl+Shift+B" Command="{Binding PrevItem}">上一个快捷键</Button>
+                <Button HotKey="Ctrl+N" Command="{Binding SkipItem}">跳过快捷键</Button>
             </StackPanel>
             <Grid Grid.Row="3" MinHeight="250" Margin="0,12,0,0">
                 <StackPanel Spacing="6">
@@ -163,49 +205,62 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        <Border MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="16,0,0,0">
+        <Border Grid.Row="1" MinWidth="200" Grid.Column="2" VerticalAlignment="Stretch" Margin="16,0,0,0">
             <Grid>
                 <StackPanel Spacing="6">
-                    <TextBlock>这里放置程序指示</TextBlock>
-                    <TextBlock>例如：</TextBlock>
-                    <TextBlock>
-                        换行数量：
-                        原文: 4
-                        译文: 2
-                    </TextBlock>
-                    <TextBlock>译文中的格式化字符串与原文不匹配</TextBlock>
-                    <TextBlock>缺少: %d %s</TextBlock>
-                    <TextBlock>多余: %1$d</TextBlock>
+                    <TextBlock Text="{Binding TranslationItem.OriginalLineCount,StringFormat='原文行数: {0}'}" />
+                    <TextBlock Text="{Binding TranslationItem.TranslatedLineCount,StringFormat='译文行数: {0}'}" />
+
+                    <Separator Height="0" Opacity="0" />
+
+                    <TextBlock IsVisible="{Binding TranslationItem.FormatError}">格式化字符串与原文不匹配</TextBlock>
                 </StackPanel>
                 <StackPanel Spacing="4" VerticalAlignment="Bottom" Classes="ShortCut">
+                    <!-- <Grid> -->
+                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+1</TextBlock> -->
+                    <!--     <TextBlock HorizontalAlignment="Right">应用第一个翻译</TextBlock> -->
+                    <!-- </Grid> -->
+                    <!-- <Grid> -->
+                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+2</TextBlock> -->
+                    <!--     <TextBlock HorizontalAlignment="Right">应用第二个翻译</TextBlock> -->
+                    <!-- </Grid> -->
+                    <!-- <Grid> -->
+                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+3</TextBlock> -->
+                    <!--     <TextBlock HorizontalAlignment="Right">应用第三个翻译</TextBlock> -->
+                    <!-- </Grid> -->
+                    <Separator Height="0" Opacity="0" />
                     <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+1</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">应用第一个翻译</TextBlock>
-                    </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+2</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">应用第二个翻译</TextBlock>
-                    </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+3</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">应用第三个翻译</TextBlock>
-                    </Grid>
-                    <Separator Height="4" Opacity="0" />
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+B</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">回到上一个</TextBlock>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+S</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">暂存所有结果</TextBlock>
                     </Grid>
                     <Grid>
                         <TextBlock HorizontalAlignment="Left">Ctrl+Shift+C</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">清空翻译框</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">清空</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+B</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">上一个</TextBlock>
                     </Grid>
                     <Grid>
                         <TextBlock HorizontalAlignment="Left">Ctrl+Shift+N</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">跳过到下一个</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">下一个</TextBlock>
                     </Grid>
                     <Grid>
                         <TextBlock HorizontalAlignment="Left">Ctrl+N</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">保存并下一个</TextBlock>
+                        <TextBlock HorizontalAlignment="Right">跳过</TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock HorizontalAlignment="Left">Enter</TextBlock>
+                        <TextBlock HorizontalAlignment="Right" IsVisible="{Binding TranslationItem.EqualLines}">
+                            <Run Foreground="{DynamicResource TextFillColorDisabled}">换行</Run>
+                            <Run>|</Run>
+                            <Run>提交</Run>
+                        </TextBlock>
+                        <TextBlock HorizontalAlignment="Right" IsVisible="{Binding !TranslationItem.EqualLines}">
+                            <Run>换行</Run>
+                            <Run>|</Run>
+                            <Run Foreground="{DynamicResource TextFillColorDisabled}">提交</Run>
+                        </TextBlock>
                     </Grid>
                 </StackPanel>
             </Grid>
