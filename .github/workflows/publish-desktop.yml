@@ -91,10 +91,13 @@ jobs:
       - name: Package Ubuntu Build
         run: |
           cd publish/ubuntu
-          tar -czvf WebTranslator-linux_amd64.tar.gz .
+          sleep 2  # 等待2秒以稳定文件系统
+          tar --ignore-failed-read -czvf WebTranslator-linux_amd64.tar.gz .
           mv WebTranslator-linux_amd64.tar.gz ../../
           cd ../..
-
+        shell: /usr/bin/bash -e {0}
+    
+    
       - name: List Final Artifacts
         run: |
           ls -l WebTranslator-windows_amd64.zip
