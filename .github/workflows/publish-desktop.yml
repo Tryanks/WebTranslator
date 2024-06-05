@@ -95,8 +95,8 @@ jobs:
         run: |
           cd publish/ubuntu
           7z a -ttar WebTranslator-linux_amd64.tar .
-          7z a -tgzip ../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
-          mv WebTranslator-linux_amd64.tar.gz ../../
+          7z a -tgzip ../../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
+          rm WebTranslator-linux_amd64.tar
           cd ../..
     
       - name: List Final Artifacts
