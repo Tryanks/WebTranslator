@@ -28,14 +28,6 @@ jobs:
         run: |
           Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe
           Remove-Item -Path publish/WebTranslator.Desktop.pdb, publish/WebTranslator.pdb -Force
-          
-      - name: Compress binaries
-        uses: crazy-max/ghaction-upx@v3
-        with: 
-          version: latest
-          files: |
-            ./publish/*
-          args: --lzma --best
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v2
@@ -67,14 +59,6 @@ jobs:
         run: |
           mv publish/WebTranslator.Desktop publish/WebTranslator
           rm -f publish/WebTranslator.Desktop.dbg publish/WebTranslator.pdb
-
-      - name: Compress binaries
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: |
-            ./publish/*
-          args: --lzma --best
 
       - name: Upload Ubuntu Build
         uses: actions/upload-artifact@v2
