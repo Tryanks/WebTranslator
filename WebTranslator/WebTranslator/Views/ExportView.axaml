@@ -5,6 +5,13 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:ExportViewModel"
              x:Class="WebTranslator.Views.ExportView"
-             xmlns:vm="clr-namespace:WebTranslator.ViewModels">
-    <TextBlock Text="{Binding Greeting}" />
+             xmlns:vm="clr-namespace:WebTranslator.ViewModels"
+             xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit">
+    <Grid Margin="16" RowDefinitions="*,Auto">
+        <edit:TextEditor Grid.Row="0" Name="Editor" IsReadOnly="True" Document="{Binding Document}" />
+        <Button Grid.Row="1" HorizontalAlignment="Right" Command="{Binding ElementName=Editor,Path=Copy}"
+                Margin="0,6,0,0">
+            复制 zh_cn.json
+        </Button>
+    </Grid>
 </UserControl>

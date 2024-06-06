@@ -148,7 +148,7 @@ public class OpenFileViewModel : ViewModelBase
 
         OriginalText = await GithubLanguageChoice.SelectOriginal!.String();
         if (GithubLanguageChoice.SelectTranslated is null)
-            TranslatedText = "{}";
+            TranslatedText = "";
         else
             TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
 
@@ -156,7 +156,7 @@ public class OpenFileViewModel : ViewModelBase
         _previewFileStatus = ImportFileMode.Github;
     }
 
-    public void OpenFileCommand(string s)
+    public async void OpenFileCommand(string s)
     {
         var word = s switch
         {
@@ -238,7 +238,7 @@ internal class LanguageChoice : ViewModelBase
         }
 
         var tasks = new List<Task<string>> { SelectOriginal!.String() };
-        if (SelectTranslated is not null) tasks.Add(SelectTranslated!.String());
+        if (SelectTranslated is not null && SelectTranslated.Name != "None") tasks.Add(SelectTranslated!.String());
 
         await Task.WhenAll(tasks);
 
@@ -251,6 +251,12 @@ internal class LanguageChoice : ViewModelBase
     {
         FileInfos = fileInfos;
         SelectTranslated = fileInfos.Find(x => x.Name.StartsWith("zh_cn."));
+        if (SelectTranslated is null)
+        {
+            FileInfos.Insert(0, new GitHubFileInfo("None", ""));
+            SelectTranslated = FileInfos[0];
+        }
+
         SelectOriginal = fileInfos.Find(x => x.Name.StartsWith("en_us."));
         if (SelectOriginal is not null) return;
         SelectOriginal = fileInfos.Find(x => !x.Name.StartsWith("zh_cn."));

@@ -1,17 +1,15 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using AvaloniaEdit.Document;
 using WebTranslator.Models;
-using WebTranslator.Services;
 
 namespace WebTranslator.ViewModels;
 
 public class ExportViewModel : ViewModelBase
 {
-    [Reactive] public string Greeting { get; set; } = "Hello, WebTranslator Exporter!";
+    public TextDocument Document { get; set; } = new();
 
     public override void SetParameter(object? parameter)
     {
         if (parameter is not ModDictionary dict) return;
-        ToastService.Notify("Not Implemented Yet");
-        Greeting = dict.ToString();
+        Document.Text = dict.ToString();
     }
 }

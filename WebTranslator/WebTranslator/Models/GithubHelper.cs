@@ -89,6 +89,7 @@ public class GitHubFileInfo(string name, string url)
 
     public async Task<string> String()
     {
+        if (string.IsNullOrEmpty(DownloadUrl)) return "";
         if (Content is not null) return Content;
         var url = "https://mirror.ghproxy.com/" +
                   (DownloadUrl.StartsWith("https://") ? DownloadUrl.Remove(0, "https://".Length) : DownloadUrl);
