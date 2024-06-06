@@ -8,6 +8,8 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <!--Public AOT-->
         <PublishAot>true</PublishAot>
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimMode>full</TrimMode>
         <ApplicationIcon>..\WebTranslator\Assets\translator.ico</ApplicationIcon>
     </PropertyGroup>
 
