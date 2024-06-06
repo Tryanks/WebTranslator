@@ -29,15 +29,16 @@ jobs:
           Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe
           Remove-Item -Path publish/WebTranslator.Desktop.pdb, publish/WebTranslator.pdb -Force
 
-      - name: Package Windows Build
-        run: |
-          Compress-Archive -Path publish/* -DestinationPath WebTranslator-windows_amd64.zip -Force
+#      - name: Package Windows Build
+#        run: |
+#          Compress-Archive -Path publish/* -DestinationPath WebTranslator-windows_amd64.zip -Force
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v2
         with:
           name: WebTranslator-windows_amd64.zip
-          path: WebTranslator-windows_amd64.zip
+          path: publish
+          compression-level: 9
   
   build-ubuntu:
     runs-on: ubuntu-20.04
@@ -63,19 +64,20 @@ jobs:
           mv publish/WebTranslator.Desktop publish/WebTranslator
           rm -f publish/WebTranslator.Desktop.dbg publish/WebTranslator.pdb
 
-      - name: Package Ubuntu Build
-        run: |
-          cd publish
-          7z a -ttar WebTranslator-linux_amd64.tar .
-          7z a -tgzip ../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
-          rm WebTranslator-linux_amd64.tar
-          cd ..
+#      - name: Package Ubuntu Build
+#        run: |
+#          cd publish
+#          7z a -ttar WebTranslator-linux_amd64.tar .
+#          7z a -tgzip ../WebTranslator-linux_amd64.tar.gz WebTranslator-linux_amd64.tar
+#          rm WebTranslator-linux_amd64.tar
+#          cd ..
 
       - name: Upload Ubuntu Build
         uses: actions/upload-artifact@v2
         with:
           name: WebTranslator-linux_amd64.tar.gz
-          path: WebTranslator-linux_amd64.tar.gz
+          path: publish
+          compression-level: 9
   
   release:
     needs: [build-windows, build-ubuntu]
