@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
+using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using FluentAvalonia.UI.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using WebTranslator.Controls;
+using WebTranslator.Interfaces;
 using WebTranslator.Models;
 using WebTranslator.Services;
 
@@ -30,7 +33,7 @@ public class OpenFileViewModel : ViewModelBase
         "";
 #endif
     [Reactive] internal GithubLinkStatus GithubLinkStatus { get; set; } = new();
-    [Reactive] internal LanguageChoice GithubLanguageChoice { get; set; } = new();
+    [Reactive] internal LanguageChoice LanguageChoice { get; set; } = new();
     [Reactive] public bool EnableDocument { get; set; }
     [Reactive] public TextDocument OriginalDocument { get; set; } = new();
     [Reactive] public TextDocument TranslatedDocument { get; set; } = new();
@@ -62,8 +65,8 @@ public class OpenFileViewModel : ViewModelBase
         }
 
         var link = GithubHelper.GithubConvert(GithubLink);
-        GithubLanguageChoice.IsLoading = false;
-        GithubLanguageChoice.Success = false;
+        LanguageChoice.IsLoading = false;
+        LanguageChoice.Success = false;
 
         var dialog = new ContentDialog
         {
@@ -74,7 +77,7 @@ public class OpenFileViewModel : ViewModelBase
             IsPrimaryButtonEnabled = false,
             Content = new ConfirmDialog
             {
-                DataContext = GithubLanguageChoice
+                DataContext = LanguageChoice
             }
         };
 
@@ -83,7 +86,7 @@ public class OpenFileViewModel : ViewModelBase
         dialog.Opened += DialogLoaded;
         dialog.PrimaryButtonClick += DialogConfirmed;
         dialog.Closed += DialogClosed;
-        GithubLanguageChoice.OnDownloaded += DialogDownloaded;
+        LanguageChoice.OnLoaded += DialogDownloaded;
 
         await dialog.ShowAsync();
         return;
@@ -92,23 +95,23 @@ public class OpenFileViewModel : ViewModelBase
         {
             dialog.Opened -= DialogLoaded;
 
-            GithubLanguageChoice.IsLoading = true;
+            LanguageChoice.IsLoading = true;
 
             ToastService.Notify("正在获取文件列表，请稍后");
             var infos = await GithubHelper.GetLanguageFilesAsync(link);
             if (infos.Count == 0)
             {
                 ToastService.Notify("获取到的文件列表为空，请确定存在语言文件", NotificationType.Error);
-                GithubLanguageChoice.IsLoading = false;
+                LanguageChoice.IsLoading = false;
                 return;
             }
 
             ToastService.Notify("获取文件列表成功");
 
             dialog.IsPrimaryButtonEnabled = false;
-            GithubLanguageChoice.SetGithubFileInfos(infos);
-            GithubLanguageChoice.IsLoading = false;
-            GithubLanguageChoice.Success = true;
+            LanguageChoice.SetFileInfos(infos);
+            LanguageChoice.IsLoading = false;
+            LanguageChoice.Success = true;
         }
 
         void DialogConfirmed(object? sender, object? e)
@@ -127,30 +130,30 @@ public class OpenFileViewModel : ViewModelBase
 
         void DialogDownloaded()
         {
-            GithubLanguageChoice.OnDownloaded -= DialogDownloaded;
+            LanguageChoice.OnLoaded -= DialogDownloaded;
             dialog.IsPrimaryButtonEnabled = true;
         }
     }
 
     private async void GithubConfirmCommand()
     {
-        if (!GithubLanguageChoice.Success)
+        if (!LanguageChoice.Success)
         {
             ToastService.Notify("请先获取文件列表", NotificationType.Error);
             return;
         }
 
-        if (GithubLanguageChoice.SelectOriginal is null)
+        if (LanguageChoice.SelectOriginal is null)
         {
             ToastService.Notify("请选择原文文件", NotificationType.Error);
             return;
         }
 
-        OriginalText = await GithubLanguageChoice.SelectOriginal!.String();
-        if (GithubLanguageChoice.SelectTranslated is null)
+        OriginalText = await LanguageChoice.SelectOriginal!.String();
+        if (LanguageChoice.SelectTranslated is null)
             TranslatedText = "";
         else
-            TranslatedText = await GithubLanguageChoice.SelectTranslated!.String();
+            TranslatedText = await LanguageChoice.SelectTranslated!.String();
 
         TabSelectedIndex = 1;
         _previewFileStatus = ImportFileMode.Github;
@@ -158,18 +161,110 @@ public class OpenFileViewModel : ViewModelBase
 
     public async void OpenFileCommand(string s)
     {
-        var word = s switch
+        switch (s)
         {
-            "Folder" => "文件夹",
-            "Original" => "原文文件",
-            "Translated" => "译文文件",
-            _ => "未知文件"
+            case "Folder":
+                await OpenFolder();
+                break;
+            case "Original":
+                await OpenOriginalFile();
+                break;
+            case "Translated":
+                await OpenTranslatedFile();
+                break;
+            default:
+                ToastService.Notify("无法打开文件", $"未知文件类型: {s}", NotificationType.Error);
+                break;
+        }
+    }
+
+    private IStorageFolder? Folder { get; set; }
+
+    private async Task OpenFolder()
+    {
+        var folders = await FilePickerService.OpenFolderPickerAsync(new FolderPickerOpenOptions());
+        if (folders.Count != 1) return;
+        Folder = folders[0];
+        var files = Folder.GetItemsAsync();
+        var fileList = new List<IFileInfo>();
+        await foreach (var file in files)
+            if (file.Name.EndsWith(".lang") || file.Name.EndsWith(".json"))
+                fileList.Add(new StorageFileInfo(file));
+        if (fileList.Count == 0)
+        {
+            ToastService.Notify("文件夹中没有任何语言文件 .lang 或 .json 类型格式文件", NotificationType.Error);
+            return;
+        }
+
+        var dialog = new ContentDialog
+        {
+            Title = "Load Storage Files",
+            PrimaryButtonText = "Confirm",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            IsPrimaryButtonEnabled = false,
+            Content = new ConfirmDialog
+            {
+                DataContext = LanguageChoice
+            }
         };
-        ToastService.Notify("暂不支持打开" + word);
-#if true
+
+        var confirm = false;
+
+        dialog.Opened += DialogLoaded;
+        dialog.PrimaryButtonClick += DialogConfirmed;
+        dialog.Closed += DialogClosed;
+        LanguageChoice.OnLoaded += LanguageLoaded;
+
+        await dialog.ShowAsync();
         return;
-#endif
-        _previewFileStatus = ImportFileMode.Folder;
+
+        void DialogLoaded(object? sender, object? e)
+        {
+            dialog.Opened -= DialogLoaded;
+
+            LanguageChoice.IsLoading = true;
+            LanguageChoice.SetFileInfos(fileList);
+            LanguageChoice.IsLoading = false;
+            LanguageChoice.Success = true;
+        }
+
+        void DialogConfirmed(object? sender, object? e)
+        {
+            dialog.PrimaryButtonClick -= DialogConfirmed;
+            confirm = true;
+        }
+
+        async void DialogClosed(object? sender, object? e)
+        {
+            dialog.Closed -= DialogClosed;
+            if (!confirm) return;
+
+            OriginalText = await LanguageChoice.SelectOriginal!.String();
+            if (LanguageChoice.SelectTranslated is null)
+                TranslatedText = "";
+            else
+                TranslatedText = await LanguageChoice.SelectTranslated!.String();
+
+            TabSelectedIndex = 1;
+            _previewFileStatus = ImportFileMode.Folder;
+        }
+
+        void LanguageLoaded()
+        {
+            LanguageChoice.OnLoaded -= LanguageLoaded;
+            dialog.IsPrimaryButtonEnabled = true;
+        }
+    }
+
+    private async Task OpenOriginalFile()
+    {
+        ToastService.Notify("未实现");
+    }
+
+    private async Task OpenTranslatedFile()
+    {
+        ToastService.Notify("未实现");
     }
 
     public void ManualInputCommand()
@@ -202,6 +297,35 @@ public class OpenFileViewModel : ViewModelBase
                 dict.LoadOriginalFile(OriginalText);
                 dict.LoadTranslatedFile(TranslatedText);
                 break;
+            case ImportFileMode.Folder:
+                if (Folder is null)
+                {
+                    ToastService.Notify("未选择文件夹", NotificationType.Error);
+                    return;
+                }
+
+                dict = new ModDictionary(Folder.Name, Folder.Path.AbsolutePath,
+                    OriginalText.Trim().StartsWith('{')
+                        ? MinecraftVersion.Version1Dot16
+                        : MinecraftVersion.Version1Dot12Dot2);
+                dict.LoadOriginalFile(OriginalText);
+                dict.LoadTranslatedFile(TranslatedText);
+                break;
+            case ImportFileMode.Manual:
+                dict = new ModDictionary("Manual", "Manual",
+                    OriginalText.Trim().StartsWith('{')
+                        ? MinecraftVersion.Version1Dot16
+                        : MinecraftVersion.Version1Dot12Dot2);
+                dict.LoadOriginalFile(OriginalText);
+                dict.LoadTranslatedFile(TranslatedText);
+                if (dict.TextDictionary.Count == 0 ||
+                    string.IsNullOrEmpty(dict.TextDictionary.First().Value.OriginalText))
+                {
+                    ToastService.Notify("输入文本无法解析", NotificationType.Error);
+                    return;
+                }
+
+                break;
             default:
                 throw new NotImplementedException();
         }
@@ -216,11 +340,11 @@ internal class LanguageChoice : ViewModelBase
 
     [Reactive] public bool IsLoading { get; set; }
     [Reactive] public bool Success { get; set; }
-    [Reactive] public bool Downloading { get; set; }
-    [Reactive] public List<GitHubFileInfo> FileInfos { get; set; } = [];
-    [Reactive] public GitHubFileInfo? SelectOriginal { get; set; }
-    [Reactive] public GitHubFileInfo? SelectTranslated { get; set; }
-    public event DownloadHandler? OnDownloaded;
+    [Reactive] public bool Downloading { get; private set; }
+    [Reactive] public List<IFileInfo> FileInfos { get; set; } = [];
+    [Reactive] public IFileInfo? SelectOriginal { get; set; }
+    [Reactive] public IFileInfo? SelectTranslated { get; set; }
+    public event DownloadHandler? OnLoaded;
 
     public async void DownloadCommand()
     {
@@ -244,10 +368,10 @@ internal class LanguageChoice : ViewModelBase
 
         Downloading = false;
         ToastService.Notify("下载完成");
-        OnDownloaded?.Invoke();
+        OnLoaded?.Invoke();
     }
 
-    public void SetGithubFileInfos(List<GitHubFileInfo> fileInfos)
+    public void SetFileInfos(List<IFileInfo> fileInfos)
     {
         FileInfos = fileInfos;
         SelectTranslated = fileInfos.Find(x => x.Name.StartsWith("zh_cn."));
@@ -260,7 +384,7 @@ internal class LanguageChoice : ViewModelBase
         SelectOriginal = fileInfos.Find(x => x.Name.StartsWith("en_us."));
         if (SelectOriginal is not null) return;
         SelectOriginal = fileInfos.Find(x => !x.Name.StartsWith("zh_cn."));
-        ToastService.Notify(SelectOriginal is null ? "目标仓库没有任何非中文文件" : $"未找到原文文件，已选择其他文件: {SelectOriginal.Name}");
+        ToastService.Notify(SelectOriginal is null ? "选取目标没有任何非中文文件" : $"未找到原文文件，已选择其他文件: {SelectOriginal.Name}");
     }
 }
 

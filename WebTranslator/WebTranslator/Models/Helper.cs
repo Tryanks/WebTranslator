@@ -14,6 +14,7 @@ public static class Helper
     public static void ReplaceOnce(this StringBuilder original, string oldValue, string newValue)
     {
         var index = original.ToString().IndexOf(oldValue, StringComparison.Ordinal);
+        if (index == -1) return;
         original.Remove(index, oldValue.Length);
         original.Insert(index, newValue);
     }
@@ -53,13 +54,14 @@ public static class Helper
         };
     }
 
-    public class WebTranslatorTemplate(int index = 0)
+    public class WebTranslatorTemplate
     {
         private const string Template = "|WebTranslator|Content%|WebTranslator|";
+        private int _index;
 
         public string Get()
         {
-            return Template.Replace("%", index--.ToString("D6"));
+            return Template.Replace("%", _index++.ToString("D6"));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using WebTranslator.Services;
+using WebTranslator.Interfaces;
 
 namespace WebTranslator.Models;
 
@@ -29,7 +29,7 @@ public static partial class GithubHelper
         return apiUrl;
     }
 
-    public static async Task<List<GitHubFileInfo>> GetLanguageFilesAsync(string apiUrl)
+    public static async Task<List<IFileInfo>> GetLanguageFilesAsync(string apiUrl)
     {
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("User-Agent", "CFPATools WebTranslator");
@@ -37,11 +37,14 @@ public static partial class GithubHelper
         var response = await httpClient.GetStringAsync(apiUrl);
         var allFiles = JArray.Parse(response);
 
-        return (from JObject? file in allFiles
-            where file["type"].ToString() == "file"
-            let name = file["name"].ToString()
-            let downloadUrl = file["download_url"].ToString()
-            select new GitHubFileInfo(name, downloadUrl)).ToList();
+        return
+        [
+            ..(from JObject? file in allFiles
+                where file["type"].ToString() == "file"
+                let name = file["name"].ToString()
+                let downloadUrl = file["download_url"].ToString()
+                select new GitHubFileInfo(name, downloadUrl)).ToList()
+        ];
     }
 
     public static async Task<string> GetGithubTextAsync(string link)
@@ -81,11 +84,11 @@ public static partial class GithubHelper
     private static partial Regex MyRegex();
 }
 
-public class GitHubFileInfo(string name, string url)
+public class GitHubFileInfo(string name, string url) : IFileInfo
 {
-    public string Name { get; } = name;
     private string DownloadUrl { get; } = url;
     private string? Content { get; set; }
+    public string Name { get; } = name;
 
     public async Task<string> String()
     {
@@ -94,7 +97,6 @@ public class GitHubFileInfo(string name, string url)
         var url = "https://mirror.ghproxy.com/" +
                   (DownloadUrl.StartsWith("https://") ? DownloadUrl.Remove(0, "https://".Length) : DownloadUrl);
         Content ??= await GithubHelper.GetGithubTextAsync(url);
-        ToastService.Notify("下载", url);
         return Content;
     }
 }

@@ -31,11 +31,12 @@ public static partial class LangFileParser
         text = text.ReplaceJson5();
         var matches = JsonKvPairRegex.Matches(text);
         var textBuilder = new StringBuilder(text);
-        var generator = new Helper.WebTranslatorTemplate(matches.Count);
+        var generator = new Helper.WebTranslatorTemplate();
         foreach (var match in matches.Reverse())
         {
             var key = match.Groups[1].Value;
             var value = match.Groups[2].Value;
+            if (keys.Contains(key)) continue;
             keys.Insert(0, key);
             var template = generator.Get();
             sd[key] = new LangFileDictionaryResult(value, template);
@@ -49,7 +50,7 @@ public static partial class LangFileParser
     {
         var lines = text.Split(LangSeparator, StringSplitOptions.RemoveEmptyEntries);
         var textBuilder = new StringBuilder(text);
-        var generator = new Helper.WebTranslatorTemplate(lines.Length);
+        var generator = new Helper.WebTranslatorTemplate();
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
@@ -61,6 +62,7 @@ public static partial class LangFileParser
 
             var key = trimmedLine[..separatorIndex].Trim();
             var value = trimmedLine[(separatorIndex + 1)..].Trim();
+            if (keys.Contains(key)) continue;
             keys.Add(key);
             var template = generator.Get();
             sd[key] = new LangFileDictionaryResult(value, template);
