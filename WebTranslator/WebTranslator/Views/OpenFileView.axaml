@@ -101,8 +101,8 @@
                     <Border Classes="Card">
                         <StackPanel Spacing="12" Orientation="Horizontal">
                             <Button Command="{Binding OpenFileCommand}" CommandParameter="Folder">选择文件夹</Button>
-                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Original">选择原文</Button>
-                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Translated">选择译文</Button>
+                            <Button IsEnabled="False" Command="{Binding OpenFileCommand}" CommandParameter="Original">选择原文</Button>
+                            <Button IsEnabled="False" Command="{Binding OpenFileCommand}" CommandParameter="Translated">选择译文</Button>
                         </StackPanel>
                     </Border>
                     <Separator Opacity="0" Height="6" />
@@ -112,7 +112,7 @@
                     </Border>
                     <Separator Opacity="0" Height="6" />
                     <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
-                    <fa:SettingsExpander Header="PR编号">
+                    <fa:SettingsExpander Header="PR编号" IsEnabled="False">
                         <fa:SettingsExpander.Footer>
                             <fa:NumberBox
                                 Grid.Column="0"
