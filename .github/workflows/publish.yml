@@ -4,6 +4,52 @@ on:
   workflow_dispatch:
 
 jobs:
+  build-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - run: dotnet workload install wasm-tools
+
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Browser
+
+      - name: Clone GitHub Pages Repository
+        env:
+          GH_TOKEN: ${{ secrets.CFPATools_Token }}
+        run: |
+          cd ..
+          git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io --depth=1 gh-pages
+
+      - name: Copy Files to GitHub Pages Repository
+        run: |
+          # Switch to the gh-pages directory in the parent directory
+          cd ../gh-pages
+
+          # Remove all files except .nojekyll and README.md
+          find . -type f ! -path './.git*' ! -name '.nojekyll' ! -name 'README.md' -delete
+          find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
+
+          # Copy new files from the publish directory
+          cp -r ${GITHUB_WORKSPACE}/publish/wwwroot/* .
+
+          # Configure git to recognize the action as the author
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          # Add changes to git
+          git add .
+          git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin master  # Ensure you're using the correct branch name
+  
   build-windows:
     runs-on: windows-latest
     steps:
