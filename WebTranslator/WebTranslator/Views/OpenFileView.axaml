@@ -40,90 +40,99 @@
         <TabControl Margin="{DynamicResource FlyoutContentThemeMargin}"
                     SelectedIndex="{Binding TabSelectedIndex}">
             <TabItem Header="导入文件">
-                <StackPanel Spacing="6" Margin="0,6,0,0">
-                    <TextBlock FontWeight="Bold">从 Github 开始</TextBlock>
-                    <Border Classes="Card">
-                        <StackPanel>
-                            <StackPanel Orientation="Vertical" Spacing="12">
-                                <TextBox
-                                    Watermark="请输入Github项目语言文件夹的链接"
-                                    MaxLines="1"
-                                    TextWrapping="NoWrap"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Top"
-                                    Margin="{DynamicResource FlyoutContentThemeMargin}"
-                                    Text="{Binding GithubLink}" />
-                                <Grid ColumnDefinitions="*,*">
-                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="24">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0" Text="github.com" />
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding GithubLinkStatus.GithubStatus}"
-                                                           Symbol="Checkmark" Foreground="Green" />
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding !GithubLinkStatus.GithubStatus}"
-                                                           Symbol="Dismiss" Foreground="Red" />
+                <ScrollViewer>
+                    <StackPanel Spacing="6" Margin="0,6,0,0">
+                        <TextBlock FontWeight="Bold">从 Github 开始</TextBlock>
+                        <Border Classes="Card">
+                            <StackPanel>
+                                <StackPanel Orientation="Vertical" Spacing="12">
+                                    <TextBox
+                                        Watermark="请输入Github项目语言文件夹的链接"
+                                        MaxLines="1"
+                                        TextWrapping="NoWrap"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Top"
+                                        Margin="{DynamicResource FlyoutContentThemeMargin}"
+                                        Text="{Binding GithubLink}" />
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="24">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
+                                                           Text="github.com" />
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding GithubLinkStatus.GithubStatus}"
+                                                               Symbol="Checkmark" Foreground="Green" />
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding !GithubLinkStatus.GithubStatus}"
+                                                               Symbol="Dismiss" Foreground="Red" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
+                                                           Text="{Binding GithubLinkStatus.Version,StringFormat='版本: {0}'}" />
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                               Symbol="Checkmark" Foreground="Green" />
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                                               Symbol="Dismiss" Foreground="Red" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Margin="0,0,4,0">
+                                                    <Run Text="以 " />
+                                                    <Run Text="/lang" FontWeight="Bold" />
+                                                    <Run Text=" 结尾" />
+                                                </TextBlock>
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding GithubLinkStatus.EndsWithLang}"
+                                                               Symbol="Checkmark" Foreground="Green" />
+                                                <ic:SymbolIcon VerticalAlignment="Center"
+                                                               IsVisible="{Binding !GithubLinkStatus.EndsWithLang}"
+                                                               Symbol="Dismiss" Foreground="Red" />
+                                            </StackPanel>
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
-                                                       Text="{Binding GithubLinkStatus.Version,StringFormat='版本: {0}'}" />
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                                           Symbol="Checkmark" Foreground="Green" />
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNullOrEmpty}}"
-                                                           Symbol="Dismiss" Foreground="Red" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Center" Margin="0,0,4,0">
-                                                <Run Text="以 " />
-                                                <Run Text="/lang" FontWeight="Bold" />
-                                                <Run Text=" 结尾" />
-                                            </TextBlock>
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding GithubLinkStatus.EndsWithLang}"
-                                                           Symbol="Checkmark" Foreground="Green" />
-                                            <ic:SymbolIcon VerticalAlignment="Center"
-                                                           IsVisible="{Binding !GithubLinkStatus.EndsWithLang}"
-                                                           Symbol="Dismiss" Foreground="Red" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Command="{Binding GithubCommand}"
-                                            HorizontalAlignment="Right">
-                                        点击校验
-                                    </Button>
-                                </Grid>
+                                        <Button Grid.Column="1" Command="{Binding GithubCommand}"
+                                                HorizontalAlignment="Right">
+                                            点击校验
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Border>
-                    <Separator Opacity="0" Height="6" />
-                    <TextBlock FontWeight="Bold">从本地文件开始</TextBlock>
-                    <Border Classes="Card">
-                        <StackPanel Spacing="12" Orientation="Horizontal">
-                            <Button Command="{Binding OpenFileCommand}" CommandParameter="Folder">选择文件夹</Button>
-                            <Button IsEnabled="False" Command="{Binding OpenFileCommand}" CommandParameter="Original">选择原文</Button>
-                            <Button IsEnabled="False" Command="{Binding OpenFileCommand}" CommandParameter="Translated">选择译文</Button>
-                        </StackPanel>
-                    </Border>
-                    <Separator Opacity="0" Height="6" />
-                    <TextBlock FontWeight="Bold">手动填写文件</TextBlock>
-                    <Border Classes="Card">
-                        <Button Command="{Binding ManualInputCommand}">进入编辑器</Button>
-                    </Border>
-                    <Separator Opacity="0" Height="6" />
-                    <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
-                    <fa:SettingsExpander Header="PR编号" IsEnabled="False">
-                        <fa:SettingsExpander.Footer>
-                            <fa:NumberBox
-                                Grid.Column="0"
-                                Maximum="19999"
-                                Minimum="0"
-                                SpinButtonPlacementMode="Inline"
-                                MinWidth="150"
-                                Value="123" />
-                        </fa:SettingsExpander.Footer>
-                    </fa:SettingsExpander>
-                </StackPanel>
+                        </Border>
+                        <Separator Opacity="0" Height="6" />
+                        <TextBlock FontWeight="Bold">从本地文件开始</TextBlock>
+                        <Border Classes="Card">
+                            <StackPanel Spacing="12" Orientation="Horizontal">
+                                <Button Command="{Binding OpenFileCommand}" CommandParameter="Folder">选择文件夹</Button>
+                                <Button IsEnabled="False" Command="{Binding OpenFileCommand}"
+                                        CommandParameter="Original">
+                                    选择原文
+                                </Button>
+                                <Button IsEnabled="False" Command="{Binding OpenFileCommand}"
+                                        CommandParameter="Translated">
+                                    选择译文
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <Separator Opacity="0" Height="6" />
+                        <TextBlock FontWeight="Bold">手动填写文件</TextBlock>
+                        <Border Classes="Card">
+                            <Button Command="{Binding ManualInputCommand}">进入编辑器</Button>
+                        </Border>
+                        <Separator Opacity="0" Height="6" />
+                        <TextBlock FontWeight="Bold">审阅 Pull Request</TextBlock>
+                        <fa:SettingsExpander Header="PR编号" IsEnabled="False">
+                            <fa:SettingsExpander.Footer>
+                                <fa:NumberBox
+                                    Grid.Column="0"
+                                    Maximum="19999"
+                                    Minimum="0"
+                                    SpinButtonPlacementMode="Inline"
+                                    MinWidth="150"
+                                    Value="123" />
+                            </fa:SettingsExpander.Footer>
+                        </fa:SettingsExpander>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
             <TabItem Header="预览文件">
                 <Border Classes="Card">
