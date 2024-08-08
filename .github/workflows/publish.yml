@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
 
@@ -54,7 +54,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
 
@@ -76,7 +76,7 @@ jobs:
           Remove-Item -Path publish/WebTranslator.Desktop.pdb, publish/WebTranslator.pdb -Force
 
       - name: Upload Windows Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: WebTranslator-windows_amd64
           path: publish
@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
 
@@ -107,7 +107,7 @@ jobs:
           rm -f publish/WebTranslator.Desktop.dbg publish/WebTranslator.pdb
 
       - name: Upload Ubuntu Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: WebTranslator-linux_amd64
           path: publish

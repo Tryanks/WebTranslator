@@ -11,7 +11,7 @@ public static class CyanInterfaces
         var link = $"https://cfpa.cyan.cafe/api/CFPATools/PRRelation/{prNumber}";
         var json = await Utils.Request(link);
         var doc = JsonConvert.DeserializeObject<ReviewPrMsg>(json);
-        return doc;
+        return doc!;
     }
 }
 

@@ -40,9 +40,9 @@ public static partial class GithubHelper
         return
         [
             ..(from JObject? file in allFiles
-                where file["type"].ToString() == "file"
-                let name = file["name"].ToString()
-                let downloadUrl = file["download_url"].ToString()
+                where file["type"]!.ToString() == "file"
+                let name = file["name"]!.ToString()
+                let downloadUrl = file["download_url"]!.ToString()
                 select new GitHubFileInfo(name, downloadUrl)).ToList()
         ];
     }

@@ -259,11 +259,13 @@ public class OpenFileViewModel : ViewModelBase
 
     private async Task OpenOriginalFile()
     {
+        await Task.Delay(1000);
         ToastService.Notify("未实现");
     }
 
     private async Task OpenTranslatedFile()
     {
+        await Task.Delay(1000);
         ToastService.Notify("未实现");
     }
 
