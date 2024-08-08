@@ -9,7 +9,7 @@
              xmlns:fa="using:FluentAvalonia.UI.Controls"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <Grid>
-        <fa:NavigationView OpenPaneLength="250"
+        <fa:NavigationView OpenPaneLength="200"
                            IsSettingsVisible="False"
                            SelectionChanged="NavigationView_OnSelectionChanged"
                            Content="{Binding NavigationContent}"
