@@ -11,7 +11,7 @@
     <!-- a href="https://github.com/Tryanks/WebTranslator/wiki"><strong>Explore the docs »</strong></a>
     <br />
     <br /-->
-    <a href="https://cfpatools.github.io">View Web Demo</a>
+    <a href="https://cfpatools.github.io">Web Demo</a>
     ·
     <a href="https://github.com/Tryanks/WebTranslator/actions">Download</a>
     .
