@@ -9,8 +9,6 @@
         Icon="/Assets/translator.ico"
         Title="WebTranslator"
         TransparencyLevelHint="Mica"
-        Background="Transparent"
-
         ExtendClientAreaToDecorationsHint="False">
     <views:MainView />
 </Window>
