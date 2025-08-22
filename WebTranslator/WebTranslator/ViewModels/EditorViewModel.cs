@@ -1,12 +1,12 @@
-﻿using ReactiveUI.Fody.Helpers;
-using WebTranslator.Models;
+﻿using WebTranslator.Models;
+using ReactiveUI;
 
 namespace WebTranslator.ViewModels;
 
 public class EditorViewModel : ViewModelBase
 {
-    [Reactive] public bool IsEmpty { get; set; } = true;
-    [Reactive] public EditorContentViewModel EditorContent { get; set; } = null!;
+    public bool IsEmpty { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = true;
+    public EditorContentViewModel EditorContent { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = null!;
 
     public override void SetParameter(object? parameter)
     {

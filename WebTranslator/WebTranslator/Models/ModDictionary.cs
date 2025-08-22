@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using ReactiveUI.Fody.Helpers;
 
 namespace WebTranslator.Models;
 
@@ -98,7 +97,7 @@ public class TextElement(string k, string en, string template, string zh = "")
     public string Key { get; set; } = k;
     public string OriginalText { get; set; } = en;
     public string ReplaceTemplate { get; set; } = template;
-    [Reactive] public string TranslatedText { get; set; } = zh;
+    public string TranslatedText { get => field; set { if (value == field) return; field = value; } } = zh;
 
     public override string ToString()
     {

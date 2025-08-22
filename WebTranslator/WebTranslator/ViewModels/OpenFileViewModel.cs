@@ -9,7 +9,7 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using FluentAvalonia.UI.Controls;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using System.Runtime.CompilerServices;
 using WebTranslator.Controls;
 using WebTranslator.Interfaces;
 using WebTranslator.Models;
@@ -24,19 +24,18 @@ public class OpenFileViewModel : ViewModelBase
         ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.GithubLink), link => { GithubLinkStatus.CheckLink(link); });
     }
 
-    [Reactive] public uint TabSelectedIndex { get; set; }
-    [Reactive]
-    public string GithubLink { get; set; } =
+    public uint TabSelectedIndex { get => field; set => this.RaiseAndSetIfChanged(ref field, value); }
+    public string GithubLink { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } =
 #if DEBUG
         "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/cf1a801466a901ec14a28c3b08dfe62f69c8db53/projects/1.20/assets/adorn-for-forge/adorn/lang";
 #else
         "";
 #endif
-    [Reactive] internal GithubLinkStatus GithubLinkStatus { get; set; } = new();
-    [Reactive] internal LanguageChoice LanguageChoice { get; set; } = new();
-    [Reactive] public bool EnableDocument { get; set; }
-    [Reactive] public TextDocument OriginalDocument { get; set; } = new();
-    [Reactive] public TextDocument TranslatedDocument { get; set; } = new();
+    internal GithubLinkStatus GithubLinkStatus { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = new();
+    internal LanguageChoice LanguageChoice { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = new();
+    public bool EnableDocument { get => field; set => this.RaiseAndSetIfChanged(ref field, value); }
+    public TextDocument OriginalDocument { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = new();
+    public TextDocument TranslatedDocument { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = new();
 
     private string OriginalText
     {
@@ -340,12 +339,12 @@ internal class LanguageChoice : ViewModelBase
 {
     public delegate void DownloadHandler();
 
-    [Reactive] public bool IsLoading { get; set; }
-    [Reactive] public bool Success { get; set; }
-    [Reactive] public bool Downloading { get; private set; }
-    [Reactive] public List<IFileInfo> FileInfos { get; set; } = [];
-    [Reactive] public IFileInfo? SelectOriginal { get; set; }
-    [Reactive] public IFileInfo? SelectTranslated { get; set; }
+    public bool IsLoading { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool Success { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool Downloading { get => field; private set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public List<IFileInfo> FileInfos { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
+    public IFileInfo? SelectOriginal { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } }
+    public IFileInfo? SelectTranslated { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } }
     public event DownloadHandler? OnLoaded;
 
     public async void DownloadCommand()
@@ -395,9 +394,9 @@ internal partial class GithubLinkStatus : ViewModelBase
     private readonly Regex _githubRegex = GenRegex();
     public string Identifier = "";
 
-    [Reactive] public bool GithubStatus { get; set; }
-    [Reactive] public string? Version { get; set; }
-    [Reactive] public bool EndsWithLang { get; set; }
+    public bool GithubStatus { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string? Version { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool EndsWithLang { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public void CheckLink(string link)
     {

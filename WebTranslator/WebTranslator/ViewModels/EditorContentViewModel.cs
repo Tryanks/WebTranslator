@@ -5,7 +5,6 @@ using System.Linq;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using WebTranslator.Models;
 using WebTranslator.Services;
 
@@ -38,13 +37,13 @@ public class EditorContentViewModel : ViewModelBase
 
     public ModDictionary ModDictionary { get; set; }
 
-    [Reactive] public string Header { get; set; }
-    [Reactive] public ObservableCollection<EditorListItem> EditorList { get; set; } = [];
-    [Reactive] public int SelectedIndex { get; set; } = -1;
-    [Reactive] public EditorListItem TranslationItem { get; set; } = null!;
-    [Reactive] public int TranslatedCount { get; set; }
+    public string Header { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public ObservableCollection<EditorListItem> EditorList { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
+    public int SelectedIndex { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = -1;
+    public EditorListItem TranslationItem { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = null!;
+    public int TranslatedCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public int AllCount { get; set; }
-    [Reactive] public bool AutoSkip { get; set; } = true;
+    public bool AutoSkip { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = true;
 
     public void SaveAll()
     {
@@ -215,18 +214,18 @@ public class EditorListItem : ViewModelBase
     public string Key { get; }
     private FormatMode FormatMode { get; }
     private List<string> OriginalFormatStrings { get; } = [];
-    [Reactive] public bool FormatError { get; set; }
+    public bool FormatError { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public TextDocument OriginalDoc { get; set; } = new();
     public TextDocument TranslatedDoc { get; set; } = new();
     public string OriginalText => OriginalDoc.Text;
-    [Reactive] public string TranslatedText { get; set; }
-    [Reactive] public string SavedTranslatedText { get; set; }
-    [Reactive] public bool IsTranslated { get; set; }
-    [Reactive] public bool IsChanged { get; set; }
+    public string TranslatedText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string SavedTranslatedText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool IsTranslated { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool IsChanged { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public int OriginalLineCount { get; }
-    [Reactive] public int TranslatedLineCount { get; set; }
-    [Reactive] public bool EqualLines { get; set; }
+    public int TranslatedLineCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool EqualLines { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public bool SameText => OriginalText == TranslatedText;
     public bool IsEmpty => IsChanged || string.IsNullOrEmpty(SavedTranslatedText);

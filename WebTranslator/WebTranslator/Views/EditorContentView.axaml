@@ -72,7 +72,7 @@
                                        Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
                         <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-8,0"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="Coral" Symbol="Circle" IsFilled="True" FontSize="8"
+                                       Foreground="Coral" Symbol="Circle" FontSize="8"
                                        IsVisible="{Binding IsChanged}" />
                         <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
                                    TextTrimming="CharacterEllipsis" />

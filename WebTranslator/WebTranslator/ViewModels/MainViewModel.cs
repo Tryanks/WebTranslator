@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
 using WebTranslator.Services;
 using WebTranslator.Views;
+using ReactiveUI;
 
 namespace WebTranslator.ViewModels;
 
@@ -38,5 +38,5 @@ public class MainViewModel : ViewModelBase
         });
     }
 
-    [Reactive] public UserControl NavigationContent { get; set; } = NavigationPage1;
+    public UserControl NavigationContent { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = NavigationPage1;
 }
