@@ -1,4 +1,4 @@
-﻿name: Desktop Publish
+name: Desktop Publish
 
 on:
   workflow_dispatch:
@@ -8,19 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
-      - run: dotnet workload install wasm-tools
+      - name: Install WebAssembly tools
+        run: dotnet workload install wasm-tools
 
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Browser
+      - name: Publish (Browser, net9.0-browser)
+        run: dotnet publish WebTranslator/WebTranslator.Browser -c Release -f net9.0-browser -o ./publish
 
       - name: Clone GitHub Pages Repository
         env:
@@ -38,7 +39,8 @@ jobs:
           find . -type f ! -path './.git*' ! -name '.nojekyll' ! -name 'README.md' -delete
           find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
 
-          # Copy new files from the publish directory
+          # Ensure destination exists and copy new files from the publish directory
+          mkdir -p .
           cp -r ${GITHUB_WORKSPACE}/publish/wwwroot/* .
 
           # Configure git to recognize the action as the author
@@ -47,84 +49,105 @@ jobs:
 
           # Add changes to git
           git add .
-          git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
-          git push origin master  # Ensure you're using the correct branch name
-  
+          if ! git diff --cached --quiet; then
+            git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin master  # Ensure this matches the actual default branch
+          else
+            echo "No changes to commit."
+          fi
+
   build-windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
-      
-      # Add MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
+          dotnet-version: 9.0.x
+
+      # Optional: Add MsBuild to the PATH (not strictly required for dotnet publish)
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
 
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
+      - name: Publish (Windows, net9.0, AOT, self-contained)
+        run: >-
+          dotnet publish WebTranslator/WebTranslator.Desktop
+          -c Release
+          -f net9.0
+          -r win-x64
+          -p:PublishAot=true
+          -p:SelfContained=true
+          -o ./publish
 
       - name: Rename and Clean Windows Files
+        shell: pwsh
         run: |
-          Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe
-          Remove-Item -Path publish/WebTranslator.Desktop.pdb, publish/WebTranslator.pdb -Force
+          if (Test-Path publish/WebTranslator.Desktop.exe) {
+            Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe -Force
+          }
+          Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
 
       - name: Upload Windows Build
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4
         with:
           name: WebTranslator-windows_amd64
           path: publish
           compression-level: 9
-  
+
   build-ubuntu:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
-      - name: Install dependencies
+      - name: Install dependencies (AOT prerequisites)
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev p7zip-full
 
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish WebTranslator/WebTranslator.Desktop
+      - name: Publish (Linux, net9.0, AOT, self-contained)
+        run: >-
+          dotnet publish WebTranslator/WebTranslator.Desktop
+          -c Release
+          -f net9.0
+          -r linux-x64
+          -p:PublishAot=true
+          -p:SelfContained=true
+          -o ./publish
 
       - name: Rename and Clean Ubuntu Files
         run: |
-          mv publish/WebTranslator.Desktop publish/WebTranslator
-          rm -f publish/WebTranslator.Desktop.dbg publish/WebTranslator.pdb
+          if [ -f publish/WebTranslator.Desktop ]; then mv publish/WebTranslator.Desktop publish/WebTranslator; fi
+          rm -f publish/*.pdb publish/*.dbg || true
 
       - name: Upload Ubuntu Build
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4
         with:
           name: WebTranslator-linux_amd64
           path: publish
           compression-level: 9
-  
+
   release:
     needs: [build-windows, build-ubuntu]
     runs-on: ubuntu-latest
     steps:
       - name: Download Windows Build
-        uses: actions/download-artifact@main
+        uses: actions/download-artifact@v4
         with:
           name: WebTranslator-windows_amd64
           path: release/windows
 
       - name: Download Ubuntu Build
-        uses: actions/download-artifact@main
+        uses: actions/download-artifact@v4
         with:
           name: WebTranslator-linux_amd64
           path: release/ubuntu
