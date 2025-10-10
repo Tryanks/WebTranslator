@@ -13,7 +13,12 @@ namespace WebTranslator.ViewModels;
 public class ExportViewModel : ViewModelBase
 {
     public TextDocument Document { get; set; } = new();
+    // Legacy simple diff document retained for backward compatibility, no longer used in UI
     public TextDocument DiffDocument { get; set; } = new();
+
+    // Raw texts for DiffPlex.Avalonia
+    public string? OldText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string? NewText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public string FileName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "zh_cn.json";
     public string FormatName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "JSON";
@@ -131,18 +136,22 @@ public class ExportViewModel : ViewModelBase
                 try
                 {
                     var oldText = File.ReadAllText(target);
-                    var diff = ComputeLineDiff(oldText, Document.Text ?? string.Empty);
-                    DiffDocument.Text = diff;
-                    HasDiff = !string.IsNullOrWhiteSpace(diff);
+                    OldText = oldText;
+                    NewText = Document.Text ?? string.Empty;
+                    HasDiff = !string.Equals(OldText, NewText, StringComparison.Ordinal);
                 }
                 catch (Exception e)
                 {
                     ToastService.Notify($"加载原文件以显示差异失败: {e.Message}");
+                    OldText = string.Empty;
+                    NewText = Document.Text ?? string.Empty;
+                    HasDiff = true;
                 }
             }
             else
             {
-                DiffDocument.Text = "(原文件不存在，将创建新文件)";
+                OldText = string.Empty;
+                NewText = Document.Text ?? string.Empty;
                 HasDiff = true;
             }
             // Default to auto-save when opened from local folder
@@ -152,6 +161,8 @@ public class ExportViewModel : ViewModelBase
         {
             AutoSaveToOrigin = false;
             HasDiff = false;
+            OldText = null;
+            NewText = null;
             DiffDocument.Text = string.Empty;
         }
     }

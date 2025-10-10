@@ -8,7 +8,8 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+             xmlns:diff="clr-namespace:DiffPlex.Avalonia.Controls;assembly=DiffPlex.Avalonia">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -79,7 +80,7 @@
             <Border Classes="Card" Grid.Row="2" IsVisible="{Binding HasDiff}">
                 <StackPanel>
                     <TextBlock Text="差异预览 (与原文件对比)" FontWeight="Bold" Margin="0,0,0,8"/>
-                    <edit:TextEditor Name="DiffEditor" IsReadOnly="True" ShowLineNumbers="False" WordWrap="True" Document="{Binding DiffDocument}" />
+                    <diff:DiffPresenter OldText="{Binding OldText}" NewText="{Binding NewText}" DisplayMode="SideBySide"/>
                 </StackPanel>
             </Border>
         </Grid>
