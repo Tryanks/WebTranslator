@@ -2,16 +2,78 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
              x:DataType="vm:ExportViewModel"
              x:Class="WebTranslator.Views.ExportView"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
-             xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit">
-    <Grid Margin="16" RowDefinitions="*,Auto">
-        <edit:TextEditor Grid.Row="0" Name="Editor" IsReadOnly="True" Document="{Binding Document}" />
-        <Button Grid.Row="1" HorizontalAlignment="Right" Command="{Binding ElementName=Editor,Path=Copy}"
-                Margin="0,6,0,0">
-            复制 zh_cn.json
-        </Button>
+             xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:fa="using:FluentAvalonia.UI.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+    <UserControl.Styles>
+        <Style Selector="edit|TextEditor">
+            <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
+            <Setter Property="ShowLineNumbers" Value="True" />
+            <Setter Property="WordWrap" Value="True" />
+        </Style>
+        <Style Selector="Border.Card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="MinHeight" Value="80" />
+            <Setter Property="Padding" Value="{StaticResource ContentDialogPadding}" />
+            <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Margin="{DynamicResource FlyoutContentPadding}" RowDefinitions="Auto,*,Auto">
+        <fa:CommandBar Grid.Row="0" DefaultLabelPosition="Right" Margin="0,-8,0,8">
+            <fa:CommandBar.PrimaryCommands>
+                <fa:CommandBarButton IconSource="Copy" Label="复制到剪贴板" Command="{Binding CopyCommand}"/>
+                <fa:CommandBarButton IconSource="Save" Label="另存为" Command="{Binding SaveAsCommand}"/>
+            </fa:CommandBar.PrimaryCommands>
+            <fa:CommandBar.SecondaryCommands>
+                <fa:CommandBarButton IconSource="ClipboardLink" Label="复制文件名" Command="{Binding CopyFileNameCommand}" />
+            </fa:CommandBar.SecondaryCommands>
+        </fa:CommandBar>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <Border Classes="Card" Grid.Row="0">
+                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="文件名"/>
+                        <TextBlock FontWeight="Bold" Text="{Binding FileName}"/>
+                        <TextBlock Text="（格式："/>
+                        <TextBlock Text="{Binding FormatName}"/>
+                        <TextBlock Text="）"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <ic:SymbolIcon Symbol="ClipboardTextLtr"/>
+                        <TextBlock Text="{Binding TextLength,StringFormat='字符数: {0}'}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Classes="Card" Grid.Row="1">
+                <edit:TextEditor Name="Editor" IsReadOnly="True" Document="{Binding Document}">
+                    <edit:TextEditor.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=Editor, Path=Copy}">
+                                <MenuItem.Icon>
+                                    <ic:SymbolIcon Symbol="Copy" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </edit:TextEditor.ContextFlyout>
+                </edit:TextEditor>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="2" HorizontalAlignment="Right" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="导出完成后可将文件提交到你的项目或发布 PR"/>
     </Grid>
 </UserControl>
