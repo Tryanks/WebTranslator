@@ -156,6 +156,7 @@ public class OpenFileViewModel : ViewModelBase
 
         TabSelectedIndex = 1;
         _previewFileStatus = ImportFileMode.Github;
+        ProjectContextService.SetGithub();
     }
 
     public async void OpenFileCommand(string s)
@@ -247,6 +248,8 @@ public class OpenFileViewModel : ViewModelBase
 
             TabSelectedIndex = 1;
             _previewFileStatus = ImportFileMode.Folder;
+            if (Folder is not null)
+                ProjectContextService.SetFolder(Folder);
         }
 
         void LanguageLoaded()
@@ -273,6 +276,7 @@ public class OpenFileViewModel : ViewModelBase
         TabSelectedIndex = 1;
         EnableDocument = true;
         _previewFileStatus = ImportFileMode.Manual;
+        ProjectContextService.SetManual();
     }
 
     private ImportFileMode _previewFileStatus = ImportFileMode.None;
