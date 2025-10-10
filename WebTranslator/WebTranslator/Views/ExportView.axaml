@@ -35,13 +35,14 @@
             <fa:CommandBar.PrimaryCommands>
                 <fa:CommandBarButton IconSource="Copy" Label="复制到剪贴板" Command="{Binding CopyCommand}"/>
                 <fa:CommandBarButton IconSource="Save" Label="另存为" Command="{Binding SaveAsCommand}"/>
+                <fa:CommandBarButton IconSource="Save" Label="保存到原文件" Command="{Binding SaveToOriginCommand}"/>
             </fa:CommandBar.PrimaryCommands>
             <fa:CommandBar.SecondaryCommands>
                 <fa:CommandBarButton IconSource="ClipboardLink" Label="复制文件名" Command="{Binding CopyFileNameCommand}" />
             </fa:CommandBar.SecondaryCommands>
         </fa:CommandBar>
 
-        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
             <Border Classes="Card" Grid.Row="0">
                 <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto">
                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -54,6 +55,9 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                         <ic:SymbolIcon Symbol="ClipboardTextLtr"/>
                         <TextBlock Text="{Binding TextLength,StringFormat='字符数: {0}'}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                        <CheckBox Content="自动保存到原文件夹" IsChecked="{Binding AutoSaveToOrigin}" IsVisible="{Binding IsLocalFolder}"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -70,6 +74,13 @@
                         </MenuFlyout>
                     </edit:TextEditor.ContextFlyout>
                 </edit:TextEditor>
+            </Border>
+
+            <Border Classes="Card" Grid.Row="2" IsVisible="{Binding HasDiff}">
+                <StackPanel>
+                    <TextBlock Text="差异预览 (与原文件对比)" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <edit:TextEditor Name="DiffEditor" IsReadOnly="True" ShowLineNumbers="False" WordWrap="True" Document="{Binding DiffDocument}" />
+                </StackPanel>
             </Border>
         </Grid>
 
