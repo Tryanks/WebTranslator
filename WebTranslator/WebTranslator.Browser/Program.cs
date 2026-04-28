@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
+using Avalonia.Media;
 using WebTranslator;
 using WebTranslator.Services;
 
@@ -17,5 +18,9 @@ internal sealed partial class Program
     }
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>();
+        => AppBuilder.Configure<App>()
+            .With(new FontManagerOptions
+            {
+                DefaultFamilyName = "avares://WebTranslator/Assets/SourceHanSansCN.otf#Source Han Sans CN"
+            });
 }
