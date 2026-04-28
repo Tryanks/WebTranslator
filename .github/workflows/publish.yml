@@ -93,6 +93,11 @@ jobs:
             Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe -Force
           }
           Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
+          $extraDlls = Get-ChildItem publish -Filter *.dll -File -ErrorAction SilentlyContinue
+          if ($extraDlls) {
+            $extraDlls | ForEach-Object { Write-Error "Unexpected Windows publish DLL: $($_.Name)" }
+            exit 1
+          }
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v7

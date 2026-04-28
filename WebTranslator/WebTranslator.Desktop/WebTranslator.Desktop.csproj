@@ -30,6 +30,24 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="2ndLAB.ANGLE.Static" Version="7151.0.0-10.0.26100.0-1.79e529b" />
+        <PackageReference Include="2ndLAB.SkiaSharp.Static" Version="2.88.9-10.0.26100.0-1.1c7d845" />
         <PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(PublishAot)' == 'true' and '$(RuntimeIdentifier)' == 'win-x64'">
+        <StaticExecutable>true</StaticExecutable>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(PublishAot)' == 'true' and '$(RuntimeIdentifier)' == 'win-x64'">
+        <DirectPInvoke Include="libHarfBuzzSharp" />
+        <DirectPInvoke Include="libSkiaSharp" />
+        <DirectPInvoke Include="av_libglesv2" />
+        <LinkerArg Include="d3d9.lib;dxguid.lib" />
+        <LinkerArg Include="dxgi.lib" />
+        <LinkerArg Include="Gdi32.lib;User32.lib" />
+        <LinkerArg Include="synchronization.lib" />
+        <LinkerArg Include="fontsub.lib;Ole32.lib;USP10.lib" />
+        <LinkerArg Include="d3d12.lib;d3dcompiler.lib" />
     </ItemGroup>
 </Project>
