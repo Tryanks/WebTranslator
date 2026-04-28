@@ -93,6 +93,7 @@ jobs:
             Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe -Force
           }
           Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
+          Remove-Item publish/av_libglesv2.dll -Force -ErrorAction SilentlyContinue
           $extraDlls = Get-ChildItem publish -Filter *.dll -File -ErrorAction SilentlyContinue
           if ($extraDlls) {
             $extraDlls | ForEach-Object { Write-Error "Unexpected Windows publish DLL: $($_.Name)" }
