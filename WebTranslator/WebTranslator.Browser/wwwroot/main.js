@@ -1,7 +1,8 @@
-﻿import { dotnet } from './_framework/dotnet.js'
-
-const is_browser = typeof window != "undefined";
+﻿const is_browser = typeof window != "undefined";
 if (!is_browser) throw new Error(`Expected to be running in a browser`);
+
+const BootConfigPath = "./_framework/blazor.boot.json";
+const FrameworkHashStorageKey = "WebTranslator.FrameworkResourceHash";
 
 const bootProgress = createBootProgress();
 
@@ -42,9 +43,14 @@ globalThis.webTranslatorDictionary = {
 };
 
 try {
+    const bootConfig = await prepareFrameworkBootConfig();
+    const bootHash = getBootResourceHash(bootConfig) ?? Date.now().toString();
+    const { dotnet } = await import(`./_framework/dotnet.js?v=${encodeURIComponent(bootHash)}`);
+
     const dotnetRuntime = await dotnet
         .withDiagnosticTracing(false)
         .withApplicationArgumentsFromQuery()
+        .withConfig(bootConfig)
         .withModuleConfig({
             onDownloadResourceProgress: (loaded, queued) => bootProgress.update(loaded, queued)
         })
@@ -62,6 +68,67 @@ try {
 } catch (error) {
     bootProgress.fail(error);
     throw error;
+}
+
+async function prepareFrameworkBootConfig() {
+    bootProgress.setPhase("正在检查资源版本");
+
+    const config = await fetchBootConfig();
+    const hash = getBootResourceHash(config);
+
+    if (!hash) return config;
+
+    const previousHash = readStoredFrameworkHash();
+    if (previousHash !== hash) {
+        bootProgress.setPhase(previousHash ? "检测到新版本，正在清理资源缓存" : "正在初始化资源缓存");
+        await clearFrameworkCaches();
+        writeStoredFrameworkHash(hash);
+    }
+
+    return config;
+}
+
+async function fetchBootConfig() {
+    const response = await fetch(BootConfigPath, {
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: {
+            "Cache-Control": "no-cache"
+        }
+    });
+
+    if (!response.ok) throw new Error(`启动清单加载失败: ${response.status} ${response.statusText}`);
+
+    return await response.json();
+}
+
+async function clearFrameworkCaches() {
+    if (!globalThis.caches) return;
+
+    const keys = await caches.keys();
+    const dotnetResourceKeys = keys.filter((key) => key.startsWith("dotnet-resources-"));
+
+    await Promise.all(dotnetResourceKeys.map((key) => caches.delete(key)));
+}
+
+function getBootResourceHash(config) {
+    return typeof config?.resources?.hash === "string" ? config.resources.hash : null;
+}
+
+function readStoredFrameworkHash() {
+    try {
+        return localStorage.getItem(FrameworkHashStorageKey);
+    } catch {
+        return null;
+    }
+}
+
+function writeStoredFrameworkHash(hash) {
+    try {
+        localStorage.setItem(FrameworkHashStorageKey, hash);
+    } catch {
+        // Some private browsing modes block localStorage. The app can still run; it just revalidates next load.
+    }
 }
 
 function createBootProgress() {
