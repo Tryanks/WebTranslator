@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
 using ReactiveUI;
@@ -28,11 +27,11 @@ public class ExportViewModel : ViewModelBase
     public string? OriginFolderPath { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public bool IsLocalFolder { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
         
-    public void CopyCommand()
+    public async Task CopyCommand()
     {
         try
         {
-            Application.Current?.Clipboard?.SetTextAsync(Document.Text);
+            await ClipboardService.SetTextAsync(Document.Text);
             ToastService.Notify("已复制到剪贴板");
         }
         catch (Exception e)
@@ -41,11 +40,11 @@ public class ExportViewModel : ViewModelBase
         }
     }
 
-    public void CopyFileNameCommand()
+    public async Task CopyFileNameCommand()
     {
         try
         {
-            Application.Current?.Clipboard?.SetTextAsync(FileName);
+            await ClipboardService.SetTextAsync(FileName);
             ToastService.Notify("文件名已复制");
         }
         catch (Exception e)

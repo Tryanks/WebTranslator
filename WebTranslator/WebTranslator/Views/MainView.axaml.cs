@@ -17,6 +17,7 @@ public partial class MainView : UserControl
         base.OnLoaded(e);
         ToastService.Set(TopLevel.GetTopLevel(this));
         FilePickerService.Set(TopLevel.GetTopLevel(this));
+        ClipboardService.Set(TopLevel.GetTopLevel(this));
         NavigationService.Register((index, _) =>
         {
             if (NavigationView.SelectedItem is NavigationViewItem item &&

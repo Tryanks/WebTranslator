@@ -423,12 +423,3 @@ internal partial class GithubLinkStatus : ViewModelBase
         @"^https?://github\.com/.*?/projects/([^/]+)/assets/(.*)/lang$")]
     private static partial Regex GenRegex();
 }
-
-internal enum ImportFileMode
-{
-    None,
-    Github,
-    Folder,
-    Manual,
-    Review
-}

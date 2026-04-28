@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Platform.Storage;
+using WebTranslator.Models;
 
 namespace WebTranslator.Services;
 

@@ -59,22 +59,22 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void TestGithubFiles()
+    public async Task TestGithubFiles()
     {
         const string GithubLink =
-            "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/main/projects/1.20-fabric/assets/better-than-bunnies-fabric/betterthanbunnies/lang";
+            "https://github.com/CFPAOrg/Minecraft-Mod-Language-Package/tree/cf1a801466a901ec14a28c3b08dfe62f69c8db53/projects/1.20/assets/adorn-for-forge/adorn/lang";
         var link = GithubHelper.GithubConvert(GithubLink);
-        var GithubFileInfos = GithubHelper.GetLanguageFilesAsync(link).Result;
-        foreach (var githubFileInfo in GithubFileInfos) testOutputHelper.WriteLine(githubFileInfo.String().Result);
+        var GithubFileInfos = await GithubHelper.GetLanguageFilesAsync(link);
+        foreach (var githubFileInfo in GithubFileInfos) testOutputHelper.WriteLine(await githubFileInfo.String());
     }
 
     [Fact]
-    public void TestGithubHelper()
+    public async Task TestGithubHelper()
     {
         const string link =
-            "https://raw.githubusercontent.com/CFPAOrg/Minecraft-Mod-Language-Package/main/projects/1.20-fabric/assets/better-than-bunnies-fabric/betterthanbunnies/lang/zh_cn.json";
-        var info = new GitHubFileInfo("zh_cn.json", link);
-        testOutputHelper.WriteLine(info.String().Result);
+            "https://raw.githubusercontent.com/CFPAOrg/Minecraft-Mod-Language-Package/cf1a801466a901ec14a28c3b08dfe62f69c8db53/projects/1.20/assets/adorn-for-forge/adorn/lang/en_us.json";
+        var info = new GitHubFileInfo("en_us.json", link);
+        testOutputHelper.WriteLine(await info.String());
     }
 
     [Fact]
