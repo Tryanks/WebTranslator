@@ -187,7 +187,7 @@ public class OpenFileViewModel : ViewModelBase
         var folders = await FilePickerService.OpenFolderPickerAsync(new FolderPickerOpenOptions());
         if (folders.Count != 1) return;
         Folder = folders[0];
-        OriginFolderPath = Folder.Path.LocalPath;
+        OriginFolderPath = GetStoragePath(Folder) ?? Folder.Name;
         ImportDisplayName = Folder.Name;
         var files = Folder.GetItemsAsync();
         var fileList = new List<IFileInfo>();
@@ -286,7 +286,7 @@ public class OpenFileViewModel : ViewModelBase
         });
         if (files.Count != 1) return;
 
-        TranslatedText = await File.ReadAllTextAsync(files[0].Path.LocalPath);
+        TranslatedText = await ReadStorageFileAsync(files[0]);
         TabSelectedIndex = 1;
         _previewFileStatus = ImportFileMode.Folder;
         ToastService.Notify($"已载入译文文件: {files[0].Name}");
@@ -327,7 +327,29 @@ public class OpenFileViewModel : ViewModelBase
 
     private async Task LoadOriginalStorageFile(IStorageFile file)
     {
-        await LoadOriginalPath(file.Path.LocalPath);
+        OriginalText = await ReadStorageFileAsync(file);
+
+        var path = GetStoragePath(file);
+        var folderPath = path is null ? null : Path.GetDirectoryName(path);
+        var canUseLocalPath = !OperatingSystem.IsBrowser() && folderPath is not null;
+        var translatedPath = canUseLocalPath && path is not null ? GetDefaultTranslatedPath(path) : null;
+        TranslatedText = translatedPath is not null && File.Exists(translatedPath)
+            ? await File.ReadAllTextAsync(translatedPath)
+            : "";
+
+        Folder = null;
+        OriginFolderPath = folderPath ?? file.Name;
+        ImportDisplayName = folderPath is null ? file.Name : Path.GetFileName(folderPath);
+        TabSelectedIndex = 1;
+        _previewFileStatus = ImportFileMode.Folder;
+        if (!OperatingSystem.IsBrowser() && folderPath is not null)
+            ProjectContextService.SetFolderPath(folderPath);
+        else
+            ProjectContextService.SetManual();
+
+        ToastService.Notify(translatedPath is not null && File.Exists(translatedPath)
+            ? $"已载入原文和译文: {Path.GetFileName(path)} / {Path.GetFileName(translatedPath)}"
+            : $"已载入原文文件: {file.Name}");
     }
 
     private async Task LoadOriginalPath(string originalPath)
@@ -376,6 +398,25 @@ public class OpenFileViewModel : ViewModelBase
         if (folderPath is null) return null;
         var extension = Path.GetExtension(originalPath);
         return Path.Combine(folderPath, "zh_cn" + extension);
+    }
+
+    private static async Task<string> ReadStorageFileAsync(IStorageFile file)
+    {
+        await using var stream = await file.OpenReadAsync();
+        using var reader = new StreamReader(stream);
+        return await reader.ReadToEndAsync();
+    }
+
+    private static string? GetStoragePath(IStorageItem item)
+    {
+        try
+        {
+            return item.Path?.LocalPath;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static IReadOnlyList<FilePickerFileType> LanguageFileTypes()

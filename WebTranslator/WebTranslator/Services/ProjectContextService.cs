@@ -11,7 +11,7 @@ public static class ProjectContextService
 
     public static void SetFolder(IStorageFolder folder)
     {
-        OriginFolderPath = folder.Path?.AbsolutePath ?? folder.Name;
+        OriginFolderPath = OperatingSystem.IsBrowser() ? null : folder.Path?.LocalPath;
         ImportMode = ImportFileMode.Folder;
     }
 
