@@ -26,38 +26,12 @@ jobs:
       - name: Publish (Browser, net9.0-browser)
         run: dotnet publish WebTranslator/WebTranslator.Browser -c Release -f net9.0-browser -o ./publish
 
-      - name: Clone GitHub Pages Repository
-        env:
-          GH_TOKEN: ${{ secrets.CFPATools_Token }}
-        run: |
-          cd ..
-          git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io --depth=1 gh-pages
-
-      - name: Copy Files to GitHub Pages Repository
-        run: |
-          # Switch to the gh-pages directory in the parent directory
-          cd ../gh-pages
-
-          # Remove all files except .nojekyll and README.md
-          find . -type f ! -path './.git*' ! -name '.nojekyll' ! -name 'README.md' -delete
-          find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
-
-          # Ensure destination exists and copy new files from the publish directory
-          mkdir -p .
-          cp -r ${GITHUB_WORKSPACE}/publish/wwwroot/* .
-
-          # Configure git to recognize the action as the author
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
-          # Add changes to git
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
-            git push origin master  # Ensure this matches the actual default branch
-          else
-            echo "No changes to commit."
-          fi
+      - name: Upload Browser Build
+        uses: actions/upload-artifact@v7
+        with:
+          name: WebTranslator-browser
+          path: publish/wwwroot
+          compression-level: 0
 
   build-windows:
     runs-on: windows-latest
@@ -167,6 +141,12 @@ jobs:
           name: WebTranslator-linux_amd64
           path: release/ubuntu
 
+      - name: Download Browser Build
+        uses: actions/download-artifact@v8
+        with:
+          name: WebTranslator-browser
+          path: release/browser
+
       - name: Create release files
         run: |
           mkdir -p release/assets
@@ -184,6 +164,29 @@ jobs:
           fi
           if [ ! -s release-notes.md ]; then
             echo "- No commits since the previous publish release." > release-notes.md
+          fi
+
+      - name: Deploy Browser to GitHub Pages Repository
+        env:
+          GH_TOKEN: ${{ secrets.CFPATools_Token }}
+        run: |
+          git clone https://x-access-token:${GH_TOKEN}@github.com/CFPATools/cfpatools.github.io --depth=1 ../gh-pages
+          cd ../gh-pages
+
+          find . -type f ! -path './.git*' ! -name '.nojekyll' ! -name 'README.md' -delete
+          find . -type d ! -path . ! -path './.git*' ! -path './.git/*' -exec rm -rf {} +
+
+          cp -r "${GITHUB_WORKSPACE}/release/browser/." .
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Deploy updates $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin master
+          else
+            echo "No changes to commit."
           fi
 
       - name: Publish GitHub Release
