@@ -13,7 +13,7 @@
     <br /-->
     <a href="https://cfpatools.github.io">Web Demo</a>
     ·
-    <a href="https://github.com/Tryanks/WebTranslator/actions">Download</a>
+    <a href="https://github.com/Tryanks/WebTranslator/releases">Download</a>
     .
     <a href="https://github.com/Tryanks/WebTranslator/issues/new">Report Bug</a>
     ·
