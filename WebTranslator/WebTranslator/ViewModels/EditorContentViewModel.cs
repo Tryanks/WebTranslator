@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using AvaloniaEdit.Document;
-using AvaloniaEdit.Utils;
-using ReactiveUI;
 using WebTranslator.Models;
 using WebTranslator.Services;
 
@@ -28,48 +26,57 @@ public class EditorContentViewModel : ViewModelBase
         AllCount = EditorList.Count;
         TranslatedCount = EditorList.Count(x => x.IsTranslated);
 
-        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SelectedIndex),
-            _ =>
-            {
-                TranslatedCount = EditorList.Count(x => x.IsTranslated);
-                RefreshSuggestions();
-            });
-        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SearchQuery), _ => RefreshSearchResults());
-        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SelectedSearchItem), item =>
-        {
-            if (item is null) return;
-            var index = EditorList.IndexOf(item);
-            if (index >= 0) SelectedIndex = index;
-            SearchQuery = "";
-            SelectedSearchItem = null;
-        });
-        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.MarkSameText), enabled =>
-        {
-            foreach (var item in EditorList)
-                item.MarkSameText = enabled;
-        });
-
         if (EditorList.Count > 0)
             SelectedIndex = 0;
     }
 
     public ModDictionary ModDictionary { get; set; }
 
-    public string Header { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public ObservableCollection<EditorListItem> EditorList { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
-    public int SelectedIndex { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = -1;
-    public EditorListItem TranslationItem { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = null!;
+    public string Header { get => field; set => SetProperty(ref field, value); }
+    public ObservableCollection<EditorListItem> EditorList { get => field; set => SetProperty(ref field, value); } = [];
+    public int SelectedIndex
+    {
+        get => field;
+        set
+        {
+            if (!SetProperty(ref field, value)) return;
+            TranslatedCount = EditorList.Count(x => x.IsTranslated);
+            RefreshSuggestions();
+        }
+    } = -1;
+    public EditorListItem TranslationItem { get => field; set { if (!SetProperty(ref field, value)) return; RefreshSuggestions(); } } = null!;
     public ObservableCollection<EditorListItem> SearchResults { get; } = [];
     public ObservableCollection<TranslationSuggestion> Suggestions { get; } = [];
-    public bool HasSuggestions { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public string SearchQuery { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "";
-    public bool HasSearchQuery { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public int SearchResultCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public EditorListItem? SelectedSearchItem { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } }
-    public int TranslatedCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool HasSuggestions { get => field; set => SetProperty(ref field, value); }
+    public string SearchQuery { get => field; set { if (!SetProperty(ref field, value)) return; RefreshSearchResults(); } } = "";
+    public bool HasSearchQuery { get => field; set => SetProperty(ref field, value); }
+    public int SearchResultCount { get => field; set => SetProperty(ref field, value); }
+    public EditorListItem? SelectedSearchItem
+    {
+        get => field;
+        set
+        {
+            if (!SetProperty(ref field, value)) return;
+            if (value is null) return;
+            var index = EditorList.IndexOf(value);
+            if (index >= 0) SelectedIndex = index;
+            SearchQuery = "";
+            SelectedSearchItem = null;
+        }
+    }
+    public int TranslatedCount { get => field; set => SetProperty(ref field, value); }
     public int AllCount { get; set; }
-    public bool AutoSkip { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = true;
-    public bool MarkSameText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool AutoSkip { get => field; set => SetProperty(ref field, value); } = true;
+    public bool MarkSameText
+    {
+        get => field;
+        set
+        {
+            if (!SetProperty(ref field, value)) return;
+            foreach (var item in EditorList)
+                item.MarkSameText = value;
+        }
+    }
 
     public void SaveAll()
     {
@@ -220,34 +227,6 @@ public class EditorListItem : ViewModelBase
     {
         SubmitRequested = act;
         TranslatedDoc.TextChanged += (_, _) => TranslatedText = TranslatedDoc.Text;
-        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.TranslatedText), s =>
-        {
-            if (s != TranslatedDoc.Text) TranslatedDoc.Text = s ?? "";
-            IsTranslated = s != OriginalText && !string.IsNullOrEmpty(SavedTranslatedText);
-            IsChanged = s != SavedTranslatedText;
-            if (FormatMode != FormatMode.None)
-            {
-                var translatedFormats = FormatStringHelper.ExtractFormatStrings(s ?? "");
-                FormatSuggestions = GetMissingFormatStrings(translatedFormats);
-                FormatError = false;
-
-                if (FormatMode == FormatMode.Sorted)
-                {
-                    var sortedTranslatedFormats = translatedFormats.OrderBy(f => f).ToList();
-                    if (OriginalFormatStrings.SequenceEqual(sortedTranslatedFormats)) return;
-                    FormatError = true;
-                }
-                else
-                {
-                    if (OriginalFormatStrings.SequenceEqual(translatedFormats)) return;
-                    FormatError = true;
-                }
-            }
-
-            TranslatedLineCount = TranslatedDoc.LineCount;
-            EqualLines = OriginalLineCount <= TranslatedLineCount;
-            this.RaisePropertyChanged(nameof(IsSameTextMarked));
-        });
 
         var cancel = false;
         TranslatedDoc.Changing += (_, e) =>
@@ -288,22 +267,22 @@ public class EditorListItem : ViewModelBase
     public string Key { get; }
     private FormatMode FormatMode { get; }
     private List<string> OriginalFormatStrings { get; } = [];
-    public bool FormatError { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public IReadOnlyList<string> FormatSuggestions { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
+    public bool FormatError { get => field; set => SetProperty(ref field, value); }
+    public IReadOnlyList<string> FormatSuggestions { get => field; set => SetProperty(ref field, value); } = [];
 
     public TextDocument OriginalDoc { get; set; } = new();
     public TextDocument TranslatedDoc { get; set; } = new();
     public string OriginalText => OriginalDoc.Text;
-    public string TranslatedText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public string SavedTranslatedText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool IsTranslated { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool IsChanged { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string TranslatedText { get => field; set { if (!SetProperty(ref field, value)) return; UpdateTranslatedText(value); } }
+    public string SavedTranslatedText { get => field; set => SetProperty(ref field, value); }
+    public bool IsTranslated { get => field; set => SetProperty(ref field, value); }
+    public bool IsChanged { get => field; set => SetProperty(ref field, value); }
     public int OriginalLineCount { get; }
-    public int TranslatedLineCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool EqualLines { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public int TranslatedLineCount { get => field; set => SetProperty(ref field, value); }
+    public bool EqualLines { get => field; set => SetProperty(ref field, value); }
 
     public bool SameText => OriginalText == TranslatedText;
-    public bool MarkSameText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); this.RaisePropertyChanged(nameof(IsSameTextMarked)); } }
+    public bool MarkSameText { get => field; set { if (!SetProperty(ref field, value)) return; RaisePropertyChanged(nameof(IsSameTextMarked)); } }
     public bool IsSameTextMarked => MarkSameText && SameText;
     public bool IsEmpty => IsChanged || string.IsNullOrEmpty(SavedTranslatedText);
 
@@ -339,6 +318,33 @@ public class EditorListItem : ViewModelBase
         foreach (var format in translatedFormats)
             missing.Remove(format);
         return missing;
+    }
+
+    private void UpdateTranslatedText(string? text)
+    {
+        if (text != TranslatedDoc.Text) TranslatedDoc.Text = text ?? "";
+        IsTranslated = text != OriginalText && !string.IsNullOrEmpty(SavedTranslatedText);
+        IsChanged = text != SavedTranslatedText;
+        if (FormatMode != FormatMode.None)
+        {
+            var translatedFormats = FormatStringHelper.ExtractFormatStrings(text ?? "");
+            FormatSuggestions = GetMissingFormatStrings(translatedFormats);
+            FormatError = !FormatMatchesOriginal(translatedFormats);
+        }
+
+        TranslatedLineCount = TranslatedDoc.LineCount;
+        EqualLines = OriginalLineCount <= TranslatedLineCount;
+        RaisePropertyChanged(nameof(IsSameTextMarked));
+    }
+
+    private bool FormatMatchesOriginal(List<string> translatedFormats)
+    {
+        return FormatMode switch
+        {
+            FormatMode.None => true,
+            FormatMode.Sorted => OriginalFormatStrings.SequenceEqual(translatedFormats.OrderBy(f => f)),
+            _ => OriginalFormatStrings.SequenceEqual(translatedFormats)
+        };
     }
 }
 

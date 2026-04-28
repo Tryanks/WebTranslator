@@ -1,12 +1,11 @@
 ﻿using WebTranslator.Models;
-using ReactiveUI;
 
 namespace WebTranslator.ViewModels;
 
 public class EditorViewModel : ViewModelBase
 {
-    public bool IsEmpty { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = true;
-    public EditorContentViewModel EditorContent { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = null!;
+    public bool IsEmpty { get => field; set => SetProperty(ref field, value); } = true;
+    public EditorContentViewModel EditorContent { get => field; set => SetProperty(ref field, value); } = null!;
 
     public override void SetParameter(object? parameter)
     {

@@ -90,13 +90,14 @@ jobs:
             Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe -Force
           }
           Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
+          & "${env:ProgramFiles}\7-Zip\7z.exe" a -t7z -mx=9 WebTranslator-windows_amd64.7z .\publish\*
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-windows_amd64
-          path: publish
-          compression-level: 9
+          path: WebTranslator-windows_amd64.7z
+          compression-level: 0
 
   build-ubuntu:
     runs-on: ubuntu-22.04
@@ -128,13 +129,14 @@ jobs:
         run: |
           if [ -f publish/WebTranslator.Desktop ]; then mv publish/WebTranslator.Desktop publish/WebTranslator; fi
           rm -f publish/*.pdb publish/*.dbg || true
+          7z a -t7z -mx=9 WebTranslator-linux_amd64.7z ./publish/*
 
       - name: Upload Ubuntu Build
         uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-linux_amd64
-          path: publish
-          compression-level: 9
+          path: WebTranslator-linux_amd64.7z
+          compression-level: 0
 
   release:
     needs: [build-windows, build-ubuntu]

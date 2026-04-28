@@ -7,8 +7,7 @@
              x:DataType="vm:EditorContentViewModel"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:fa="using:FluentAvalonia.UI.Controls">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -43,20 +42,44 @@
     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,*" Margin="{DynamicResource FlyoutContentPadding}">
         <fa:CommandBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DefaultLabelPosition="Right" Margin="0,-8,0,8">
             <fa:CommandBar.PrimaryCommands>
-                <fa:CommandBarButton IconSource="SaveAs" Label="暂存更改" ToolTip.Tip="保存所有未保存的更改项"
-                                     Command="{Binding SaveAll}" />
-                <fa:CommandBarButton IconSource="Save" Label="开始导出" ToolTip.Tip="完成翻译，进入导出页"
-                                     Command="{Binding ExportCommand}"/>
+                <fa:CommandBarButton Label="暂存更改" ToolTip.Tip="保存所有未保存的更改项"
+                                     Command="{Binding SaveAll}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconSaveAs}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
+                <fa:CommandBarButton Label="开始导出" ToolTip.Tip="完成翻译，进入导出页"
+                                     Command="{Binding ExportCommand}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconSave}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
                 <fa:CommandBarSeparator />
-                <fa:CommandBarButton IconSource="Delete" Label="清除重复译文" ToolTip.Tip="当译文与原文完全相同时，将译文清空，留待翻译"
-                                     Command="{Binding ClearAllTranslationText}" />
-                <fa:CommandBarButton IconSource="ClipboardFilled" Label="填充原文到译文" ToolTip.Tip="使用原文填充所有为空的译文"
-                                     Command="{Binding FillAllTranslationText}" />
+                <fa:CommandBarButton Label="清除重复译文" ToolTip.Tip="当译文与原文完全相同时，将译文清空，留待翻译"
+                                     Command="{Binding ClearAllTranslationText}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconDelete}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
+                <fa:CommandBarButton Label="填充原文到译文" ToolTip.Tip="使用原文填充所有为空的译文"
+                                     Command="{Binding FillAllTranslationText}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconClipboardFilled}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
                 <fa:CommandBarSeparator />
-                <fa:CommandBarToggleButton IconSource="Import" Label="自动跳转翻译项" ToolTip.Tip="当点击提交时，自动跳转到下一条译文为空的条目"
-                                           IsChecked="{Binding AutoSkip}" />
-                <fa:CommandBarToggleButton IconSource="Flag" Label="标记重复译文" ToolTip.Tip="标记译文与原文完全相同的条目"
-                                           IsChecked="{Binding MarkSameText}" />
+                <fa:CommandBarToggleButton Label="自动跳转翻译项" ToolTip.Tip="当点击提交时，自动跳转到下一条译文为空的条目"
+                                           IsChecked="{Binding AutoSkip}">
+                    <fa:CommandBarToggleButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconImport}" />
+                    </fa:CommandBarToggleButton.IconSource>
+                </fa:CommandBarToggleButton>
+                <fa:CommandBarToggleButton Label="标记重复译文" ToolTip.Tip="标记译文与原文完全相同的条目"
+                                           IsChecked="{Binding MarkSameText}">
+                    <fa:CommandBarToggleButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconFlag}" />
+                    </fa:CommandBarToggleButton.IconSource>
+                </fa:CommandBarToggleButton>
             </fa:CommandBar.PrimaryCommands>
             <fa:CommandBar.SecondaryCommands>
                 <!-- <fa:CommandBarButton Label="附加功能" /> -->
@@ -75,14 +98,14 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:EditorListItem">
                         <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*,Auto">
-                            <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
-                                           Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
-                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
-                                           Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
-                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,-8,0"
-                                           VerticalAlignment="Center" HorizontalAlignment="Right"
-                                           Foreground="Coral" Symbol="Circle" FontSize="8"
-                                           IsVisible="{Binding IsChanged}" />
+                            <fa:FAPathIcon Margin="0,0,8,0" VerticalAlignment="Center"
+                                         Foreground="Green" Data="{StaticResource IconCheck}" IsVisible="{Binding IsTranslated}" />
+                            <fa:FAPathIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                         Foreground="Red" Data="{StaticResource IconDismiss}" IsVisible="{Binding !IsTranslated}" />
+                            <fa:FAPathIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,-8,0"
+                                         VerticalAlignment="Center" HorizontalAlignment="Right"
+                                         Foreground="Coral" Data="{StaticResource IconDirty}" Width="8" Height="8"
+                                         IsVisible="{Binding IsChanged}" />
                             <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
                                        TextTrimming="CharacterEllipsis" />
                             <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
@@ -102,10 +125,10 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:EditorListItem">
                         <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                            <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
-                                           Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
-                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
-                                           Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
+                            <fa:FAPathIcon Margin="0,0,8,0" VerticalAlignment="Center"
+                                         Foreground="Green" Data="{StaticResource IconCheck}" IsVisible="{Binding IsTranslated}" />
+                            <fa:FAPathIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                         Foreground="Red" Data="{StaticResource IconDismiss}" IsVisible="{Binding !IsTranslated}" />
                             <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
                                        TextTrimming="CharacterEllipsis" />
                             <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
@@ -151,7 +174,7 @@
                                     <MenuItem Header="Copy" InputGesture="Ctrl+C"
                                               Command="{Binding ElementName=SyntaxEditor1, Path=Copy}">
                                         <MenuItem.Icon>
-                                            <ic:SymbolIcon Symbol="Copy" />
+                                            <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </MenuFlyout>
@@ -178,19 +201,19 @@
                                     <MenuItem Header="Cut" InputGesture="Ctrl+X"
                                               Command="{Binding ElementName=SyntaxEditor2, Path=Cut}">
                                         <MenuItem.Icon>
-                                            <ic:SymbolIcon Symbol="Cut" />
+                                            <fa:FAPathIcon Data="{StaticResource IconCut}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="Copy" InputGesture="Ctrl+C"
                                               Command="{Binding ElementName=SyntaxEditor2, Path=Copy}">
                                         <MenuItem.Icon>
-                                            <ic:SymbolIcon Symbol="Copy" />
+                                            <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="Paste" InputGesture="Ctrl+V"
                                               Command="{Binding ElementName=SyntaxEditor2, Path=Paste}">
                                         <MenuItem.Icon>
-                                            <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                            <fa:FAPathIcon Data="{StaticResource IconPaste}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </MenuFlyout>
@@ -245,7 +268,7 @@
                             <DataTemplate x:DataType="vm:TranslationSuggestion">
                                 <Button Margin="0,0,8,8" Command="{Binding Apply}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <ic:SymbolIcon Symbol="BookOpen" />
+                                        <fa:FAPathIcon Data="{StaticResource IconBook}" />
                                         <TextBlock Text="{Binding Text}" />
                                     </StackPanel>
                                 </Button>

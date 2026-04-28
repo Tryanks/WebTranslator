@@ -10,6 +10,14 @@
         <PublishAot>true</PublishAot>
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>full</TrimMode>
+        <OptimizationPreference>Size</OptimizationPreference>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <EventSourceSupport>false</EventSourceSupport>
+        <MetricsSupport>false</MetricsSupport>
+        <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+        <DebuggerSupport>false</DebuggerSupport>
+        <StackTraceSupport>false</StackTraceSupport>
+        <UseSystemResourceKeys>true</UseSystemResourceKeys>
         <ApplicationIcon>..\WebTranslator\Assets\translator.ico</ApplicationIcon>
     </PropertyGroup>
 

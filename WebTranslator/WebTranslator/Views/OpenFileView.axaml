@@ -7,8 +7,7 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              x:DataType="vm:OpenFileViewModel"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:fa="using:FluentAvalonia.UI.Controls">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{DynamicResource FlyoutContentThemeMargin}" />
@@ -59,22 +58,22 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
                                                            Text="github.com" />
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding GithubLinkStatus.GithubStatus}"
-                                                               Symbol="Checkmark" Foreground="Green" />
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding !GithubLinkStatus.GithubStatus}"
-                                                               Symbol="Dismiss" Foreground="Red" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding GithubLinkStatus.GithubStatus}"
+                                                             Data="{StaticResource IconCheck}" Foreground="Green" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding !GithubLinkStatus.GithubStatus}"
+                                                             Data="{StaticResource IconDismiss}" Foreground="Red" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Center" Margin="0,0,4,0"
                                                            Text="{Binding GithubLinkStatus.Version,StringFormat='版本: {0}'}" />
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                                               Symbol="Checkmark" Foreground="Green" />
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNullOrEmpty}}"
-                                                               Symbol="Dismiss" Foreground="Red" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                             Data="{StaticResource IconCheck}" Foreground="Green" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding GithubLinkStatus.Version,Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                                             Data="{StaticResource IconDismiss}" Foreground="Red" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Center" Margin="0,0,4,0">
@@ -82,12 +81,12 @@
                                                     <Run Text="/lang" FontWeight="Bold" />
                                                     <Run Text=" 结尾" />
                                                 </TextBlock>
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding GithubLinkStatus.EndsWithLang}"
-                                                               Symbol="Checkmark" Foreground="Green" />
-                                                <ic:SymbolIcon VerticalAlignment="Center"
-                                                               IsVisible="{Binding !GithubLinkStatus.EndsWithLang}"
-                                                               Symbol="Dismiss" Foreground="Red" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding GithubLinkStatus.EndsWithLang}"
+                                                             Data="{StaticResource IconCheck}" Foreground="Green" />
+                                                <fa:FAPathIcon VerticalAlignment="Center"
+                                                             IsVisible="{Binding !GithubLinkStatus.EndsWithLang}"
+                                                             Data="{StaticResource IconDismiss}" Foreground="Red" />
                                             </StackPanel>
                                         </StackPanel>
                                         <Button Grid.Column="1" Command="{Binding GithubCommand}"
@@ -156,19 +155,19 @@
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V"
                                                   Command="{Binding ElementName=OriginalTextEditor, Path=Paste}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                                <fa:FAPathIcon Data="{StaticResource IconPaste}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Cut" InputGesture="Ctrl+X"
                                                   Command="{Binding ElementName=OriginalTextEditor, Path=Cut}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Cut" />
+                                                <fa:FAPathIcon Data="{StaticResource IconCut}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Copy" InputGesture="Ctrl+C"
                                                   Command="{Binding ElementName=OriginalTextEditor, Path=Copy}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Copy" />
+                                                <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuFlyout>
@@ -186,19 +185,19 @@
                                         <MenuItem Header="Paste" InputGesture="Ctrl+V"
                                                   Command="{Binding ElementName=TranslatedTextEditor, Path=Paste}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="ClipboardPaste" />
+                                                <fa:FAPathIcon Data="{StaticResource IconPaste}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Cut" InputGesture="Ctrl+X"
                                                   Command="{Binding ElementName=TranslatedTextEditor, Path=Cut}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Cut" />
+                                                <fa:FAPathIcon Data="{StaticResource IconCut}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Copy" InputGesture="Ctrl+C"
                                                   Command="{Binding ElementName=TranslatedTextEditor, Path=Copy}">
                                             <MenuItem.Icon>
-                                                <ic:SymbolIcon Symbol="Copy" />
+                                                <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuFlyout>

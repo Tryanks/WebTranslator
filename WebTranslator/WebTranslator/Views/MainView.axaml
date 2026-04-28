@@ -6,8 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WebTranslator.Views.MainView"
              x:DataType="vm:MainViewModel"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:fa="using:FluentAvalonia.UI.Controls">
     <Grid>
         <fa:NavigationView OpenPaneLength="200"
                            IsSettingsVisible="False"
@@ -17,17 +16,17 @@
             <fa:NavigationView.MenuItems>
                 <fa:NavigationViewItem MaxWidth="300" Tag="OpenFile" Content="打开" IsSelected="True">
                     <fa:NavigationViewItem.IconSource>
-                        <ic:SymbolIconSource Symbol="FolderOpen" />
+                        <fa:PathIconSource Data="{StaticResource IconFolder}" />
                     </fa:NavigationViewItem.IconSource>
                 </fa:NavigationViewItem>
                 <fa:NavigationViewItem MaxWidth="300" Tag="Editor" Content="翻译">
                     <fa:NavigationViewItem.IconSource>
-                        <ic:SymbolIconSource Symbol="Translate" />
+                        <fa:PathIconSource Data="{StaticResource IconTranslate}" />
                     </fa:NavigationViewItem.IconSource>
                 </fa:NavigationViewItem>
                 <fa:NavigationViewItem MaxWidth="300" Tag="ExportFile" Content="导出">
                     <fa:NavigationViewItem.IconSource>
-                        <ic:SymbolIconSource Symbol="Save" />
+                        <fa:PathIconSource Data="{StaticResource IconSave}" />
                     </fa:NavigationViewItem.IconSource>
                 </fa:NavigationViewItem>
             </fa:NavigationView.MenuItems>

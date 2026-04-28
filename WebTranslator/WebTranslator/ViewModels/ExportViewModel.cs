@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
-using ReactiveUI;
 using WebTranslator.Models;
 using WebTranslator.Services;
 
@@ -14,20 +13,20 @@ public class ExportViewModel : ViewModelBase
     public TextDocument Document { get; set; } = new();
     public TextDocument DiffDocument { get; set; } = new();
 
-    public string? OldText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public string? NewText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string? OldText { get => field; set => SetProperty(ref field, value); }
+    public string? NewText { get => field; set => SetProperty(ref field, value); }
 
-    public string FileName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "zh_cn.json";
-    public string FormatName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "JSON";
-    public int TextLength { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public int LineCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool HasDiff { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool AutoSaveToOrigin { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); if (value) _ = SaveToOriginCommand(); } }
-    public string? OriginFolderPath { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool IsLocalFolder { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); this.RaisePropertyChanged(nameof(CanSaveToOrigin)); } }
+    public string FileName { get => field; set => SetProperty(ref field, value); } = "zh_cn.json";
+    public string FormatName { get => field; set => SetProperty(ref field, value); } = "JSON";
+    public int TextLength { get => field; set => SetProperty(ref field, value); }
+    public int LineCount { get => field; set => SetProperty(ref field, value); }
+    public bool HasDiff { get => field; set => SetProperty(ref field, value); }
+    public bool AutoSaveToOrigin { get => field; set { if (!SetProperty(ref field, value)) return; if (value) _ = SaveToOriginCommand(); } }
+    public string? OriginFolderPath { get => field; set => SetProperty(ref field, value); }
+    public bool IsLocalFolder { get => field; set { if (!SetProperty(ref field, value)) return; RaisePropertyChanged(nameof(CanSaveToOrigin)); } }
     public bool CanSaveToOrigin => IsLocalFolder;
-    public string SaveTargetText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "未关联原始文件夹";
-    public string LastSavedPath { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "";
+    public string SaveTargetText { get => field; set => SetProperty(ref field, value); } = "未关联原始文件夹";
+    public string LastSavedPath { get => field; set => SetProperty(ref field, value); } = "";
         
     public async Task CopyCommand()
     {

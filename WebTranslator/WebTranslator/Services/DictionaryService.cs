@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
 using Avalonia.Platform;
@@ -39,6 +40,7 @@ public static class DictionaryService
 
     private static IEnumerable<Uri> EnumerateSources()
     {
+        yield return new Uri("avares://WebTranslator/Assets/dict.json.br");
         yield return new Uri("avares://WebTranslator/Assets/dict.json");
         yield return new Uri(Path.Combine(AppContext.BaseDirectory, "dict.json"));
         yield return new Uri(Path.Combine(AppContext.BaseDirectory, "Dict-Mini.json"));
@@ -52,6 +54,13 @@ public static class DictionaryService
         {
             if (!AssetLoader.Exists(source)) return null;
             using var stream = AssetLoader.Open(source);
+            if (source.AbsolutePath.EndsWith(".br", StringComparison.OrdinalIgnoreCase))
+            {
+                using var brotli = new BrotliStream(stream, CompressionMode.Decompress);
+                using var compressedReader = new StreamReader(brotli);
+                return compressedReader.ReadToEnd();
+            }
+
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }

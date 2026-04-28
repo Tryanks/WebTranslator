@@ -7,8 +7,7 @@
              x:Class="WebTranslator.Views.ExportView"
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
+             xmlns:fa="using:FluentAvalonia.UI.Controls">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -33,13 +32,29 @@
     <Grid Margin="{DynamicResource FlyoutContentPadding}" RowDefinitions="Auto,*,Auto">
         <fa:CommandBar Grid.Row="0" DefaultLabelPosition="Right" Margin="0,-8,0,8">
             <fa:CommandBar.PrimaryCommands>
-                <fa:CommandBarButton IconSource="Copy" Label="复制到剪贴板" Command="{Binding CopyCommand}"/>
-                <fa:CommandBarButton IconSource="Save" Label="另存为" Command="{Binding SaveAsCommand}"/>
-                <fa:CommandBarButton IconSource="Save" Label="保存到原文件" Command="{Binding SaveToOriginCommand}"
-                                     IsEnabled="{Binding CanSaveToOrigin}"/>
+                <fa:CommandBarButton Label="复制到剪贴板" Command="{Binding CopyCommand}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconCopy}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
+                <fa:CommandBarButton Label="另存为" Command="{Binding SaveAsCommand}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconSaveAs}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
+                <fa:CommandBarButton Label="保存到原文件" Command="{Binding SaveToOriginCommand}"
+                                     IsEnabled="{Binding CanSaveToOrigin}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconSave}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
             </fa:CommandBar.PrimaryCommands>
             <fa:CommandBar.SecondaryCommands>
-                <fa:CommandBarButton IconSource="ClipboardLink" Label="复制文件名" Command="{Binding CopyFileNameCommand}" />
+                <fa:CommandBarButton Label="复制文件名" Command="{Binding CopyFileNameCommand}">
+                    <fa:CommandBarButton.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconClipboardLink}" />
+                    </fa:CommandBarButton.IconSource>
+                </fa:CommandBarButton>
             </fa:CommandBar.SecondaryCommands>
         </fa:CommandBar>
 
@@ -54,15 +69,15 @@
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <ic:SymbolIcon Symbol="Clipboard"/>
+                        <fa:FAPathIcon Data="{StaticResource IconClipboard}" />
                         <TextBlock Text="{Binding TextLength,StringFormat='字符数 {0}'}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <ic:SymbolIcon Symbol="TextBulletListSquare"/>
+                        <fa:FAPathIcon Data="{StaticResource IconLines}" />
                         <TextBlock Text="{Binding LineCount,StringFormat='行数 {0}'}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <ic:SymbolIcon Symbol="BranchFork"/>
+                        <fa:FAPathIcon Data="{StaticResource IconDiff}" />
                         <TextBlock IsVisible="{Binding HasDiff}" Text="存在变更"/>
                         <TextBlock IsVisible="{Binding !HasDiff}" Text="无待保存差异"/>
                     </StackPanel>
@@ -77,7 +92,7 @@
                             <MenuFlyout>
                                 <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=Editor, Path=Copy}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy" />
+                                        <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>
@@ -117,7 +132,7 @@
                             <MenuFlyout>
                                 <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=DiffEditor, Path=Copy}">
                                     <MenuItem.Icon>
-                                        <ic:SymbolIcon Symbol="Copy" />
+                                        <fa:FAPathIcon Data="{StaticResource IconCopy}" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuFlyout>
@@ -128,7 +143,7 @@
 
             <Border Classes="Card" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="{Binding !HasDiff}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <ic:SymbolIcon Symbol="CheckmarkCircle"/>
+                    <fa:FAPathIcon Data="{StaticResource IconCheckCircle}" />
                     <TextBlock Text="当前导出内容与原文件一致，或尚未关联可比较的原文件。"/>
                 </StackPanel>
             </Border>
