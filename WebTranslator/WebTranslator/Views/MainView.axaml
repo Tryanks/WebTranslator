@@ -29,6 +29,11 @@
                         <fa:PathIconSource Data="{StaticResource IconSave}" />
                     </fa:NavigationViewItem.IconSource>
                 </fa:NavigationViewItem>
+                <fa:NavigationViewItem MaxWidth="300" Tag="Settings" Content="设置">
+                    <fa:NavigationViewItem.IconSource>
+                        <fa:PathIconSource Data="{StaticResource IconSettings}" />
+                    </fa:NavigationViewItem.IconSource>
+                </fa:NavigationViewItem>
             </fa:NavigationView.MenuItems>
         </fa:NavigationView>
     </Grid>

@@ -39,6 +39,7 @@ public partial class MainView : UserControl
             "OpenFile" => 0,
             "Editor" => 1,
             "ExportFile" => 2,
+            "Settings" => 3,
             _ => 0
         });
     }

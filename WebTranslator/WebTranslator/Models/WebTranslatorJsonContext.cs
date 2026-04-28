@@ -9,4 +9,5 @@ namespace WebTranslator.Models;
 [JsonSerializable(typeof(ModDictionary))]
 [JsonSerializable(typeof(ReviewPrMsg))]
 [JsonSerializable(typeof(List<GitHubContentItem>))]
+[JsonSerializable(typeof(GitHubRelease))]
 internal partial class WebTranslatorJsonContext : JsonSerializerContext;

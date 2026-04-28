@@ -3,6 +3,9 @@ name: Desktop Publish
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-browser:
     runs-on: ubuntu-latest
@@ -90,13 +93,12 @@ jobs:
             Move-Item -Path publish/WebTranslator.Desktop.exe -Destination publish/WebTranslator.exe -Force
           }
           Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
-          & "${env:ProgramFiles}\7-Zip\7z.exe" a -t7z -mx=9 WebTranslator-windows_amd64.7z .\publish\*
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-windows_amd64
-          path: WebTranslator-windows_amd64.7z
+          path: publish/WebTranslator.exe
           compression-level: 0
 
   build-ubuntu:
@@ -113,7 +115,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Install dependencies (AOT prerequisites)
-        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev p7zip-full
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
       - name: Publish (Linux, net9.0, AOT, self-contained)
         run: >-
@@ -128,20 +130,25 @@ jobs:
       - name: Rename and Clean Ubuntu Files
         run: |
           if [ -f publish/WebTranslator.Desktop ]; then mv publish/WebTranslator.Desktop publish/WebTranslator; fi
+          chmod +x publish/WebTranslator
           rm -f publish/*.pdb publish/*.dbg || true
-          7z a -t7z -mx=9 WebTranslator-linux_amd64.7z ./publish/*
 
       - name: Upload Ubuntu Build
         uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-linux_amd64
-          path: WebTranslator-linux_amd64.7z
+          path: publish/WebTranslator
           compression-level: 0
 
   release:
-    needs: [build-windows, build-ubuntu]
+    needs: [build-browser, build-windows, build-ubuntu]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Download Windows Build
         uses: actions/download-artifact@v8
         with:
@@ -153,3 +160,37 @@ jobs:
         with:
           name: WebTranslator-linux_amd64
           path: release/ubuntu
+
+      - name: Create release files
+        run: |
+          mkdir -p release/assets
+          cp release/windows/WebTranslator.exe release/assets/WebTranslator-windows_amd64.exe
+          cp release/ubuntu/WebTranslator release/assets/WebTranslator-linux_amd64
+          chmod +x release/assets/WebTranslator-linux_amd64
+
+      - name: Create release notes
+        run: |
+          previous_tag="$(git describe --tags --abbrev=0 --match 'publish-*' 2>/dev/null || true)"
+          if [ -n "$previous_tag" ]; then
+            git log --pretty=format:'- %s (%h)' "${previous_tag}..HEAD" > release-notes.md
+          else
+            git log --pretty=format:'- %s (%h)' > release-notes.md
+          fi
+          if [ ! -s release-notes.md ]; then
+            echo "- No commits since the previous publish release." > release-notes.md
+          fi
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: publish-${{ github.run_number }}.${{ github.run_attempt }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            release/assets/WebTranslator-windows_amd64.exe \
+            release/assets/WebTranslator-linux_amd64 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$RELEASE_TAG" \
+            --notes-file release-notes.md \
+            --prerelease \
+            --latest=false

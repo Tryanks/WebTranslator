@@ -1,4 +1,5 @@
 using WebTranslator.Models;
+using WebTranslator.Services;
 using Xunit.Abstractions;
 
 namespace WebTranslator.Tests;
@@ -90,5 +91,31 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         var key = dict2.Keys.First();
         var value = dict2.TextDictionary[key];
         testOutputHelper.WriteLine("Same status: " + dict2.Equals(dict));
+    }
+
+    [Fact]
+    public async Task TestDictionaryServiceLoadsUserStorage()
+    {
+        DictionaryService.SetStorage(new TestDictionaryStorage("""{"Find an Artifact":["找到一件饰品"]}"""));
+        var status = await DictionaryService.InitializeAsync();
+
+        Assert.True(status.Installed);
+        Assert.Equal(1, status.EntryCount);
+        Assert.Equal(["找到一件饰品"], DictionaryService.GetTranslations("Find an Artifact"));
+
+        await DictionaryService.ClearAsync();
+    }
+
+    private sealed class TestDictionaryStorage(string text) : IDictionaryStorage
+    {
+        private string? Text { get; set; } = text;
+
+        public string DisplayLocation => "test";
+        public bool CanReadSynchronously => true;
+        public string? ReadText() => Text;
+        public Task<string?> ReadTextAsync() => Task.FromResult(Text);
+        public Task WriteTextAsync(string value) { Text = value; return Task.CompletedTask; }
+        public Task DeleteAsync() { Text = null; return Task.CompletedTask; }
+        public DateTimeOffset? GetLastWriteTime() => null;
     }
 }

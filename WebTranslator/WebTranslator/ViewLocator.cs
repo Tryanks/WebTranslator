@@ -18,6 +18,7 @@ public class ViewLocator : IDataTemplate
             OpenFileViewModel => new OpenFileView(),
             EditorViewModel => new EditorView(),
             ExportViewModel => new ExportView(),
+            SettingsViewModel => new SettingsView(),
             EditorContentViewModel => new EditorContentView(),
             _ => new TextBlock { Text = "Not Found: " + data.GetType().Name }
         };

@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
-        <AvaloniaResource Remove="Assets\dict.json" />
         <AvaloniaResource Remove="Assets\SourceHanSansCN.otf" />
     </ItemGroup>
 

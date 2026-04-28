@@ -16,13 +16,18 @@
     <div id="out">
         <div id="avalonia-splash">
             <div class="center">
-                <h2 class="purple">
-                    <span class="highlight">Loading..</span>
-                    <br />
-                    <br />
-                    Powered by
-                    <a class="highlight" href="https://www.avaloniaui.net/" target="_blank">Avalonia UI</a>
-                </h2>
+                <div class="boot-panel" role="status" aria-live="polite">
+                    <img class="boot-logo" src="Logo.svg" alt="" />
+                    <h1>WebTranslator</h1>
+                    <p id="boot-phase">正在准备加载资源</p>
+                    <div class="boot-progress" aria-hidden="true">
+                        <div id="boot-progress-value"></div>
+                    </div>
+                    <div class="boot-progress-row">
+                        <span id="boot-resource-count">已加载 0 / ? 个资源</span>
+                        <span id="boot-progress-percent">0%</span>
+                    </div>
+                </div>
             </div>
             <img class="icon" src="Logo.svg" alt="Avalonia Logo" />
         </div>
