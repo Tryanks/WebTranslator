@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using WebTranslator.Services;
 using WebTranslator.ViewModels;
 using WebTranslator.Views;
 
@@ -17,6 +18,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            StartupPathService.Set(desktop.Args);
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainViewModel()

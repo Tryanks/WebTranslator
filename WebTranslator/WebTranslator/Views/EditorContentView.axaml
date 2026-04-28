@@ -55,35 +55,68 @@
                 <fa:CommandBarSeparator />
                 <fa:CommandBarToggleButton IconSource="Import" Label="自动跳转翻译项" ToolTip.Tip="当点击提交时，自动跳转到下一条译文为空的条目"
                                            IsChecked="{Binding AutoSkip}" />
+                <fa:CommandBarToggleButton IconSource="Flag" Label="标记重复译文" ToolTip.Tip="标记译文与原文完全相同的条目"
+                                           IsChecked="{Binding MarkSameText}" />
             </fa:CommandBar.PrimaryCommands>
             <fa:CommandBar.SecondaryCommands>
                 <!-- <fa:CommandBarButton Label="附加功能" /> -->
             </fa:CommandBar.SecondaryCommands>
         </fa:CommandBar>
-        <ListBox Grid.Row="1" Grid.Column="0" Width="300" Margin="0,0,16,0" ItemsSource="{Binding EditorList}"
-                 SelectedIndex="{Binding SelectedIndex}"
-                 SelectedItem="{Binding TranslationItem}">
-            <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:EditorListItem">
-                    <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                        <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
-                                       Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
-                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
-                                       Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
-                        <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-8,0"
-                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="Coral" Symbol="Circle" FontSize="8"
-                                       IsVisible="{Binding IsChanged}" />
-                        <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
-                                   TextTrimming="CharacterEllipsis" />
-                        <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
-                                   Foreground="{DynamicResource TextFillColorDisabled}"
-                                   Text="{Binding SavedTranslatedText}"
-                                   TextTrimming="CharacterEllipsis" />
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Grid Grid.Row="1" Grid.Column="0" Width="300" Margin="0,0,16,0" RowDefinitions="Auto,Auto,*">
+            <TextBox Grid.Row="0" Watermark="搜索键名、原文或译文" Text="{Binding SearchQuery}" />
+            <TextBlock Grid.Row="1" Margin="0,6,0,8" FontSize="12"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       IsVisible="{Binding HasSearchQuery}"
+                       Text="{Binding SearchResultCount,StringFormat='匹配 {0} 项'}" />
+            <ListBox Grid.Row="2" ItemsSource="{Binding EditorList}"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     SelectedItem="{Binding TranslationItem}"
+                     IsVisible="{Binding !HasSearchQuery}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EditorListItem">
+                        <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*,Auto">
+                            <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
+                                           Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
+                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                           Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
+                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,-8,0"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right"
+                                           Foreground="Coral" Symbol="Circle" FontSize="8"
+                                           IsVisible="{Binding IsChanged}" />
+                            <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorDisabled}"
+                                       Text="{Binding SavedTranslatedText}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Margin="8,0,0,0"
+                                       VerticalAlignment="Center" FontSize="11" Foreground="Brown"
+                                       IsVisible="{Binding IsSameTextMarked}">重复</TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox Grid.Row="2" ItemsSource="{Binding SearchResults}"
+                     SelectedItem="{Binding SelectedSearchItem}"
+                     IsVisible="{Binding HasSearchQuery}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EditorListItem">
+                        <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
+                            <ic:SymbolIcon Margin="0,0,8,0" VerticalAlignment="Center"
+                                           Foreground="Green" Symbol="Checkmark" IsVisible="{Binding IsTranslated}" />
+                            <ic:SymbolIcon Grid.Column="0" Grid.Row="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                           Foreground="Red" Symbol="Dismiss" IsVisible="{Binding !IsTranslated}" />
+                            <TextBlock Grid.Column="1" Grid.Row="0" FontSize="16" Text="{Binding OriginalText}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorDisabled}"
+                                       Text="{Binding SavedTranslatedText}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
         <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto">
             <StackPanel Grid.Row="0">
                 <TextBlock Text="{Binding Header,StringFormat='模组路径: {0}',Mode=OneTime}" FontSize="16" />
@@ -198,10 +231,27 @@
                 <Button HotKey="Ctrl+N" Command="{Binding SkipItem}">跳过快捷键</Button>
             </StackPanel>
             <Grid Grid.Row="3" MinHeight="250" Margin="0,12,0,0">
-                <StackPanel Spacing="6">
-                    <TextBlock>只是个占位符</TextBlock>
-                    <TextBlock>这里将放置词典</TextBlock>
-                    <TextBlock>等外围功能</TextBlock>
+                <StackPanel Spacing="8">
+                    <TextBlock FontWeight="SemiBold">词典推荐</TextBlock>
+                    <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               IsVisible="{Binding !HasSuggestions}">当前条目没有可用推荐</TextBlock>
+                    <ItemsControl ItemsSource="{Binding Suggestions}" IsVisible="{Binding HasSuggestions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TranslationSuggestion">
+                                <Button Margin="0,0,8,8" Command="{Binding Apply}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <ic:SymbolIcon Symbol="BookOpen" />
+                                        <TextBlock Text="{Binding Text}" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -1,11 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using AvaloniaEdit;
+using AvaloniaEdit.CodeCompletion;
+using AvaloniaEdit.Document;
+using AvaloniaEdit.Editing;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
+using WebTranslator.ViewModels;
 
 namespace WebTranslator.Views;
 
@@ -81,5 +87,32 @@ public partial class EditorContentView : UserControl
     {
         if (sender is not TextEditor editor) return;
         editor.SyntaxHighlighting = HighlightingLoader.Load(_xsd, HighlightingManager.Instance);
+        if (editor.Name != "SyntaxEditor2") return;
+        editor.TextArea.TextEntered += (_, e) =>
+        {
+            if (e.Text != "%") return;
+            if (DataContext is not EditorContentViewModel vm) return;
+            var suggestions = vm.TranslationItem?.FormatSuggestions ?? [];
+            if (suggestions.Count == 0) return;
+
+            var completionWindow = new CompletionWindow(editor.TextArea);
+            foreach (var suggestion in suggestions)
+                completionWindow.CompletionList.CompletionData.Add(new FormatCompletionData(suggestion));
+            completionWindow.Show();
+        };
+    }
+}
+
+internal class FormatCompletionData(string text) : ICompletionData
+{
+    public IImage? Image => null;
+    public string Text { get; } = text;
+    public object Content => Text;
+    public object Description => $"插入 {Text}";
+    public double Priority => 0;
+
+    public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
+    {
+        textArea.Document.Replace(completionSegment, Text);
     }
 }

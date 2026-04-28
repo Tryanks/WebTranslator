@@ -36,56 +36,96 @@
             <fa:CommandBar.PrimaryCommands>
                 <fa:CommandBarButton IconSource="Copy" Label="复制到剪贴板" Command="{Binding CopyCommand}"/>
                 <fa:CommandBarButton IconSource="Save" Label="另存为" Command="{Binding SaveAsCommand}"/>
-                <fa:CommandBarButton IconSource="Save" Label="保存到原文件" Command="{Binding SaveToOriginCommand}"/>
+                <fa:CommandBarButton IconSource="Save" Label="保存到原文件" Command="{Binding SaveToOriginCommand}"
+                                     IsEnabled="{Binding CanSaveToOrigin}"/>
             </fa:CommandBar.PrimaryCommands>
             <fa:CommandBar.SecondaryCommands>
                 <fa:CommandBarButton IconSource="ClipboardLink" Label="复制文件名" Command="{Binding CopyFileNameCommand}" />
             </fa:CommandBar.SecondaryCommands>
         </fa:CommandBar>
 
-        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
-            <Border Classes="Card" Grid.Row="0">
-                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="文件名"/>
-                        <TextBlock FontWeight="Bold" Text="{Binding FileName}"/>
-                        <TextBlock Text="（格式："/>
-                        <TextBlock Text="{Binding FormatName}"/>
-                        <TextBlock Text="）"/>
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,320">
+            <Border Classes="Card" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="导出文件" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding FileName}"/>
+                            <TextBlock Text="{Binding FormatName,StringFormat='格式: {0}'}"/>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
                         <ic:SymbolIcon Symbol="Clipboard"/>
-                        <TextBlock Text="{Binding TextLength,StringFormat='字符数: {0}'}"/>
+                        <TextBlock Text="{Binding TextLength,StringFormat='字符数 {0}'}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                        <CheckBox Content="自动保存到原文件夹" IsChecked="{Binding AutoSaveToOrigin}" IsVisible="{Binding IsLocalFolder}"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                        <ic:SymbolIcon Symbol="TextBulletListSquare"/>
+                        <TextBlock Text="{Binding LineCount,StringFormat='行数 {0}'}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                        <ic:SymbolIcon Symbol="BranchFork"/>
+                        <TextBlock IsVisible="{Binding HasDiff}" Text="存在变更"/>
+                        <TextBlock IsVisible="{Binding !HasDiff}" Text="无待保存差异"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <Border Classes="Card" Grid.Row="1">
-                <edit:TextEditor Name="Editor" IsReadOnly="True" Document="{Binding Document}">
-                    <edit:TextEditor.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=Editor, Path=Copy}">
-                                <MenuItem.Icon>
-                                    <ic:SymbolIcon Symbol="Copy" />
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </MenuFlyout>
-                    </edit:TextEditor.ContextFlyout>
-                </edit:TextEditor>
+            <Border Classes="Card" Grid.Row="1" Grid.Column="0">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Text="文件预览" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <edit:TextEditor Grid.Row="1" Name="Editor" IsReadOnly="True" Document="{Binding Document}">
+                        <edit:TextEditor.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=Editor, Path=Copy}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="Copy" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </MenuFlyout>
+                        </edit:TextEditor.ContextFlyout>
+                    </edit:TextEditor>
+                </Grid>
             </Border>
 
-            <Border Classes="Card" Grid.Row="2" IsVisible="{Binding HasDiff}">
-                <StackPanel>
-                    <TextBlock Text="差异预览 (与原文件对比)" FontWeight="Bold" Margin="0,0,0,8"/>
-                    <diff:DiffViewer LeftDiff="{Binding OldText}" RightDiff="{Binding NewText}"/>
+            <StackPanel Grid.Row="1" Grid.Column="1">
+                <Border Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="保存目标" FontWeight="SemiBold"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding SaveTargetText}"/>
+                        <CheckBox Content="进入导出页时自动保存到原文件夹"
+                                  IsChecked="{Binding AutoSaveToOrigin}"
+                                  IsVisible="{Binding IsLocalFolder}"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   IsVisible="{Binding !IsLocalFolder}"
+                                   Text="当前导入来源不能直接写回原文件。"/>
+                    </StackPanel>
+                </Border>
+                <Border Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="最近保存" FontWeight="SemiBold"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding LastSavedPath}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Border Classes="Card" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="{Binding HasDiff}">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Text="差异预览" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <diff:DiffViewer Grid.Row="1" OldText="{Binding OldText}" NewText="{Binding NewText}" IsSideBySide="True"/>
+                </Grid>
+            </Border>
+
+            <Border Classes="Card" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="{Binding !HasDiff}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ic:SymbolIcon Symbol="CheckmarkCircle"/>
+                    <TextBlock Text="当前导出内容与原文件一致，或尚未关联可比较的原文件。"/>
                 </StackPanel>
             </Border>
         </Grid>
 
         <TextBlock Grid.Row="2" HorizontalAlignment="Right" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                   Text="导出完成后可将文件提交到你的项目或发布 PR"/>
+                   Text="导出完成后可提交到项目或发布 PR"/>
     </Grid>
 </UserControl>

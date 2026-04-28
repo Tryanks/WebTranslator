@@ -12,20 +12,21 @@ namespace WebTranslator.ViewModels;
 public class ExportViewModel : ViewModelBase
 {
     public TextDocument Document { get; set; } = new();
-    // Legacy simple diff document retained for backward compatibility, no longer used in UI
-    public TextDocument DiffDocument { get; set; } = new();
 
-    // Raw texts for DiffPlex.Avalonia
     public string? OldText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public string? NewText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public string FileName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "zh_cn.json";
     public string FormatName { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "JSON";
     public int TextLength { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public int LineCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public bool HasDiff { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public bool AutoSaveToOrigin { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); if (value) _ = SaveToOriginCommand(); } }
     public string? OriginFolderPath { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
-    public bool IsLocalFolder { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public bool IsLocalFolder { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); this.RaisePropertyChanged(nameof(CanSaveToOrigin)); } }
+    public bool CanSaveToOrigin => IsLocalFolder;
+    public string SaveTargetText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "未关联原始文件夹";
+    public string LastSavedPath { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "";
         
     public async Task CopyCommand()
     {
@@ -82,6 +83,7 @@ public class ExportViewModel : ViewModelBase
             await writer.WriteAsync(Document.Text);
             await writer.FlushAsync();
 
+            LastSavedPath = file.Path.LocalPath;
             ToastService.Notify("导出成功", Avalonia.Controls.Notifications.NotificationType.Success);
         }
         catch (Exception e)
@@ -102,6 +104,10 @@ public class ExportViewModel : ViewModelBase
             var target = System.IO.Path.Combine(OriginFolderPath!, FileName);
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target)!);
             await File.WriteAllTextAsync(target, Document.Text ?? string.Empty);
+            LastSavedPath = target;
+            OldText = Document.Text ?? string.Empty;
+            NewText = Document.Text ?? string.Empty;
+            HasDiff = false;
             ToastService.Notify($"已保存到原文件: {target}", Avalonia.Controls.Notifications.NotificationType.Success);
         }
         catch (Exception e)
@@ -114,7 +120,8 @@ public class ExportViewModel : ViewModelBase
     {
         if (parameter is not ModDictionary dict) return;
         Document.Text = dict.ToString();
-        TextLength = Document.Text?.Length ?? 0;
+        UpdateStats();
+        LastSavedPath = "";
         // Determine defaults from dictionary
         var langExt = dict.Format == LangFormat.Json ? ".json" : ".lang";
         FileName = dict.Version switch
@@ -127,9 +134,10 @@ public class ExportViewModel : ViewModelBase
         // Read context for origin folder and prepare diff
         OriginFolderPath = ProjectContextService.OriginFolderPath;
         IsLocalFolder = ProjectContextService.ImportMode == ImportFileMode.Folder && !string.IsNullOrWhiteSpace(OriginFolderPath);
+        SaveTargetText = IsLocalFolder ? System.IO.Path.Combine(OriginFolderPath!, FileName) : "未关联原始文件夹";
         if (IsLocalFolder)
         {
-            var target = System.IO.Path.Combine(OriginFolderPath!, FileName);
+            var target = SaveTargetText;
             if (File.Exists(target))
             {
                 try
@@ -162,30 +170,13 @@ public class ExportViewModel : ViewModelBase
             HasDiff = false;
             OldText = null;
             NewText = null;
-            DiffDocument.Text = string.Empty;
         }
     }
 
-    private static string ComputeLineDiff(string oldText, string newText)
+    private void UpdateStats()
     {
-        // Very small and simple line-by-line diff; not optimal but sufficient for preview
-        var oldLines = (oldText ?? string.Empty).Replace("\r\n", "\n").Split('\n');
-        var newLines = (newText ?? string.Empty).Replace("\r\n", "\n").Split('\n');
-        var max = Math.Max(oldLines.Length, newLines.Length);
-        using var sw = new StringWriter();
-        sw.WriteLine($"--- 原文件");
-        sw.WriteLine($"+++ 导出内容");
-        for (int i = 0; i < max; i++)
-        {
-            var o = i < oldLines.Length ? oldLines[i] : null;
-            var n = i < newLines.Length ? newLines[i] : null;
-            if (o == n)
-            {
-                continue; // skip unchanged lines to keep preview compact
-            }
-            if (o is not null) sw.WriteLine($"- {o}");
-            if (n is not null) sw.WriteLine($"+ {n}");
-        }
-        return sw.ToString();
+        var text = Document.Text ?? string.Empty;
+        TextLength = text.Length;
+        LineCount = string.IsNullOrEmpty(text) ? 0 : text.Replace("\r\n", "\n").Split('\n').Length;
     }
 }

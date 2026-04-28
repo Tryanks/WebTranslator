@@ -2,6 +2,7 @@
 using WebTranslator.Services;
 using WebTranslator.Views;
 using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace WebTranslator.ViewModels;
 
@@ -39,4 +40,9 @@ public class MainViewModel : ViewModelBase
     }
 
     public UserControl NavigationContent { get => field; set => this.RaiseAndSetIfChanged(ref field, value); } = NavigationPage1;
+
+    public Task OpenStartupPathAsync(string path)
+    {
+        return Page1.OpenPathAsync(path);
+    }
 }

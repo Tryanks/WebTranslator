@@ -103,12 +103,10 @@
                         <Border Classes="Card">
                             <StackPanel Spacing="12" Orientation="Horizontal">
                                 <Button Command="{Binding OpenFileCommand}" CommandParameter="Folder">选择文件夹</Button>
-                                <Button IsEnabled="False" Command="{Binding OpenFileCommand}"
-                                        CommandParameter="Original">
+                                <Button Command="{Binding OpenFileCommand}" CommandParameter="Original">
                                     选择原文
                                 </Button>
-                                <Button IsEnabled="False" Command="{Binding OpenFileCommand}"
-                                        CommandParameter="Translated">
+                                <Button Command="{Binding OpenFileCommand}" CommandParameter="Translated">
                                     选择译文
                                 </Button>
                             </StackPanel>

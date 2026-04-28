@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Utils;
 using FluentAvalonia.UI.Controls;
 using ReactiveUI;
-using System.Runtime.CompilerServices;
 using WebTranslator.Controls;
 using WebTranslator.Interfaces;
 using WebTranslator.Models;
@@ -179,12 +179,16 @@ public class OpenFileViewModel : ViewModelBase
     }
 
     private IStorageFolder? Folder { get; set; }
+    private string? OriginFolderPath { get; set; }
+    private string? ImportDisplayName { get; set; }
 
     private async Task OpenFolder()
     {
         var folders = await FilePickerService.OpenFolderPickerAsync(new FolderPickerOpenOptions());
         if (folders.Count != 1) return;
         Folder = folders[0];
+        OriginFolderPath = Folder.Path.LocalPath;
+        ImportDisplayName = Folder.Name;
         var files = Folder.GetItemsAsync();
         var fileList = new List<IFileInfo>();
         await foreach (var file in files)
@@ -261,14 +265,126 @@ public class OpenFileViewModel : ViewModelBase
 
     private async Task OpenOriginalFile()
     {
-        await Task.Delay(1000);
-        ToastService.Notify("未实现");
+        var files = await FilePickerService.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "选择原文语言文件",
+            AllowMultiple = false,
+            FileTypeFilter = LanguageFileTypes()
+        });
+        if (files.Count != 1) return;
+
+        await LoadOriginalStorageFile(files[0]);
     }
 
     private async Task OpenTranslatedFile()
     {
-        await Task.Delay(1000);
-        ToastService.Notify("未实现");
+        var files = await FilePickerService.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "选择译文语言文件",
+            AllowMultiple = false,
+            FileTypeFilter = LanguageFileTypes()
+        });
+        if (files.Count != 1) return;
+
+        TranslatedText = await File.ReadAllTextAsync(files[0].Path.LocalPath);
+        TabSelectedIndex = 1;
+        _previewFileStatus = ImportFileMode.Folder;
+        ToastService.Notify($"已载入译文文件: {files[0].Name}");
+    }
+
+    public async Task OpenPathAsync(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+
+        try
+        {
+            if (Directory.Exists(path))
+            {
+                var originalPath = FindOriginalLanguageFile(path);
+                if (originalPath is null)
+                {
+                    ToastService.Notify("启动路径中未找到 en_us.json 或 en_us.lang", NotificationType.Error);
+                    return;
+                }
+
+                await LoadOriginalPath(originalPath);
+                return;
+            }
+
+            if (File.Exists(path))
+            {
+                await LoadOriginalPath(path);
+                return;
+            }
+
+            ToastService.Notify($"启动路径不存在: {path}", NotificationType.Error);
+        }
+        catch (Exception e)
+        {
+            ToastService.Notify($"启动路径打开失败: {e.Message}", NotificationType.Error);
+        }
+    }
+
+    private async Task LoadOriginalStorageFile(IStorageFile file)
+    {
+        await LoadOriginalPath(file.Path.LocalPath);
+    }
+
+    private async Task LoadOriginalPath(string originalPath)
+    {
+        var folderPath = Path.GetDirectoryName(originalPath);
+        if (folderPath is null)
+        {
+            ToastService.Notify("无法识别原文文件所在文件夹", NotificationType.Error);
+            return;
+        }
+
+        OriginalText = await File.ReadAllTextAsync(originalPath);
+        var translatedPath = GetDefaultTranslatedPath(originalPath);
+        TranslatedText = translatedPath is not null && File.Exists(translatedPath)
+            ? await File.ReadAllTextAsync(translatedPath)
+            : "";
+
+        Folder = null;
+        OriginFolderPath = folderPath;
+        ImportDisplayName = Path.GetFileName(folderPath);
+        TabSelectedIndex = 1;
+        _previewFileStatus = ImportFileMode.Folder;
+        ProjectContextService.SetFolderPath(folderPath);
+
+        ToastService.Notify(translatedPath is not null && File.Exists(translatedPath)
+            ? $"已载入原文和译文: {Path.GetFileName(originalPath)} / {Path.GetFileName(translatedPath)}"
+            : $"已载入原文文件: {Path.GetFileName(originalPath)}");
+    }
+
+    private static string? FindOriginalLanguageFile(string folderPath)
+    {
+        foreach (var fileName in new[] { "en_us.json", "en_us.lang" })
+        {
+            var path = Path.Combine(folderPath, fileName);
+            if (File.Exists(path)) return path;
+        }
+
+        return Directory.EnumerateFiles(folderPath)
+            .FirstOrDefault(x => x.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+                                 x.EndsWith(".lang", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string? GetDefaultTranslatedPath(string originalPath)
+    {
+        var folderPath = Path.GetDirectoryName(originalPath);
+        if (folderPath is null) return null;
+        var extension = Path.GetExtension(originalPath);
+        return Path.Combine(folderPath, "zh_cn" + extension);
+    }
+
+    private static IReadOnlyList<FilePickerFileType> LanguageFileTypes()
+    {
+        return
+        [
+            new FilePickerFileType("Minecraft 语言文件") { Patterns = ["*.json", "*.lang"] },
+            FilePickerFileTypes.All
+        ];
     }
 
     public void ManualInputCommand()
@@ -283,56 +399,63 @@ public class OpenFileViewModel : ViewModelBase
 
     public void NextCommand()
     {
-        if (string.IsNullOrEmpty(OriginalText) && string.IsNullOrEmpty(TranslatedText))
+        if (string.IsNullOrWhiteSpace(OriginalText))
         {
-            ToastService.Notify("没有任何文本待翻译");
+            ToastService.Notify("没有原文内容待翻译");
             return;
         }
 
         ModDictionary dict;
-
-        switch (_previewFileStatus)
+        try
         {
-            case ImportFileMode.Github:
-                var id = GithubLinkStatus.Identifier.Split("/");
-                var cfid = id[^2];
-                var modid = id[^1];
-                var version = Helper.GetVersion(GithubLinkStatus.Version!);
-                dict = new ModDictionary(cfid, modid, version);
-                dict.LoadOriginalFile(OriginalText);
-                dict.LoadTranslatedFile(TranslatedText);
-                break;
-            case ImportFileMode.Folder:
-                if (Folder is null)
-                {
-                    ToastService.Notify("未选择文件夹", NotificationType.Error);
-                    return;
-                }
+            switch (_previewFileStatus)
+            {
+                case ImportFileMode.Github:
+                    var id = GithubLinkStatus.Identifier.Split("/");
+                    var cfid = id[^2];
+                    var modid = id[^1];
+                    var version = Helper.GetVersion(GithubLinkStatus.Version!);
+                    dict = new ModDictionary(cfid, modid, version);
+                    dict.LoadOriginalFile(OriginalText);
+                    dict.LoadTranslatedFile(TranslatedText);
+                    break;
+                case ImportFileMode.Folder:
+                    if (string.IsNullOrWhiteSpace(OriginFolderPath))
+                    {
+                        ToastService.Notify("未选择文件夹", NotificationType.Error);
+                        return;
+                    }
 
-                dict = new ModDictionary(Folder.Name, Folder.Path.AbsolutePath,
-                    OriginalText.Trim().StartsWith('{')
-                        ? MinecraftVersion.Version1Dot16
-                        : MinecraftVersion.Version1Dot12Dot2);
-                dict.LoadOriginalFile(OriginalText);
-                dict.LoadTranslatedFile(TranslatedText);
-                break;
-            case ImportFileMode.Manual:
-                dict = new ModDictionary("Manual", "Manual",
-                    OriginalText.Trim().StartsWith('{')
-                        ? MinecraftVersion.Version1Dot16
-                        : MinecraftVersion.Version1Dot12Dot2);
-                dict.LoadOriginalFile(OriginalText);
-                dict.LoadTranslatedFile(TranslatedText);
-                if (dict.TextDictionary.Count == 0 ||
-                    string.IsNullOrEmpty(dict.TextDictionary.First().Value.OriginalText))
-                {
-                    ToastService.Notify("输入文本无法解析", NotificationType.Error);
-                    return;
-                }
+                    dict = new ModDictionary(ImportDisplayName ?? "Local", OriginFolderPath,
+                        OriginalText.Trim().StartsWith('{')
+                            ? MinecraftVersion.Version1Dot16
+                            : MinecraftVersion.Version1Dot12Dot2);
+                    dict.LoadOriginalFile(OriginalText);
+                    dict.LoadTranslatedFile(TranslatedText);
+                    break;
+                case ImportFileMode.Manual:
+                    dict = new ModDictionary("Manual", "Manual",
+                        OriginalText.Trim().StartsWith('{')
+                            ? MinecraftVersion.Version1Dot16
+                            : MinecraftVersion.Version1Dot12Dot2);
+                    dict.LoadOriginalFile(OriginalText);
+                    dict.LoadTranslatedFile(TranslatedText);
+                    if (dict.TextDictionary.Count == 0 ||
+                        string.IsNullOrEmpty(dict.TextDictionary.First().Value.OriginalText))
+                    {
+                        ToastService.Notify("输入文本无法解析", NotificationType.Error);
+                        return;
+                    }
 
-                break;
-            default:
-                throw new NotImplementedException();
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.Notify($"输入文本无法解析: {e.Message}", NotificationType.Error);
+            return;
         }
 
         NavigationService.NavigatePage(1, dict);

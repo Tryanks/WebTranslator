@@ -29,7 +29,25 @@ public class EditorContentViewModel : ViewModelBase
         TranslatedCount = EditorList.Count(x => x.IsTranslated);
 
         ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SelectedIndex),
-            _ => TranslatedCount = EditorList.Count(x => x.IsTranslated));
+            _ =>
+            {
+                TranslatedCount = EditorList.Count(x => x.IsTranslated);
+                RefreshSuggestions();
+            });
+        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SearchQuery), _ => RefreshSearchResults());
+        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.SelectedSearchItem), item =>
+        {
+            if (item is null) return;
+            var index = EditorList.IndexOf(item);
+            if (index >= 0) SelectedIndex = index;
+            SearchQuery = "";
+            SelectedSearchItem = null;
+        });
+        ExtensionMethods.Subscribe(this.WhenAnyValue(x => x.MarkSameText), enabled =>
+        {
+            foreach (var item in EditorList)
+                item.MarkSameText = enabled;
+        });
 
         if (EditorList.Count > 0)
             SelectedIndex = 0;
@@ -41,9 +59,17 @@ public class EditorContentViewModel : ViewModelBase
     public ObservableCollection<EditorListItem> EditorList { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
     public int SelectedIndex { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = -1;
     public EditorListItem TranslationItem { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = null!;
+    public ObservableCollection<EditorListItem> SearchResults { get; } = [];
+    public ObservableCollection<TranslationSuggestion> Suggestions { get; } = [];
+    public bool HasSuggestions { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public string SearchQuery { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = "";
+    public bool HasSearchQuery { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public int SearchResultCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public EditorListItem? SelectedSearchItem { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } }
     public int TranslatedCount { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public int AllCount { get; set; }
     public bool AutoSkip { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } } = true;
+    public bool MarkSameText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public void SaveAll()
     {
@@ -67,6 +93,47 @@ public class EditorContentViewModel : ViewModelBase
             item.TranslatedText = item.OriginalText;
             item.Save();
         }
+    }
+
+    private void RefreshSearchResults()
+    {
+        SearchResults.Clear();
+        var query = SearchQuery.Trim();
+        HasSearchQuery = query.Length > 0;
+        if (!HasSearchQuery)
+        {
+            SearchResultCount = 0;
+            return;
+        }
+
+        foreach (var item in EditorList.Where(item =>
+                     item.Key.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                     item.OriginalText.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                     item.SavedTranslatedText.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                     item.TranslatedText.Contains(query, StringComparison.OrdinalIgnoreCase)))
+            SearchResults.Add(item);
+
+        SearchResultCount = SearchResults.Count;
+    }
+
+    private void RefreshSuggestions()
+    {
+        Suggestions.Clear();
+        if (TranslationItem is null)
+        {
+            HasSuggestions = false;
+            return;
+        }
+
+        foreach (var value in DictionaryService.GetTranslations(TranslationItem.OriginalText).Distinct())
+            Suggestions.Add(new TranslationSuggestion(value, ApplySuggestion));
+        HasSuggestions = Suggestions.Count > 0;
+    }
+
+    private void ApplySuggestion(string value)
+    {
+        if (TranslationItem is null) return;
+        TranslationItem.TranslatedText = value;
     }
 
     public void SaveItem()
@@ -161,6 +228,7 @@ public class EditorListItem : ViewModelBase
             if (FormatMode != FormatMode.None)
             {
                 var translatedFormats = FormatStringHelper.ExtractFormatStrings(s ?? "");
+                FormatSuggestions = GetMissingFormatStrings(translatedFormats);
                 FormatError = false;
 
                 if (FormatMode == FormatMode.Sorted)
@@ -178,6 +246,7 @@ public class EditorListItem : ViewModelBase
 
             TranslatedLineCount = TranslatedDoc.LineCount;
             EqualLines = OriginalLineCount <= TranslatedLineCount;
+            this.RaisePropertyChanged(nameof(IsSameTextMarked));
         });
 
         var cancel = false;
@@ -202,7 +271,12 @@ public class EditorListItem : ViewModelBase
         OriginalLineCount = OriginalDoc.LineCount;
         FormatMode = FormatStringHelper.DetermineFormatMode(original);
         if (FormatMode != FormatMode.None)
-            OriginalFormatStrings = FormatStringHelper.ExtractFormatStrings(original).OrderBy(f => f).ToList();
+        {
+            var formatStrings = FormatStringHelper.ExtractFormatStrings(original);
+            OriginalFormatStrings = FormatMode == FormatMode.Sorted
+                ? formatStrings.OrderBy(f => f).ToList()
+                : formatStrings;
+        }
         SavedTranslatedText = translated;
         TranslatedText = translated;
         TranslatedDoc.UndoStack.ClearAll();
@@ -215,6 +289,7 @@ public class EditorListItem : ViewModelBase
     private FormatMode FormatMode { get; }
     private List<string> OriginalFormatStrings { get; } = [];
     public bool FormatError { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
+    public IReadOnlyList<string> FormatSuggestions { get => field; set { if (Equals(value, field)) return; field = value; this.RaisePropertyChanged(); } } = [];
 
     public TextDocument OriginalDoc { get; set; } = new();
     public TextDocument TranslatedDoc { get; set; } = new();
@@ -228,6 +303,8 @@ public class EditorListItem : ViewModelBase
     public bool EqualLines { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
 
     public bool SameText => OriginalText == TranslatedText;
+    public bool MarkSameText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); this.RaisePropertyChanged(nameof(IsSameTextMarked)); } }
+    public bool IsSameTextMarked => MarkSameText && SameText;
     public bool IsEmpty => IsChanged || string.IsNullOrEmpty(SavedTranslatedText);
 
     public void Save()
@@ -247,5 +324,30 @@ public class EditorListItem : ViewModelBase
     {
         TranslatedText = "";
         TranslatedDoc.UndoStack.ClearAll();
+    }
+
+    private IReadOnlyList<string> GetMissingFormatStrings(List<string> translatedFormats)
+    {
+        if (OriginalFormatStrings.Count == 0) return [];
+
+        if (FormatMode == FormatMode.Format &&
+            translatedFormats.Count < OriginalFormatStrings.Count &&
+            OriginalFormatStrings.Take(translatedFormats.Count).SequenceEqual(translatedFormats))
+            return [OriginalFormatStrings[translatedFormats.Count]];
+
+        var missing = OriginalFormatStrings.ToList();
+        foreach (var format in translatedFormats)
+            missing.Remove(format);
+        return missing;
+    }
+}
+
+public class TranslationSuggestion(string text, Action<string> apply)
+{
+    public string Text { get; } = text;
+
+    public void Apply()
+    {
+        apply(Text);
     }
 }

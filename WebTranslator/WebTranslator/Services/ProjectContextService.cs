@@ -15,6 +15,12 @@ public static class ProjectContextService
         ImportMode = ImportFileMode.Folder;
     }
 
+    public static void SetFolderPath(string folderPath)
+    {
+        OriginFolderPath = folderPath;
+        ImportMode = ImportFileMode.Folder;
+    }
+
     public static void SetGithub()
     {
         OriginFolderPath = null;

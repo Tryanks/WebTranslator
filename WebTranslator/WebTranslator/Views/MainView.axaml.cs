@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using WebTranslator.Services;
+using WebTranslator.ViewModels;
 
 namespace WebTranslator.Views;
 
@@ -24,6 +25,10 @@ public partial class MainView : UserControl
                 item.Tag!.ToString() == index.ToString()) return;
             NavigationView.SelectedItem = NavigationView.MenuItems[(int)index];
         });
+
+        var startupPath = StartupPathService.Take();
+        if (!string.IsNullOrWhiteSpace(startupPath) && DataContext is MainViewModel vm)
+            _ = vm.OpenStartupPathAsync(startupPath);
     }
 
     private void NavigationView_OnSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
