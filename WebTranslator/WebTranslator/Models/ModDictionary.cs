@@ -3,26 +3,35 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WebTranslator.Models;
 
-public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVersion version)
+public class ModDictionary
 {
     public List<string> Keys = [];
     public Dictionary<string, TextElement> TextDictionary = new();
 
-    public string CurseForgeId { get; } = curseForgeId;
-    public string ModNamespace { get; } = modNamespace;
+    [JsonConstructor]
+    public ModDictionary(string curseForgeId, string modNamespace, MinecraftVersion version)
+    {
+        CurseForgeId = curseForgeId;
+        ModNamespace = modNamespace;
+        Version = version;
+    }
 
-    public MinecraftVersion Version { get; } = version;
+    public string CurseForgeId { get; }
+    public string ModNamespace { get; }
+
+    public MinecraftVersion Version { get; }
     public LangFormat Format => Version.GetFormat();
 
     public string Template { get; set; } = "";
 
     public static ModDictionary FromJson(string jsonString)
     {
-        var dict = JsonConvert.DeserializeObject<ModDictionary>(jsonString);
+        var dict = JsonSerializer.Deserialize(jsonString, WebTranslatorJsonContext.Default.ModDictionary);
         if (dict == null)
             throw new ArgumentException("Input text may not Minecraft Mod language file.");
         return dict;
@@ -87,17 +96,29 @@ public class ModDictionary(string curseForgeId, string modNamespace, MinecraftVe
 
     public string Export()
     {
-        var json = JsonConvert.SerializeObject(this);
+        var json = JsonSerializer.Serialize(this, WebTranslatorJsonContext.Default.ModDictionary);
         return json;
     }
 }
 
-public class TextElement(string k, string en, string template, string zh = "")
+public class TextElement
 {
-    public string Key { get; set; } = k;
-    public string OriginalText { get; set; } = en;
-    public string ReplaceTemplate { get; set; } = template;
-    public string TranslatedText { get => field; set { if (value == field) return; field = value; } } = zh;
+    public TextElement()
+    {
+    }
+
+    public TextElement(string key, string originalText, string replaceTemplate, string translatedText = "")
+    {
+        Key = key;
+        OriginalText = originalText;
+        ReplaceTemplate = replaceTemplate;
+        TranslatedText = translatedText;
+    }
+
+    public string Key { get; set; } = "";
+    public string OriginalText { get; set; } = "";
+    public string ReplaceTemplate { get; set; } = "";
+    public string TranslatedText { get; set; } = "";
 
     public override string ToString()
     {

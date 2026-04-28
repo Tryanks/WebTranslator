@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using WebTranslator.Interfaces;
 
 namespace WebTranslator.Models;
@@ -35,15 +36,14 @@ public static partial class GithubHelper
         httpClient.DefaultRequestHeaders.Add("User-Agent", "CFPATools WebTranslator");
 
         var response = await httpClient.GetStringAsync(apiUrl);
-        var allFiles = JArray.Parse(response);
+        var allFiles = JsonSerializer.Deserialize(response, WebTranslatorJsonContext.Default.ListGitHubContentItem) ?? [];
 
         return
         [
-            ..(from JObject? file in allFiles
-                where file["type"]!.ToString() == "file"
-                let name = file["name"]!.ToString()
-                let downloadUrl = file["download_url"]!.ToString()
-                select new GitHubFileInfo(name, downloadUrl)).ToList()
+            ..(from file in allFiles
+                where file.Type == "file"
+                where !string.IsNullOrWhiteSpace(file.Name) && !string.IsNullOrWhiteSpace(file.DownloadUrl)
+                select new GitHubFileInfo(file.Name, file.DownloadUrl)).ToList()
         ];
     }
 
@@ -82,6 +82,15 @@ public static partial class GithubHelper
 
     [GeneratedRegex(@"^https://github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/(blob|tree)/(?<branch>[^/]+)/(?<path>.*)$")]
     private static partial Regex MyRegex();
+}
+
+internal class GitHubContentItem
+{
+    public string Type { get; set; } = "";
+    public string Name { get; set; } = "";
+
+    [JsonPropertyName("download_url")]
+    public string DownloadUrl { get; set; } = "";
 }
 
 public class GitHubFileInfo(string name, string url) : IFileInfo

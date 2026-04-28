@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Avalonia.Platform;
-using Newtonsoft.Json.Linq;
 
 namespace WebTranslator.Services;
 
@@ -63,13 +63,20 @@ public static class DictionaryService
     private static Dictionary<string, List<string>> Parse(string json)
     {
         var result = new Dictionary<string, List<string>>();
-        var doc = JObject.Parse(json);
-        foreach (var property in doc.Properties())
+        using var doc = JsonDocument.Parse(json);
+        if (doc.RootElement.ValueKind != JsonValueKind.Object) return result;
+
+        foreach (var property in doc.RootElement.EnumerateObject())
         {
-            var values = property.Value switch
+            var values = property.Value.ValueKind switch
             {
-                JArray array => array.Values<string>().OfType<string>().Where(x => !string.IsNullOrWhiteSpace(x)).ToList(),
-                JValue value when value.Type == JTokenType.String => [value.Value<string>()!],
+                JsonValueKind.Array => property.Value.EnumerateArray()
+                    .Where(x => x.ValueKind == JsonValueKind.String)
+                    .Select(x => x.GetString())
+                    .OfType<string>()
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList(),
+                JsonValueKind.String => [property.Value.GetString()!],
                 _ => []
             };
 

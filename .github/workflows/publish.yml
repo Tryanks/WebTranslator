@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
 
@@ -60,18 +60,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
 
       # Optional: Add MsBuild to the PATH (not strictly required for dotnet publish)
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Publish (Windows, net9.0, AOT, self-contained)
         run: >-
@@ -92,7 +92,7 @@ jobs:
           Get-ChildItem publish -Include *.pdb,*.dbg -File -ErrorAction SilentlyContinue | Remove-Item -Force
 
       - name: Upload Windows Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-windows_amd64
           path: publish
@@ -102,12 +102,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
 
@@ -130,7 +130,7 @@ jobs:
           rm -f publish/*.pdb publish/*.dbg || true
 
       - name: Upload Ubuntu Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WebTranslator-linux_amd64
           path: publish
@@ -141,13 +141,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Windows Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WebTranslator-windows_amd64
           path: release/windows
 
       - name: Download Ubuntu Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: WebTranslator-linux_amd64
           path: release/ubuntu

@@ -159,24 +159,11 @@ public class OpenFileViewModel : ViewModelBase
         ProjectContextService.SetGithub();
     }
 
-    public async void OpenFileCommand(string s)
-    {
-        switch (s)
-        {
-            case "Folder":
-                await OpenFolder();
-                break;
-            case "Original":
-                await OpenOriginalFile();
-                break;
-            case "Translated":
-                await OpenTranslatedFile();
-                break;
-            default:
-                ToastService.Notify("无法打开文件", $"未知文件类型: {s}", NotificationType.Error);
-                break;
-        }
-    }
+    public async void OpenFolderCommand() => await OpenFolder();
+
+    public async void OpenOriginalFileCommand() => await OpenOriginalFile();
+
+    public async void OpenTranslatedFileCommand() => await OpenTranslatedFile();
 
     private IStorageFolder? Folder { get; set; }
     private string? OriginFolderPath { get; set; }

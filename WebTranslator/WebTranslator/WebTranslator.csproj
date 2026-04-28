@@ -6,23 +6,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.4" />
+        <PackageReference Include="Avalonia" Version="11.3.8" />
         <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.4" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.8" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.3.0.6" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
         <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.308-ci" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
         <PackageReference Include="Octokit.Reactive" Version="14.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <UpToDateCheckInput Remove="Controls\CheckedTextBlock.axaml"/>
+        <UpToDateCheckInput Remove="Controls\CheckedTextBlock.axaml" />
     </ItemGroup>
 </Project>

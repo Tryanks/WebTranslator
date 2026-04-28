@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace WebTranslator.Models;
 
@@ -10,7 +10,7 @@ public static class CyanInterfaces
     {
         var link = $"https://cfpa.cyan.cafe/api/CFPATools/PRRelation/{prNumber}";
         var json = await Utils.Request(link);
-        var doc = JsonConvert.DeserializeObject<ReviewPrMsg>(json);
+        var doc = JsonSerializer.Deserialize(json, WebTranslatorJsonContext.Default.ReviewPrMsg);
         return doc!;
     }
 }
