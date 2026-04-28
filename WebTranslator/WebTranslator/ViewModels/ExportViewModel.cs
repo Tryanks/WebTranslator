@@ -12,6 +12,7 @@ namespace WebTranslator.ViewModels;
 public class ExportViewModel : ViewModelBase
 {
     public TextDocument Document { get; set; } = new();
+    public TextDocument DiffDocument { get; set; } = new();
 
     public string? OldText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
     public string? NewText { get => field; set { if (value == field) return; field = value; this.RaisePropertyChanged(); } }
@@ -107,6 +108,7 @@ public class ExportViewModel : ViewModelBase
             LastSavedPath = target;
             OldText = Document.Text ?? string.Empty;
             NewText = Document.Text ?? string.Empty;
+            DiffDocument.Text = "";
             HasDiff = false;
             ToastService.Notify($"已保存到原文件: {target}", Avalonia.Controls.Notifications.NotificationType.Success);
         }
@@ -146,6 +148,7 @@ public class ExportViewModel : ViewModelBase
                     OldText = oldText;
                     NewText = Document.Text ?? string.Empty;
                     HasDiff = !string.Equals(OldText, NewText, StringComparison.Ordinal);
+                    DiffDocument.Text = HasDiff ? ComputeLineDiff(OldText, NewText) : "";
                 }
                 catch (Exception e)
                 {
@@ -153,6 +156,7 @@ public class ExportViewModel : ViewModelBase
                     OldText = string.Empty;
                     NewText = Document.Text ?? string.Empty;
                     HasDiff = true;
+                    DiffDocument.Text = ComputeLineDiff(OldText, NewText);
                 }
             }
             else
@@ -160,6 +164,7 @@ public class ExportViewModel : ViewModelBase
                 OldText = string.Empty;
                 NewText = Document.Text ?? string.Empty;
                 HasDiff = true;
+                DiffDocument.Text = ComputeLineDiff(OldText, NewText);
             }
             // Default to auto-save when opened from local folder
             AutoSaveToOrigin = true;
@@ -170,6 +175,7 @@ public class ExportViewModel : ViewModelBase
             HasDiff = false;
             OldText = null;
             NewText = null;
+            DiffDocument.Text = "";
         }
     }
 
@@ -178,5 +184,26 @@ public class ExportViewModel : ViewModelBase
         var text = Document.Text ?? string.Empty;
         TextLength = text.Length;
         LineCount = string.IsNullOrEmpty(text) ? 0 : text.Replace("\r\n", "\n").Split('\n').Length;
+    }
+
+    private static string ComputeLineDiff(string? oldText, string? newText)
+    {
+        var oldLines = (oldText ?? string.Empty).Replace("\r\n", "\n").Split('\n');
+        var newLines = (newText ?? string.Empty).Replace("\r\n", "\n").Split('\n');
+        var max = Math.Max(oldLines.Length, newLines.Length);
+        using var writer = new StringWriter();
+        writer.WriteLine("--- 原文件");
+        writer.WriteLine("+++ 导出内容");
+
+        for (var i = 0; i < max; i++)
+        {
+            var oldLine = i < oldLines.Length ? oldLines[i] : null;
+            var newLine = i < newLines.Length ? newLines[i] : null;
+            if (oldLine == newLine) continue;
+            if (oldLine is not null) writer.WriteLine($"- {oldLine}");
+            if (newLine is not null) writer.WriteLine($"+ {newLine}");
+        }
+
+        return writer.ToString();
     }
 }

@@ -8,8 +8,7 @@
              xmlns:vm="clr-namespace:WebTranslator.ViewModels"
              xmlns:edit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:fa="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentIcons.Avalonia.Fluent"
-             xmlns:diff="clr-namespace:DiffPlex.Avalonia.Controls;assembly=DiffPlex.Avalonia">
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent">
     <UserControl.Styles>
         <Style Selector="edit|TextEditor">
             <Setter Property="Margin" Value="{StaticResource TextControlThemePadding}" />
@@ -113,7 +112,17 @@
             <Border Classes="Card" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="{Binding HasDiff}">
                 <Grid RowDefinitions="Auto,*">
                     <TextBlock Grid.Row="0" Text="差异预览" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <diff:DiffViewer Grid.Row="1" OldText="{Binding OldText}" NewText="{Binding NewText}" IsSideBySide="True"/>
+                    <edit:TextEditor Grid.Row="1" Name="DiffEditor" IsReadOnly="True" Document="{Binding DiffDocument}">
+                        <edit:TextEditor.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{Binding ElementName=DiffEditor, Path=Copy}">
+                                    <MenuItem.Icon>
+                                        <ic:SymbolIcon Symbol="Copy" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </MenuFlyout>
+                        </edit:TextEditor.ContextFlyout>
+                    </edit:TextEditor>
                 </Grid>
             </Border>
 
