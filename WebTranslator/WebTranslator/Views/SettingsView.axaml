@@ -15,6 +15,19 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="{StaticResource ContentDialogPadding}" />
         </Style>
+        <Style Selector="Border.SettingsGroup">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="TextBlock.SettingHeader">
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="TextBlock.SettingDescription">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
     </UserControl.Styles>
     <ScrollViewer>
         <StackPanel Margin="{DynamicResource FlyoutContentPadding}" Spacing="16" MaxWidth="880">
@@ -33,59 +46,82 @@
                 </Grid>
             </Border>
 
-            <fa:SettingsExpander Header="词典状态">
-                <fa:SettingsExpander.Footer>
-                    <TextBlock Text="{Binding DictionaryStatusText}" />
-                </fa:SettingsExpander.Footer>
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="120,*" RowSpacing="10">
-                    <TextBlock Text="来源" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Grid.Column="1" Text="{Binding DictionarySourceText}" TextWrapping="Wrap" />
+            <Border Classes="SettingsGroup">
+                <StackPanel>
+                    <Border Padding="16">
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="SettingHeader" Text="词典状态" />
+                                <TextBlock Classes="SettingDescription" Text="当前本地词典的来源、条目数量和缓存位置。" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                       Text="{Binding DictionaryStatusText}" />
 
-                    <TextBlock Grid.Row="1" Text="条目" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DictionaryEntryCountText}" />
+                            <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,14,0,0"
+                                  RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                                  ColumnDefinitions="120,*" RowSpacing="10">
+                                <TextBlock Text="来源" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Column="1" Text="{Binding DictionarySourceText}" TextWrapping="Wrap" />
 
-                    <TextBlock Grid.Row="2" Text="大小" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DictionarySizeText}" />
+                                <TextBlock Grid.Row="1" Text="条目" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DictionaryEntryCountText}" />
 
-                    <TextBlock Grid.Row="3" Text="更新时间" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DictionaryUpdatedAtText}" />
+                                <TextBlock Grid.Row="2" Text="大小" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DictionarySizeText}" />
 
-                    <TextBlock Grid.Row="4" Text="位置" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding DictionaryLocationText}" TextWrapping="Wrap" />
-                </Grid>
-            </fa:SettingsExpander>
+                                <TextBlock Grid.Row="3" Text="更新时间" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DictionaryUpdatedAtText}" />
 
-            <fa:SettingsExpander Header="下载词典">
-                <fa:SettingsExpander.Footer>
-                    <Button Command="{Binding DownloadDictionaryCommand}" IsEnabled="{Binding CanStartOperation}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <fa:FAPathIcon Data="{StaticResource IconDownload}" />
-                            <TextBlock Text="下载或更新" />
-                        </StackPanel>
-                    </Button>
-                </fa:SettingsExpander.Footer>
-                <StackPanel Spacing="12">
-                    <TextBlock TextWrapping="Wrap"
-                               Text="下载源：https://github.com/CFPATools/i18n-dict/releases/latest 中的 Dict-Mini.json" />
-                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}"
-                                 IsVisible="{Binding HasDownloadProgress}" />
+                                <TextBlock Grid.Row="4" Text="位置" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding DictionaryLocationText}" TextWrapping="Wrap" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Height="1" Margin="16,0" Background="{DynamicResource CardStrokeColorDefaultBrush}" />
+
+                    <Border Padding="16">
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="16" RowSpacing="12">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="SettingHeader" Text="下载词典" />
+                                <TextBlock Classes="SettingDescription"
+                                           Text="下载源：https://github.com/CFPATools/i18n-dict/releases/latest 中的 Dict-Mini.json" />
+                            </StackPanel>
+                            <Button Grid.Column="1" VerticalAlignment="Center"
+                                    Command="{Binding DownloadDictionaryCommand}"
+                                    IsEnabled="{Binding CanStartOperation}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <fa:FAPathIcon Data="{StaticResource IconDownload}" />
+                                    <TextBlock Text="下载或更新" />
+                                </StackPanel>
+                            </Button>
+                            <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Minimum="0" Maximum="100"
+                                         Value="{Binding DownloadProgress}"
+                                         IsVisible="{Binding HasDownloadProgress}" />
+                        </Grid>
+                    </Border>
+
+                    <Border Height="1" Margin="16,0" Background="{DynamicResource CardStrokeColorDefaultBrush}" />
+
+                    <Border Padding="16">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="SettingHeader" Text="本地缓存" />
+                                <TextBlock Classes="SettingDescription"
+                                           Text="清除后翻译页不会再显示词典建议；重新下载后立即生效。" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Button Command="{Binding RefreshCommand}" IsEnabled="{Binding CanStartOperation}">
+                                    <TextBlock Text="刷新状态" />
+                                </Button>
+                                <Button Command="{Binding ClearDictionaryCommand}" IsEnabled="{Binding CanStartOperation}">
+                                    <TextBlock Text="清除词典" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </StackPanel>
-            </fa:SettingsExpander>
-
-            <fa:SettingsExpander Header="本地缓存">
-                <fa:SettingsExpander.Footer>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Command="{Binding RefreshCommand}" IsEnabled="{Binding CanStartOperation}">
-                            <TextBlock Text="刷新状态" />
-                        </Button>
-                        <Button Command="{Binding ClearDictionaryCommand}" IsEnabled="{Binding CanStartOperation}">
-                            <TextBlock Text="清除词典" />
-                        </Button>
-                    </StackPanel>
-                </fa:SettingsExpander.Footer>
-                <TextBlock TextWrapping="Wrap"
-                           Text="清除后翻译页不会再显示词典建议；重新下载后立即生效。" />
-            </fa:SettingsExpander>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
