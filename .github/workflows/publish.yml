@@ -27,6 +27,21 @@ jobs:
       - name: Publish (Browser, net9.0-browser)
         run: dotnet publish WebTranslator/WebTranslator.Browser -c Release -f net9.0-browser -o ./publish
 
+      - name: Download browser dictionary
+        run: |
+          release_json="$(mktemp)"
+          curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "User-Agent: CFPATools WebTranslator" \
+            https://api.github.com/repos/CFPATools/i18n-dict/releases/latest \
+            -o "$release_json"
+          download_url="$(jq -r '.assets[] | select(.name == "Dict-Mini.json") | .browser_download_url' "$release_json")"
+          if [ -z "$download_url" ] || [ "$download_url" = "null" ]; then
+            echo "Dict-Mini.json not found in latest i18n-dict release."
+            exit 1
+          fi
+          curl -fL "$download_url" -o ./publish/wwwroot/Dict-Mini.json
+
       - name: Upload Browser Build
         uses: actions/upload-artifact@v7
         with:

@@ -12,7 +12,9 @@ internal sealed partial class Program
 {
     private static async Task Main(string[] args)
     {
+        ShortcutDisplayService.SetUseAppleCommandModifier(BrowserShortcutPlatform.UsesAppleCommandModifier());
         DictionaryService.SetStorage(new BrowserDictionaryStorage());
+        DictionaryService.SetRemoteSource(new BrowserHostedDictionaryRemoteSource());
         await DictionaryService.InitializeAsync();
         await BuildAvaloniaApp().StartBrowserAppAsync("out");
     }

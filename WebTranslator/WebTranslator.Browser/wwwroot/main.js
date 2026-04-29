@@ -6,7 +6,16 @@ const FrameworkHashStorageKey = "WebTranslator.FrameworkResourceHash";
 
 const bootProgress = createBootProgress();
 
+globalThis.webTranslatorPlatform = {
+    platform() {
+        return navigator.userAgentData?.platform || navigator.platform || "";
+    }
+};
+
 globalThis.webTranslatorDictionary = {
+    dictionaryUrl() {
+        return new URL("Dict-Mini.json", document.baseURI).toString();
+    },
     async root() {
         if (!navigator.storage?.getDirectory) {
             throw new Error("当前浏览器不支持持久化本地存储");

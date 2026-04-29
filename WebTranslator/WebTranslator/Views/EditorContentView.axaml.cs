@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -11,6 +12,7 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
+using WebTranslator.Services;
 using WebTranslator.ViewModels;
 
 namespace WebTranslator.Views;
@@ -22,6 +24,7 @@ public partial class EditorContentView : UserControl
     public EditorContentView()
     {
         InitializeComponent();
+        AddHandler(KeyDownEvent, HandleShortcutKeyDown, RoutingStrategies.Tunnel);
         // ReSharper disable once StringLiteralTypo
         const string xsdText = """
                                <?xml version="1.0"?>
@@ -76,6 +79,62 @@ public partial class EditorContentView : UserControl
         var reader = new XmlTextReader(new StringReader(xsdText));
         _xsd = HighlightingLoader.LoadXshd(reader);
         reader.Close();
+    }
+
+    private void HandleShortcutKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not EditorContentViewModel vm) return;
+        if (HandleCommandShortcut(vm, e)) return;
+
+        if (!e.KeyModifiers.HasFlag(KeyModifiers.Alt)) return;
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta)) return;
+
+        var number = GetDigit(e.Key);
+        if (number is null) return;
+
+        e.Handled = vm.ApplySuggestionByShortcut(number.Value);
+    }
+
+    private static bool HandleCommandShortcut(EditorContentViewModel vm, KeyEventArgs e)
+    {
+        if (e.Handled) return true;
+
+        var handled = e.Key switch
+        {
+            Key.S when ShortcutDisplayService.IsCommandShortcut(e.KeyModifiers) => Execute(vm.SaveAll),
+            Key.C when ShortcutDisplayService.IsCommandShortcut(e.KeyModifiers, shift: true) =>
+                Execute(vm.TranslationItem.Clear),
+            Key.N when ShortcutDisplayService.IsCommandShortcut(e.KeyModifiers, shift: true) => Execute(vm.NextItem),
+            Key.B when ShortcutDisplayService.IsCommandShortcut(e.KeyModifiers, shift: true) => Execute(vm.PrevItem),
+            Key.N when ShortcutDisplayService.IsCommandShortcut(e.KeyModifiers) => Execute(vm.SkipItem),
+            _ => false
+        };
+
+        e.Handled = handled;
+        return handled;
+    }
+
+    private static bool Execute(Action action)
+    {
+        action();
+        return true;
+    }
+
+    private static int? GetDigit(Key key)
+    {
+        return key switch
+        {
+            Key.D1 or Key.NumPad1 => 1,
+            Key.D2 or Key.NumPad2 => 2,
+            Key.D3 or Key.NumPad3 => 3,
+            Key.D4 or Key.NumPad4 => 4,
+            Key.D5 or Key.NumPad5 => 5,
+            Key.D6 or Key.NumPad6 => 6,
+            Key.D7 or Key.NumPad7 => 7,
+            Key.D8 or Key.NumPad8 => 8,
+            Key.D9 or Key.NumPad9 => 9,
+            _ => null
+        };
     }
 
     private void InitializeComponent()

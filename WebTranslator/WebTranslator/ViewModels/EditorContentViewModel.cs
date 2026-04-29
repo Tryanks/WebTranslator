@@ -47,6 +47,9 @@ public class EditorContentViewModel : ViewModelBase
     public EditorListItem TranslationItem { get => field; set { if (!SetProperty(ref field, value)) return; RefreshSuggestions(); } } = null!;
     public ObservableCollection<EditorListItem> SearchResults { get; } = [];
     public ObservableCollection<TranslationSuggestion> Suggestions { get; } = [];
+    public string CommandModifierText => ShortcutDisplayService.CommandModifier;
+    public string CommandShiftModifierText => ShortcutDisplayService.CommandShiftModifier;
+    public string SuggestionShortcutModifierText => ShortcutDisplayService.AltModifier;
     public bool HasSuggestions { get => field; set => SetProperty(ref field, value); }
     public string SearchQuery { get => field; set { if (!SetProperty(ref field, value)) return; RefreshSearchResults(); } } = "";
     public bool HasSearchQuery { get => field; set => SetProperty(ref field, value); }
@@ -132,8 +135,9 @@ public class EditorContentViewModel : ViewModelBase
             return;
         }
 
+        var index = 1;
         foreach (var value in DictionaryService.GetTranslations(TranslationItem.OriginalText).Distinct())
-            Suggestions.Add(new TranslationSuggestion(value, ApplySuggestion));
+            Suggestions.Add(new TranslationSuggestion(value, ApplySuggestion, index++));
         HasSuggestions = Suggestions.Count > 0;
     }
 
@@ -141,6 +145,13 @@ public class EditorContentViewModel : ViewModelBase
     {
         if (TranslationItem is null) return;
         TranslationItem.TranslatedText = value;
+    }
+
+    public bool ApplySuggestionByShortcut(int number)
+    {
+        if (number < 1 || number > Suggestions.Count) return false;
+        Suggestions[number - 1].Apply();
+        return true;
     }
 
     public void SaveItem()
@@ -348,9 +359,11 @@ public class EditorListItem : ViewModelBase
     }
 }
 
-public class TranslationSuggestion(string text, Action<string> apply)
+public class TranslationSuggestion(string text, Action<string> apply, int shortcutNumber)
 {
     public string Text { get; } = text;
+    public int ShortcutNumber { get; } = shortcutNumber;
+    public string ShortcutText => $"{ShortcutDisplayService.AltModifier}+{ShortcutNumber}";
 
     public void Apply()
     {

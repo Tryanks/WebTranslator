@@ -16,6 +16,8 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        BrowserClipboardShortcutService.Register();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             StartupPathService.Set(desktop.Args);

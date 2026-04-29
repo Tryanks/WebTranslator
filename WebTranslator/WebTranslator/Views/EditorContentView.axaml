@@ -38,6 +38,30 @@
         <Style Selector="StackPanel.ShortCut TextBlock">
             <Setter Property="FontSize" Value="12" />
         </Style>
+        <Style Selector="Border.KeyCap">
+            <Setter Property="MinWidth" Value="24" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="6,0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+        </Style>
+        <Style Selector="Border.KeyCap TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="fa|FAPathIcon.ShortcutIcon">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+        <Style Selector="fa|FAPathIcon.ShortcutIcon.Disabled">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+        </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,*" Margin="{DynamicResource FlyoutContentPadding}">
         <fa:CommandBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DefaultLabelPosition="Right" Margin="0,-8,0,8">
@@ -266,8 +290,11 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:TranslationSuggestion">
-                                <Button Margin="0,0,8,8" Command="{Binding Apply}">
+                                <Button Margin="0,0,8,8" Command="{Binding Apply}" ToolTip.Tip="{Binding ShortcutText}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Classes="KeyCap">
+                                            <TextBlock Text="{Binding ShortcutNumber}" />
+                                        </Border>
                                         <fa:FAPathIcon Data="{StaticResource IconBook}" />
                                         <TextBlock Text="{Binding Text}" />
                                     </StackPanel>
@@ -288,52 +315,94 @@
 
                     <TextBlock IsVisible="{Binding TranslationItem.FormatError}">格式化字符串与原文不匹配</TextBlock>
                 </StackPanel>
-                <StackPanel Spacing="4" VerticalAlignment="Bottom" Classes="ShortCut">
-                    <!-- <Grid> -->
-                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+1</TextBlock> -->
-                    <!--     <TextBlock HorizontalAlignment="Right">应用第一个翻译</TextBlock> -->
-                    <!-- </Grid> -->
-                    <!-- <Grid> -->
-                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+2</TextBlock> -->
-                    <!--     <TextBlock HorizontalAlignment="Right">应用第二个翻译</TextBlock> -->
-                    <!-- </Grid> -->
-                    <!-- <Grid> -->
-                    <!--     <TextBlock HorizontalAlignment="Left">Ctrl+Shift+3</TextBlock> -->
-                    <!--     <TextBlock HorizontalAlignment="Right">应用第三个翻译</TextBlock> -->
-                    <!-- </Grid> -->
+                <StackPanel Spacing="6" VerticalAlignment="Bottom" Classes="ShortCut">
                     <Separator Height="0" Opacity="0" />
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+S</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">暂存所有结果</TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="暂存所有结果">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconSaveAs}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding CommandModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="S" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+C</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">清空</TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="清空当前译文">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconDelete}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding CommandShiftModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="C" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+B</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">上一个</TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="上一个">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconImport}">
+                            <fa:FAPathIcon.RenderTransform>
+                                <RotateTransform Angle="180" />
+                            </fa:FAPathIcon.RenderTransform>
+                        </fa:FAPathIcon>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding CommandShiftModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="B" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+Shift+N</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">下一个</TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="下一个">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconImport}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding CommandShiftModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="N" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Ctrl+N</TextBlock>
-                        <TextBlock HorizontalAlignment="Right">跳过</TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="跳过">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconCheckCircle}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding CommandModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="N" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
-                    <Grid>
-                        <TextBlock HorizontalAlignment="Left">Enter</TextBlock>
-                        <TextBlock HorizontalAlignment="Right" IsVisible="{Binding TranslationItem.EqualLines}">
-                            <Run Foreground="{DynamicResource TextFillColorDisabled}">换行</Run>
-                            <Run>|</Run>
-                            <Run>提交</Run>
-                        </TextBlock>
-                        <TextBlock HorizontalAlignment="Right" IsVisible="{Binding !TranslationItem.EqualLines}">
-                            <Run>换行</Run>
-                            <Run>|</Run>
-                            <Run Foreground="{DynamicResource TextFillColorDisabled}">提交</Run>
-                        </TextBlock>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="Enter 换行或提交">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <fa:FAPathIcon Classes="ShortcutIcon Disabled" Data="{StaticResource IconLines}"
+                                           IsVisible="{Binding TranslationItem.EqualLines}" />
+                            <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconLines}"
+                                           IsVisible="{Binding !TranslationItem.EqualLines}" />
+                            <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconCheckCircle}"
+                                           IsVisible="{Binding TranslationItem.EqualLines}" />
+                            <fa:FAPathIcon Classes="ShortcutIcon Disabled" Data="{StaticResource IconCheckCircle}"
+                                           IsVisible="{Binding !TranslationItem.EqualLines}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="Enter" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ToolTip.Tip="应用词典推荐">
+                        <fa:FAPathIcon Classes="ShortcutIcon" Data="{StaticResource IconBook}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="{Binding SuggestionShortcutModifierText}" />
+                            </Border>
+                            <Border Classes="KeyCap">
+                                <TextBlock Text="1-9" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </Grid>

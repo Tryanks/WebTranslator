@@ -85,7 +85,7 @@
                             <StackPanel Spacing="4">
                                 <TextBlock Classes="SettingHeader" Text="下载词典" />
                                 <TextBlock Classes="SettingDescription"
-                                           Text="下载源：https://github.com/CFPATools/i18n-dict/releases/latest 中的 Dict-Mini.json" />
+                                           Text="桌面端从 GitHub Release 下载；网页版从站点同源缓存下载 Dict-Mini.json。" />
                             </StackPanel>
                             <Button Grid.Column="1" VerticalAlignment="Center"
                                     Command="{Binding DownloadDictionaryCommand}"

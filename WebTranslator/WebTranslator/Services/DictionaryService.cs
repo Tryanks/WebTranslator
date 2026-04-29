@@ -12,11 +12,10 @@ namespace WebTranslator.Services;
 
 public static class DictionaryService
 {
-    private const string ReleaseApiUrl = "https://api.github.com/repos/CFPATools/i18n-dict/releases/latest";
-    private const string DictionaryAssetName = "Dict-Mini.json";
     private static Dictionary<string, List<string>>? Entries { get; set; }
     private static bool Initialized { get; set; }
     private static IDictionaryStorage Storage { get; set; } = new FileDictionaryStorage();
+    private static IDictionaryRemoteSource RemoteSource { get; set; } = new GitHubReleaseDictionaryRemoteSource();
     private static DictionaryStatus Status { get; set; } =
         new(false, 0, "未安装", "", "", null, 0, Storage.DisplayLocation);
 
@@ -26,6 +25,11 @@ public static class DictionaryService
         Entries = null;
         Initialized = false;
         Status = new DictionaryStatus(false, 0, "未安装", "", "", null, 0, storage.DisplayLocation);
+    }
+
+    public static void SetRemoteSource(IDictionaryRemoteSource remoteSource)
+    {
+        RemoteSource = remoteSource;
     }
 
     public static DictionaryStatus GetStatus()
@@ -70,24 +74,13 @@ public static class DictionaryService
     public static async Task<DictionaryStatus> DownloadLatestAsync(IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        using var client = CreateClient();
-        using var releaseResponse = await client.GetAsync(ReleaseApiUrl, cancellationToken);
-        releaseResponse.EnsureSuccessStatusCode();
-
-        await using var releaseStream = await releaseResponse.Content.ReadAsStreamAsync(cancellationToken);
-        var release = await JsonSerializer.DeserializeAsync(releaseStream,
-            WebTranslatorJsonContext.Default.GitHubRelease, cancellationToken);
-        var asset = release?.Assets.FirstOrDefault(x => x.Name == DictionaryAssetName);
-        if (asset?.BrowserDownloadUrl is null)
-            throw new InvalidOperationException($"最新 Release 中未找到 {DictionaryAssetName}。");
-
-        var json = await DownloadStringAsync(client, asset.BrowserDownloadUrl, progress, cancellationToken);
-        var entries = Parse(json);
+        var download = await RemoteSource.DownloadAsync(progress, cancellationToken);
+        var entries = Parse(download.Json);
         if (entries.Count == 0)
             throw new InvalidOperationException("下载的词典为空或格式不可识别。");
 
-        await Storage.WriteTextAsync(json);
-        ApplyEntries(entries, release?.Name ?? release?.TagName ?? "最新词典", release?.PublishedAt, asset.Size);
+        await Storage.WriteTextAsync(download.Json);
+        ApplyEntries(entries, download.SourceName, download.UpdatedAt, download.Size);
         return Status;
     }
 
@@ -142,14 +135,15 @@ public static class DictionaryService
             Storage.DisplayLocation);
     }
 
-    private static HttpClient CreateClient()
+    public static HttpClient CreateClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("CFPATools WebTranslator");
+        if (!OperatingSystem.IsBrowser())
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("CFPATools WebTranslator");
         return client;
     }
 
-    private static async Task<string> DownloadStringAsync(HttpClient client, string url, IProgress<double>? progress,
+    public static async Task<string> DownloadStringAsync(HttpClient client, string url, IProgress<double>? progress,
         CancellationToken cancellationToken)
     {
         using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
@@ -216,6 +210,17 @@ public static class DictionaryService
     }
 }
 
+public interface IDictionaryRemoteSource
+{
+    Task<DictionaryDownload> DownloadAsync(IProgress<double>? progress, CancellationToken cancellationToken);
+}
+
+public sealed record DictionaryDownload(
+    string Json,
+    string SourceName,
+    DateTimeOffset? UpdatedAt,
+    long Size);
+
 public interface IDictionaryStorage
 {
     string DisplayLocation { get; }
@@ -280,5 +285,34 @@ internal sealed class FileDictionaryStorage : IDictionaryStorage
     {
         if (OperatingSystem.IsBrowser() || !File.Exists(DictionaryPath)) return null;
         return File.GetLastWriteTime(DictionaryPath);
+    }
+}
+
+internal sealed class GitHubReleaseDictionaryRemoteSource : IDictionaryRemoteSource
+{
+    private const string ReleaseApiUrl = "https://api.github.com/repos/CFPATools/i18n-dict/releases/latest";
+    private const string DictionaryAssetName = "Dict-Mini.json";
+
+    public async Task<DictionaryDownload> DownloadAsync(IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        using var client = DictionaryService.CreateClient();
+        using var releaseResponse = await client.GetAsync(ReleaseApiUrl, cancellationToken);
+        releaseResponse.EnsureSuccessStatusCode();
+
+        await using var releaseStream = await releaseResponse.Content.ReadAsStreamAsync(cancellationToken);
+        var release = await JsonSerializer.DeserializeAsync(releaseStream,
+            WebTranslatorJsonContext.Default.GitHubRelease, cancellationToken);
+        var asset = release?.Assets.FirstOrDefault(x => x.Name == DictionaryAssetName);
+        if (asset?.BrowserDownloadUrl is null)
+            throw new InvalidOperationException($"最新 Release 中未找到 {DictionaryAssetName}。");
+
+        var json = await DictionaryService.DownloadStringAsync(client, asset.BrowserDownloadUrl, progress,
+            cancellationToken);
+        return new DictionaryDownload(
+            json,
+            release?.Name ?? release?.TagName ?? "最新词典",
+            release?.PublishedAt,
+            asset.Size);
     }
 }
